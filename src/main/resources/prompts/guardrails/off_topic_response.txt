@@ -1,0 +1,6 @@
+{
+  "message": "Xin lỗi, tôi chỉ có thể hỗ trợ các câu hỏi liên quan đến tiếng Nhật và luyện thi JLPT. Bạn có muốn hỏi gì về bài học hôm nay không?",
+  "quiz": null,
+  "related_grammar": [],
+  "difficulty_feedback": null
+}

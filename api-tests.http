@@ -1,0 +1,41 @@
+### 1. Test Giải thích Ngữ pháp (Grammar Explain)
+POST http://localhost:8080/api/ai/chat
+Content-Type: application/json
+
+{
+  "useCase": "GRAMMAR_EXPLAIN",
+  "userContext": {
+    "user_name": "Minh",
+    "jlpt_level": "N4",
+    "last_mock_score": "80",
+    "weak_sections": "Ngữ pháp",
+    "streak_days": "5"
+  },
+  "params": {
+    "grammar_point": "〜てもいいですか (Cho phép làm gì đó)",
+    "jlpt_level": "N4",
+    "user_message": "Sensei ơi, giải thích giúp em cấu trúc này với ạ!"
+  }
+}
+
+###
+
+### 2. Test Chấm Câu (Writing Check)
+POST http://localhost:8080/api/ai/chat
+Content-Type: application/json
+
+{
+  "useCase": "WRITING_CHECK",
+  "userContext": {
+    "user_name": "Minh",
+    "jlpt_level": "N4",
+    "last_mock_score": "80",
+    "weak_sections": "Viết",
+    "streak_days": "5"
+  },
+  "params": {
+    "user_sentence": "私は昨日公園で友達を会いました。",
+    "jlpt_level": "N4",
+    "current_topic": "Hành động quá khứ"
+  }
+}

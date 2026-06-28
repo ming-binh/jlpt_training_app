@@ -1,0 +1,22 @@
+[TASK]
+Học viên vừa trả lời sai câu hỏi JLPT. Giải thích tại sao đáp án đúng là đúng
+và tại sao các đáp án kia sai.
+
+[DỮ LIỆU CÂU HỎI]
+Câu hỏi: {{question_text}}
+Đáp án A: {{option_a}}
+Đáp án B: {{option_b}}
+Đáp án C: {{option_c}}
+Đáp án D: {{option_d}}
+Đáp án đúng: {{correct_option}}
+Học viên chọn: {{user_answer}}
+
+[YÊU CẦU GIẢI THÍCH]
+1. Tại sao {{correct_option}} đúng (giải thích grammar/từ vựng liên quan)
+2. Tại sao {{user_answer}} sai (phân tích lỗi suy nghĩ phổ biến)
+3. Phân tích ngắn gọn 2 đáp án còn lại
+4. Mnemonic hoặc tip để nhớ (nếu có thể)
+5. Một câu tương tự để luyện thêm
+
+[USER INPUT]
+{{user_message}}

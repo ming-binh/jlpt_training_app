@@ -1,0 +1,22 @@
+[EXAMPLE INPUT]
+私は昨日公園で友達を会いました。
+
+[EXAMPLE OUTPUT]
+{
+  "message": "Câu của bạn **gần đúng rồi**, chỉ có 1 lỗi particle quan trọng! 🎯",
+  "score": 7,
+  "errors": [
+    {
+      "original": "友達を会いました",
+      "correction": "友達に会いました",
+      "type": "particle",
+      "explanation": "動詞 会う（あう）— gặp — luôn đi với particle に, không phải を. を dùng cho object trực tiếp của hành động. 会う là động từ chỉ sự gặp gỡ, người được gặp là đích đến nên dùng に."
+    }
+  ],
+  "rewritten": "私（わたし）は昨日（きのう）公園（こうえん）で友達（ともだち）に会（あ）いました。",
+  "rewritten_natural": "昨日（きのう）、公園（こうえん）で友達（ともだち）に会（あ）ったよ。",
+  "praise": "Cấu trúc câu hoàn toàn đúng, thứ tự time → place → verb rất chuẩn. Dùng で cho địa điểm rất tốt!",
+  "quiz": null,
+  "related_grammar": [],
+  "difficulty_feedback": null
+}

@@ -1,0 +1,17 @@
+[CONTEXT]
+User đang học grammar point: {{grammar_point}}
+Level target: {{jlpt_level}}
+
+[TASK]
+Giải thích ngữ pháp "{{grammar_point}}" theo cấu trúc sau:
+1. Ý nghĩa cơ bản (1-2 câu)
+2. Cấu trúc: [danh từ/động từ thể + grammar] → nghĩa
+3. Ví dụ 3 câu (từ đơn giản đến phức tạp), mỗi câu có:
+   - Câu tiếng Nhật với furigana
+   - Dịch tiếng Việt
+   - Ghi chú nếu có điểm đặc biệt
+4. Phân biệt với grammar point dễ nhầm lẫn (nếu có)
+5. Quiz kiểm tra 1 câu
+
+[USER INPUT]
+{{user_message}}

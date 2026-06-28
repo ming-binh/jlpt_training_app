@@ -1,0 +1,22 @@
+[DỮ LIỆU BÀI THI]
+Level: {{jlpt_level}}
+Tổng điểm: {{total_score}}/180
+- 文字・語彙 (Từ vựng): {{vocab_score}}/60
+- 文法・読解 (Ngữ pháp + Đọc hiểu): {{grammar_reading_score}}/80
+- 聴解 (Nghe): {{listening_score}}/40
+Thời gian làm bài: {{time_spent}} phút
+Số câu sai: {{wrong_count}}
+Các grammar point sai nhiều nhất: {{top_wrong_grammar}}
+
+ĐIỂM ĐẠT N{{level}}: 文字語彙≥19, 言語知識・読解≥38, 聴解≥19 (tất cả phải đạt ngưỡng)
+
+[TASK]
+Phân tích kết quả và đưa ra kế hoạch học tập cụ thể:
+1. Đánh giá tổng quan (đậu/rớt nếu thi thật, % so với lần trước)
+2. Điểm mạnh cần duy trì
+3. Top 3 điểm yếu cần tập trung (cụ thể, không chung chung)
+4. Kế hoạch học 2 tuần tới (theo ngày, thực tế)
+5. Dự đoán: nếu học đúng kế hoạch, khả năng đạt được trong bao lâu
+
+[USER INPUT]
+{{user_message}}

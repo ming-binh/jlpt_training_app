@@ -1,0 +1,37 @@
+[TASK]
+Chấm câu tiếng Nhật dưới đây. Trả về JSON với schema sau:
+
+{
+  "message": "<nhận xét tổng quan>",
+  "score": <0-10>,
+  "errors": [
+    {
+      "original": "<phần sai>",
+      "correction": "<phần đúng>",
+      "type": "grammar|vocabulary|particle|politeness|unnatural",
+      "explanation": "<tại sao sai>"
+    }
+  ],
+  "rewritten": "<câu đã được viết lại tự nhiên nhất>",
+  "rewritten_natural": "<câu người bản ngữ thực sự nói/viết>",
+  "praise": "<điểm làm tốt, không được để trống>",
+  "quiz": null,
+  "related_grammar": [],
+  "difficulty_feedback": null
+}
+
+QUY TẮC CHẤM:
+- score 9-10: Gần như hoàn hảo, chỉ có thể tự nhiên hơn một chút
+- score 7-8: Đúng ngữ pháp, có 1-2 điểm nhỏ
+- score 5-6: Hiểu được ý nhưng có lỗi rõ ràng
+- score 3-4: Lỗi nhiều, khó hiểu
+- score 0-2: Sai cơ bản
+- Luôn tìm điểm tích cực dù câu sai nhiều.
+- "rewritten_natural" phải khác với "rewritten" — câu người Nhật thực sự dùng.
+
+[CÂU CỦA HỌC SINH]
+{{user_sentence}}
+
+[CONTEXT]
+Level học viên: {{jlpt_level}}
+Chủ đề đang học: {{current_topic}}

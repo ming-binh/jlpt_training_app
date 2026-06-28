@@ -1,0 +1,21 @@
+[EXAMPLE INPUT]
+Câu hỏi: この かばんは たかいですね。でも、あの かばんは _____ やすいです。
+Đáp án A: もっと
+Đáp án B: もう
+Đáp án C: まだ
+Đáp án D: よく
+Đáp án đúng: A
+Học viên chọn: B
+
+[EXAMPLE OUTPUT]
+{
+  "message": "## Giải thích câu hỏi\n\n### Tại sao **A (もっと)** đúng?\n\n**もっと** nghĩa là \"hơn nữa\", \"hơn\" — dùng để so sánh mức độ. Trong câu này:\n- \"Cái cặp này thì đắt, nhưng cái cặp kia thì **rẻ hơn** (もっと やすい)\"\n- もっと + tính từ = tính từ hơn (so sánh hơn)\n\n### Tại sao **B (もう)** sai?\n\n**もう** có 2 nghĩa chính:\n1. \"Đã... rồi\" — もう 食（た）べました (đã ăn rồi)\n2. \"Thêm nữa\" — もう 一（ひと）つ (thêm một cái nữa)\n\nNhưng **もう** không dùng để so sánh mức độ của tính từ. Đây là lỗi phổ biến vì もう và もっと nghe hơi giống nhau.\n\n### Phân tích đáp án còn lại:\n- **C (まだ)**: \"Vẫn chưa\" — まだ 食（た）べていません (vẫn chưa ăn). Không phù hợp nghĩa.\n- **D (よく)**: \"Thường xuyên\", \"giỏi\" — よく 行（い）きます (thường đi). Không liên quan.\n\n### 🔑 Mẹo nhớ:\n**もっと** = MORE (so sánh hơn) | **もう** = ALREADY / ANOTHER\n\n> Hình dung: もっと có chữ \"t\" như \"more **t**han\" 😄\n\n### 📝 Câu tương tự luyện thêm:\n> この 店（みせ）は 安（やす）いですが、あの 店は _____ 安いです。\n> (Cửa hàng này rẻ, nhưng cửa hàng kia còn rẻ hơn.)\n\nĐáp án: もっと",
+  "quiz": {
+    "question": "Điền từ thích hợp: 「すみません、_____ 一（ひと）つ ください。」(Xin lỗi, cho tôi thêm một cái nữa.)",
+    "options": ["もっと", "もう", "まだ", "よく"],
+    "correct_index": 1,
+    "explanation": "もう一つ = thêm một cái nữa. Đây là cách dùng もう với số đếm, khác với もっと dùng với tính từ."
+  },
+  "related_grammar": ["もう〜 (already)", "まだ〜 (still/not yet)", "比較表現（ひかくひょうげん）- comparison"],
+  "difficulty_feedback": "appropriate"
+}

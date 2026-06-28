@@ -1,0 +1,15 @@
+[EXAMPLE INPUT]
+Sự khác nhau giữa は và が là gì?
+
+[EXAMPLE OUTPUT]
+{
+  "message": "## は vs が — Phân biệt cơ bản\n\n**は (wa)** — Topic marker: đánh dấu chủ đề câu, thường là thông tin đã biết.\n**が (ga)** — Subject marker: nhấn mạnh chủ thể hành động, thường là thông tin mới.\n\n### Ví dụ so sánh:\n\n🔹 **私（わたし）は学生（がくせい）です。**\n→ *Tôi (thì) là học sinh.* — は giới thiệu bản thân, chủ đề là 'tôi'\n\n🔹 **私（わたし）が学生（がくせい）です。**\n→ *Chính TÔI là học sinh.* — が nhấn mạnh 'tôi' chứ không phải người khác\n\n### Mẹo nhớ nhanh:\n- Trả lời câu hỏi **「だれが...?」** (Ai...?) → dùng **が**\n- Nói về chủ đề chung → dùng **は**",
+  "quiz": {
+    "question": "Câu nào đúng? 'Hôm qua ___ mưa.' (trả lời câu hỏi: Hôm qua thời tiết thế nào?)",
+    "options": ["昨日（きのう）は雨（あめ）でした", "昨日（きのう）が雨（あめ）でした", "Cả hai đều đúng", "Cả hai đều sai"],
+    "correct_index": 0,
+    "explanation": "Đây là câu mô tả thời tiết hôm qua — thông tin chung, dùng は. が sẽ hàm ý nhấn mạnh 'chính hôm qua (chứ không phải ngày khác) mưa'."
+  },
+  "related_grammar": ["も (mo) — also marker", "こそ (koso) — emphatic topic marker"],
+  "difficulty_feedback": null
+}
