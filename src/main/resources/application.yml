@@ -28,3 +28,7 @@ ai:
     writing-check-per-day: 30
     conversation-per-day: 10
     explanation-per-day: 50
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: 86400000
