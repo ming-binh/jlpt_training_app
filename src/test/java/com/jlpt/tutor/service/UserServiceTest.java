@@ -74,6 +74,6 @@ class UserServiceTest {
         Optional<User> result = userService.findById("user-001");
 
         assertTrue(result.isPresent());
-        assertEquals("Minh", result.get().getUsername());
+        assertEquals("Minh", result.get().getDisplayName());
     }
 }

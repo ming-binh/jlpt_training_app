@@ -3,6 +3,7 @@ package com.jlpt.tutor.controller;
 import com.jlpt.tutor.dto.AiRequest;
 import com.jlpt.tutor.dto.AiResponse;
 import com.jlpt.tutor.entity.Conversation;
+import com.jlpt.tutor.entity.User;
 import com.jlpt.tutor.model.Message;
 import com.jlpt.tutor.service.ConversationService;
 import com.jlpt.tutor.service.GeminiService;
@@ -13,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 
@@ -33,9 +35,10 @@ public class ChatController {
 
     @PostMapping("/chat")
     public AiResponse chat(
-            @RequestHeader(value = "X-User-Id", required = false) String userId,
+            Authentication authentication,
             @Valid @RequestBody AiRequest request) {
 
+        String userId = getUserId(authentication);
         enrichRequest(userId, request);
         String userMessage = extractUserMessage(request);
 
@@ -71,9 +74,10 @@ public class ChatController {
 
     @PostMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> chatStream(
-            @RequestHeader(value = "X-User-Id", required = false) String userId,
+            Authentication authentication,
             @Valid @RequestBody AiRequest request) {
 
+        String userId = getUserId(authentication);
         enrichRequest(userId, request);
         String userMessage = extractUserMessage(request);
 
@@ -88,6 +92,13 @@ public class ChatController {
         rateLimitService.checkRateLimit(userId, request.getUseCase());
 
         return geminiService.chatStream(request);
+    }
+
+    private String getUserId(Authentication authentication) {
+        if (authentication != null && authentication.getPrincipal() instanceof User user) {
+            return user.getId();
+        }
+        return null;
     }
 
     /**

@@ -27,7 +27,7 @@ public class UserService {
         return userRepository.findById(userId)
                 .map(user -> {
                     Map<String, String> context = new HashMap<>();
-                    context.put("user_name", user.getUsername() != null ? user.getUsername() : "Bạn");
+                    context.put("user_name", user.getDisplayName() != null ? user.getDisplayName() : "Bạn");
                     context.put("jlpt_level", user.getJlptLevel() != null ? user.getJlptLevel() : "N5");
                     context.put("last_mock_score", user.getMockScore() != null ? String.valueOf(user.getMockScore()) : "N/A");
                     context.put("weak_sections", ""); // Will be enriched when weak_sections field is added

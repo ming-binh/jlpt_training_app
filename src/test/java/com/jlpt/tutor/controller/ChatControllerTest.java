@@ -4,16 +4,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jlpt.tutor.dto.AiRequest;
 import com.jlpt.tutor.dto.AiResponse;
 import com.jlpt.tutor.entity.Conversation;
+import com.jlpt.tutor.entity.Role;
+import com.jlpt.tutor.entity.User;
 import com.jlpt.tutor.exception.RateLimitException;
 import com.jlpt.tutor.model.AiUseCase;
+import com.jlpt.tutor.security.JwtAuthenticationFilter;
 import com.jlpt.tutor.service.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -23,6 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ChatController.class)
+@AutoConfigureMockMvc(addFilters = false) // Bypass security filters for controller testing
 class ChatControllerTest {
 
     @Autowired
@@ -46,6 +55,17 @@ class ChatControllerTest {
     @MockBean
     private RateLimitService rateLimitService;
 
+    @MockBean
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @MockBean
+    private AuthenticationProvider authenticationProvider;
+
+    private UsernamePasswordAuthenticationToken getMockAuth(String userId) {
+        User user = User.builder().id(userId).role(Role.USER).build();
+        return new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+    }
+
     @Test
     void testChat_OnTopic() throws Exception {
         AiRequest request = new AiRequest();
@@ -59,8 +79,8 @@ class ChatControllerTest {
                 .thenReturn(Conversation.builder().id("conv-123").userId("user-001").build());
 
         mockMvc.perform(post("/api/ai/chat")
+                .principal(getMockAuth("user-001"))
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-User-Id", "user-001")
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Chào bạn!"));
@@ -78,8 +98,8 @@ class ChatControllerTest {
         when(offTopicFilter.isOnTopic(anyString())).thenReturn(false);
 
         mockMvc.perform(post("/api/ai/chat")
+                .principal(getMockAuth("user-001"))
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-User-Id", "user-001")
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value(org.hamcrest.Matchers.containsString("Xin lỗi, tôi chỉ có thể hỗ trợ")));
@@ -124,8 +144,8 @@ class ChatControllerTest {
                 .thenReturn(Conversation.builder().id("conv-456").userId("user-001").build());
 
         mockMvc.perform(post("/api/ai/chat")
+                .principal(getMockAuth("user-001"))
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-User-Id", "user-001")
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
@@ -138,8 +158,8 @@ class ChatControllerTest {
         String jsonBody = "{\"params\":{\"user_message\":\"test\"}}";
 
         mockMvc.perform(post("/api/ai/chat")
+                .principal(getMockAuth("user-001"))
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-User-Id", "user-001")
                 .content(jsonBody))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.error").exists());
@@ -156,8 +176,8 @@ class ChatControllerTest {
                 .when(rateLimitService).checkRateLimit(anyString(), any(AiUseCase.class));
 
         mockMvc.perform(post("/api/ai/chat")
+                .principal(getMockAuth("user-001"))
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("X-User-Id", "user-001")
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isTooManyRequests())
                 .andExpect(jsonPath("$.error").value("Rate limit exceeded"));
