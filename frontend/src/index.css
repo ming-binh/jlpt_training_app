@@ -1,0 +1,28 @@
+@import './styles/variables.css';
+@import './styles/animations.css';
+
+/* Global utilities */
+.gradient-text {
+  /* No gradients in Postman theme. Fallback to primary. */
+  color: var(--color-primary);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-ink);
+  font-weight: 600;
+  margin-top: 0;
+  margin-bottom: var(--space-4);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.mono-text {
+  font-family: var(--font-mono);
+}

@@ -1,0 +1,23 @@
+/* Flat and minimal animations for Postman Theme */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes spinner {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--duration-base) var(--easing-standard);
+}
+
+.animate-slide-up {
+  /* Removed bounce effect. Replaced with simple fade in Postman theme */
+  animation: fadeIn var(--duration-base) var(--easing-standard);
+}
+
+/* We don't use glow or transform translateY for hover in this dense developer tool.
+   Just subtle color changes which are handled in component CSS directly. */
