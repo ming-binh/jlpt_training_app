@@ -1,6 +1,7 @@
 ### 1. Test Giải thích Ngữ pháp (Grammar Explain)
 POST http://localhost:8080/api/ai/chat
 Content-Type: application/json
+X-User-Id: user-001
 
 {
   "useCase": "GRAMMAR_EXPLAIN",
@@ -23,6 +24,7 @@ Content-Type: application/json
 ### 2. Test Chấm Câu (Writing Check)
 POST http://localhost:8080/api/ai/chat
 Content-Type: application/json
+X-User-Id: user-001
 
 {
   "useCase": "WRITING_CHECK",
@@ -37,5 +39,50 @@ Content-Type: application/json
     "user_sentence": "私は昨日公園で友達を会いました。",
     "jlpt_level": "N4",
     "current_topic": "Hành động quá khứ"
+  }
+}
+
+###
+
+### 3. Test with conversationId (resume existing conversation)
+POST http://localhost:8080/api/ai/chat
+Content-Type: application/json
+X-User-Id: user-001
+
+{
+  "useCase": "CONVERSATION",
+  "conversationId": "replace-with-actual-id",
+  "params": {
+    "user_message": "tiếng nhật N4 có bao nhiêu điểm ngữ pháp?"
+  }
+}
+
+###
+
+### 4. Test auto userContext from DB (no userContext in body)
+POST http://localhost:8080/api/ai/chat
+Content-Type: application/json
+X-User-Id: user-001
+
+{
+  "useCase": "GRAMMAR_EXPLAIN",
+  "params": {
+    "grammar_point": "〜なければならない",
+    "jlpt_level": "N4",
+    "user_message": "Giải thích cấu trúc bắt buộc này"
+  }
+}
+
+###
+
+### 5. Test Off-topic (should be rejected)
+POST http://localhost:8080/api/ai/chat
+Content-Type: application/json
+X-User-Id: user-001
+
+{
+  "useCase": "CONVERSATION",
+  "params": {
+    "user_message": "thời tiết hôm nay thế nào?"
   }
 }

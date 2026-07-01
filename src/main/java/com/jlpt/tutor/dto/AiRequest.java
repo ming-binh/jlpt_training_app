@@ -13,4 +13,5 @@ public class AiRequest {
     private Map<String, String> userContext;
     private Map<String, String> params;
     private List<Message> history;
+    private String conversationId;
 }
