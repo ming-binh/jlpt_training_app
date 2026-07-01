@@ -4,11 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jlpt.tutor.dto.AiRequest;
 import com.jlpt.tutor.dto.AiResponse;
 import com.jlpt.tutor.entity.Conversation;
+import com.jlpt.tutor.exception.RateLimitException;
 import com.jlpt.tutor.model.AiUseCase;
-import com.jlpt.tutor.service.ConversationService;
-import com.jlpt.tutor.service.GeminiService;
-import com.jlpt.tutor.service.OffTopicFilter;
-import com.jlpt.tutor.service.UserService;
+import com.jlpt.tutor.service.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -44,6 +42,9 @@ class ChatControllerTest {
 
     @MockBean
     private UserService userService;
+
+    @MockBean
+    private RateLimitService rateLimitService;
 
     @Test
     void testChat_OnTopic() throws Exception {
@@ -113,7 +114,6 @@ class ChatControllerTest {
         AiRequest request = new AiRequest();
         request.setUseCase(AiUseCase.GRAMMAR_EXPLAIN);
         request.setParams(Map.of("user_message", "giải thích ngữ pháp N4"));
-        // No userContext — should be auto-filled from DB
 
         when(offTopicFilter.isOnTopic(anyString())).thenReturn(true);
         when(userService.buildUserContext("user-001"))
@@ -130,5 +130,38 @@ class ChatControllerTest {
                 .andExpect(status().isOk());
 
         verify(userService).buildUserContext("user-001");
+    }
+
+    @Test
+    void testChat_NullUseCase_Returns400() throws Exception {
+        // useCase is @NotNull — sending null should trigger validation error
+        String jsonBody = "{\"params\":{\"user_message\":\"test\"}}";
+
+        mockMvc.perform(post("/api/ai/chat")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-User-Id", "user-001")
+                .content(jsonBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error").exists());
+    }
+
+    @Test
+    void testChat_RateLimitExceeded_Returns429() throws Exception {
+        AiRequest request = new AiRequest();
+        request.setUseCase(AiUseCase.CONVERSATION);
+        request.setParams(Map.of("user_message", "tiếng nhật N4"));
+
+        when(offTopicFilter.isOnTopic(anyString())).thenReturn(true);
+        doThrow(new RateLimitException("Rate limit exceeded"))
+                .when(rateLimitService).checkRateLimit(anyString(), any(AiUseCase.class));
+
+        mockMvc.perform(post("/api/ai/chat")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("X-User-Id", "user-001")
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(jsonPath("$.error").value("Rate limit exceeded"));
+
+        verify(geminiService, never()).chat(any());
     }
 }

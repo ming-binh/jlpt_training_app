@@ -2,6 +2,7 @@ package com.jlpt.tutor.service;
 
 import com.jlpt.tutor.dto.AiRequest;
 import com.jlpt.tutor.model.AiUseCase;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -14,7 +15,10 @@ import java.util.Map;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class PromptBuilder {
+
+    private final PromptVariantService promptVariantService;
 
     @Value("classpath:prompts/master_system.txt")
     private Resource masterSystemPrompt;
@@ -51,7 +55,7 @@ public class PromptBuilder {
 
     public String build(AiRequest request) {
         String master = loadAndFill(masterSystemPrompt, request.getUserContext());
-        String template = loadTemplate(request.getUseCase());
+        String template = loadTemplate(request.getUseCase(), request.getUserId());
         String filled = fillTemplate(template, request.getParams());
 
         String guardrails = loadGuardrails();
@@ -64,7 +68,14 @@ public class PromptBuilder {
         return fillTemplate(readResource(resource), params);
     }
 
-    private String loadTemplate(AiUseCase useCase) {
+    private String loadTemplate(AiUseCase useCase, String userId) {
+        // Try getting a variant first (A/B testing)
+        String variant = promptVariantService.selectPromptVariant(useCase.name(), userId);
+        if (variant != null) {
+            return variant;
+        }
+        
+        // Fallback to default file resources
         return switch (useCase) {
             case GRAMMAR_EXPLAIN -> readResource(grammarExplainPrompt);
             case WRITING_CHECK -> readResource(writingCheckPrompt);

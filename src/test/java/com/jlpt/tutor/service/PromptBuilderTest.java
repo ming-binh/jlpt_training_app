@@ -11,14 +11,19 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class PromptBuilderTest {
 
     private PromptBuilder promptBuilder;
+    private PromptVariantService promptVariantService;
 
     @BeforeEach
     void setUp() {
-        promptBuilder = new PromptBuilder();
+        promptVariantService = mock(PromptVariantService.class);
+        promptBuilder = new PromptBuilder(promptVariantService);
         
         ReflectionTestUtils.setField(promptBuilder, "masterSystemPrompt", 
                 new ByteArrayResource("You are an AI Tutor for {{user_name}}.".getBytes(StandardCharsets.UTF_8)));
@@ -38,6 +43,8 @@ class PromptBuilderTest {
         request.setUseCase(AiUseCase.GRAMMAR_EXPLAIN);
         request.setUserContext(Map.of("user_name", "Minh"));
         request.setParams(Map.of("grammar_point", "〜てもいいですか", "jlpt_level", "N4"));
+
+        when(promptVariantService.selectPromptVariant(anyString(), anyString())).thenReturn(null); // use fallback
 
         String result = promptBuilder.build(request);
 
