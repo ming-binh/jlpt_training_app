@@ -5,21 +5,21 @@ spring:
   application:
     name: jlpt-ai-tutor
   profiles:
-    active: dev
+    active: ${SPRING_PROFILES_ACTIVE:prod}
   config:
     import: optional:file:.env[.properties]
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:postgres}
+    password: ${DB_PASSWORD:}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 ai:
@@ -30,5 +30,10 @@ ai:
     explanation-per-day: 50
 
 jwt:
-  secret: ${JWT_SECRET}
+  secret: ${JWT_SECRET:8f4e6d5c2b1a09f8e7d6c5b4a3928170f6e5d4c3b2a1908f7e6d5c4b3a210987}
   expiration: 86400000
+
+supabase:
+  jwt:
+    secret: ${SUPABASE_JWT_SECRET:}
+  url: ${SUPABASE_URL:}

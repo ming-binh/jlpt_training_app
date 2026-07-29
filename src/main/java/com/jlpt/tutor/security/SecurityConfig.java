@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
 @EnableWebSecurity
@@ -19,23 +20,37 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
+    @Value("${spring.h2.console.enabled:false}")
+    private boolean h2ConsoleEnabled;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/h2-console/**").permitAll()
-                .anyRequest().authenticated()
-            )
+            .authorizeHttpRequests(auth -> {
+                auth
+                    .requestMatchers("/api/auth/**").permitAll()
+                    .requestMatchers("/api/vocabulary/**").permitAll()
+                    .requestMatchers("/api/kanji/**").permitAll()
+                    .requestMatchers("/api/grammar/**").permitAll();
+
+                // H2 console — only in dev (h2.console.enabled=true)
+                if (h2ConsoleEnabled) {
+                    auth.requestMatchers("/h2-console/**").permitAll();
+                }
+
+                auth.anyRequest().authenticated();
+            })
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
             .authenticationProvider(authenticationProvider)
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-        // Required to allow H2 console to be viewed in iframe
-        http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
+        // Allow H2 console iframe — only needed in dev
+        if (h2ConsoleEnabled) {
+            http.headers(headers -> headers.frameOptions(frame -> frame.disable()));
+        }
 
         return http.build();
     }

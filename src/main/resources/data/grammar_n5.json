@@ -1,0 +1,142 @@
+[
+  {
+    "title": "〜です",
+    "structure": "Noun + です",
+    "meaning": "Là ~. Dùng để khẳng định danh tính hoặc trạng thái.",
+    "examples": "[{\"ja\":\"私（わたし）は学生（がくせい）です。\",\"vi\":\"Tôi là học sinh.\"}]",
+    "relatedGrammar": "〜ではありません, 〜だ"
+  },
+  {
+    "title": "〜ではありません / 〜じゃありません",
+    "structure": "Noun + ではありません",
+    "meaning": "Không phải là ~. Dạng phủ định lịch sự.",
+    "examples": "[{\"ja\":\"私（わたし）は先生（せんせい）ではありません。\",\"vi\":\"Tôi không phải là giáo viên.\"}]",
+    "relatedGrammar": "〜です"
+  },
+  {
+    "title": "〜は〜が",
+    "structure": "Topic は Subject が Adjective",
+    "meaning": "Chủ đề は, chủ thể が. Phân biệt topic marker và subject marker.",
+    "examples": "[{\"ja\":\"象（ぞう）は鼻（はな）が長（なが）いです。\",\"vi\":\"Voi thì mũi dài.\"}]",
+    "relatedGrammar": "〜も"
+  },
+  {
+    "title": "〜を",
+    "structure": "Noun を Verb",
+    "meaning": "Particle chỉ tân ngữ (object) trực tiếp của động từ.",
+    "examples": "[{\"ja\":\"パンを食（た）べます。\",\"vi\":\"Ăn bánh mì.\"}]",
+    "relatedGrammar": "〜が, 〜に"
+  },
+  {
+    "title": "〜に (thời gian/nơi chốn)",
+    "structure": "Time/Place に Verb",
+    "meaning": "Particle chỉ thời gian cụ thể hoặc đích đến.",
+    "examples": "[{\"ja\":\"7時（しちじ）に起（お）きます。\",\"vi\":\"Thức dậy lúc 7 giờ.\"}]",
+    "relatedGrammar": "〜で, 〜へ"
+  },
+  {
+    "title": "〜で (nơi chốn/phương tiện)",
+    "structure": "Place で Verb / Means で Verb",
+    "meaning": "Particle chỉ nơi diễn ra hành động hoặc phương tiện.",
+    "examples": "[{\"ja\":\"図書館（としょかん）で勉強（べんきょう）します。\",\"vi\":\"Học ở thư viện.\"}]",
+    "relatedGrammar": "〜に"
+  },
+  {
+    "title": "〜へ",
+    "structure": "Place へ Verb of motion",
+    "meaning": "Particle chỉ hướng đi.",
+    "examples": "[{\"ja\":\"学校（がっこう）へ行（い）きます。\",\"vi\":\"Đi đến trường.\"}]",
+    "relatedGrammar": "〜に"
+  },
+  {
+    "title": "〜から〜まで",
+    "structure": "Time/Place から Time/Place まで",
+    "meaning": "Từ ~ đến ~. Dùng cho thời gian hoặc không gian.",
+    "examples": "[{\"ja\":\"9時（くじ）から5時（ごじ）まで働（はたら）きます。\",\"vi\":\"Làm việc từ 9 giờ đến 5 giờ.\"}]",
+    "relatedGrammar": ""
+  },
+  {
+    "title": "〜ませんか",
+    "structure": "Verb ます-stem + ませんか",
+    "meaning": "Mời ai đó làm gì (lịch sự). Won't you ~?",
+    "examples": "[{\"ja\":\"一緒（いっしょ）に映画（えいが）を見（み）ませんか。\",\"vi\":\"Bạn có muốn cùng đi xem phim không?\"}]",
+    "relatedGrammar": "〜ましょう"
+  },
+  {
+    "title": "〜ましょう",
+    "structure": "Verb ます-stem + ましょう",
+    "meaning": "Hãy cùng làm ~! (Let's ~)",
+    "examples": "[{\"ja\":\"食（た）べましょう。\",\"vi\":\"Hãy cùng ăn nào!\"}]",
+    "relatedGrammar": "〜ませんか"
+  },
+  {
+    "title": "〜たいです",
+    "structure": "Verb ます-stem + たいです",
+    "meaning": "Muốn làm ~.",
+    "examples": "[{\"ja\":\"日本（にほん）に行（い）きたいです。\",\"vi\":\"Tôi muốn đi Nhật.\"}]",
+    "relatedGrammar": "〜たがっている"
+  },
+  {
+    "title": "〜てください",
+    "structure": "Verb て-form + ください",
+    "meaning": "Xin hãy làm ~. (Yêu cầu lịch sự)",
+    "examples": "[{\"ja\":\"ここに名前（なまえ）を書（か）いてください。\",\"vi\":\"Xin hãy viết tên ở đây.\"}]",
+    "relatedGrammar": "〜ないでください"
+  },
+  {
+    "title": "〜ないでください",
+    "structure": "Verb ない-form + でください",
+    "meaning": "Xin đừng làm ~.",
+    "examples": "[{\"ja\":\"ここで写真（しゃしん）を撮（と）らないでください。\",\"vi\":\"Xin đừng chụp ảnh ở đây.\"}]",
+    "relatedGrammar": "〜てください"
+  },
+  {
+    "title": "〜てもいいですか",
+    "structure": "Verb て-form + もいいですか",
+    "meaning": "Có được phép làm ~ không? (Xin phép)",
+    "examples": "[{\"ja\":\"窓（まど）を開（あ）けてもいいですか。\",\"vi\":\"Tôi mở cửa sổ có được không?\"}]",
+    "relatedGrammar": "〜てはいけません"
+  },
+  {
+    "title": "〜てはいけません",
+    "structure": "Verb て-form + はいけません",
+    "meaning": "Không được phép làm ~.",
+    "examples": "[{\"ja\":\"ここでたばこを吸（す）ってはいけません。\",\"vi\":\"Không được hút thuốc ở đây.\"}]",
+    "relatedGrammar": "〜てもいいですか"
+  },
+  {
+    "title": "〜ている",
+    "structure": "Verb て-form + いる/います",
+    "meaning": "Đang làm ~ (tiếp diễn) hoặc trạng thái kết quả.",
+    "examples": "[{\"ja\":\"今（いま）、本（ほん）を読（よ）んでいます。\",\"vi\":\"Bây giờ tôi đang đọc sách.\"}]",
+    "relatedGrammar": ""
+  },
+  {
+    "title": "Adjective い + くない",
+    "structure": "い-Adj (bỏ い) + くないです",
+    "meaning": "Phủ định tính từ い. Không ~.",
+    "examples": "[{\"ja\":\"この映画（えいが）はおもしろくないです。\",\"vi\":\"Bộ phim này không hay.\"}]",
+    "relatedGrammar": ""
+  },
+  {
+    "title": "Adjective な + じゃない",
+    "structure": "な-Adj + じゃないです",
+    "meaning": "Phủ định tính từ な. Không ~.",
+    "examples": "[{\"ja\":\"ここは静（しず）かじゃないです。\",\"vi\":\"Chỗ này không yên tĩnh.\"}]",
+    "relatedGrammar": ""
+  },
+  {
+    "title": "〜が好（す）きです",
+    "structure": "Noun が 好きです/嫌いです",
+    "meaning": "Thích / Ghét ~.",
+    "examples": "[{\"ja\":\"私（わたし）は猫（ねこ）が好（す）きです。\",\"vi\":\"Tôi thích mèo.\"}]",
+    "relatedGrammar": "〜が上手です"
+  },
+  {
+    "title": "〜があります / 〜がいます",
+    "structure": "Place に Noun が あります/います",
+    "meaning": "Có ~. あります cho vật vô tri, います cho sinh vật.",
+    "examples": "[{\"ja\":\"机（つくえ）の上（うえ）に本（ほん）があります。\",\"vi\":\"Trên bàn có quyển sách.\"}]",
+    "relatedGrammar": ""
+  }
+]

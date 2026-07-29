@@ -2,6 +2,7 @@ package com.jlpt.tutor.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jlpt.tutor.dto.*;
 import com.jlpt.tutor.exception.AiResponseException;
@@ -15,7 +16,9 @@ import reactor.core.publisher.Flux;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -27,6 +30,12 @@ public class GeminiService {
     private final String model;
     private final ConversationManager conversationManager;
     private final AiMetricsService metricsService;
+
+    @Value("${GROQ_API_KEY:}")
+    private String groqApiKey;
+
+    @Value("${GROQ_MODEL:llama-3.3-70b-versatile}")
+    private String groqModel;
 
     private static final int MAX_RETRIES = 2;
     private static final Duration RETRY_DELAY = Duration.ofMillis(500);
@@ -48,6 +57,72 @@ public class GeminiService {
         long start = System.currentTimeMillis();
         AiUseCase useCase = request.getUseCase() != null ? request.getUseCase() : AiUseCase.CONVERSATION;
 
+        // If Groq API key is present and valid, use Groq
+        if (groqApiKey != null && groqApiKey.startsWith("gsk_")) {
+            return chatWithGroq(request, useCase, start);
+        }
+
+        // Fallback to Gemini
+        return chatWithGemini(request, useCase, start);
+    }
+
+    // ---- Groq AI Engine ----
+    private AiResponse chatWithGroq(AiRequest request, AiUseCase useCase, long start) {
+        log.info("Calling Groq AI API with model {}...", groqModel);
+        WebClient groqClient = WebClient.builder().build();
+
+        List<Map<String, String>> messages = new ArrayList<>();
+        String prompt = promptBuilder.build(request);
+        messages.add(Map.of("role", "user", "content", prompt));
+
+        if (useCase == AiUseCase.CONVERSATION && request.getHistory() != null && !request.getHistory().isEmpty()) {
+            String userMessage = extractUserMessage(request);
+            List<Message> context = conversationManager.buildContext(request.getHistory(), userMessage);
+            messages.clear();
+            for (Message msg : context) {
+                String role = "model".equals(msg.getRole()) || "assistant".equals(msg.getRole()) ? "assistant" : "user";
+                messages.add(Map.of("role", role, "content", msg.getContent()));
+            }
+        }
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("model", groqModel);
+        body.put("messages", messages);
+        body.put("temperature", getTemperature(useCase));
+        body.put("response_format", Map.of("type", "json_object"));
+
+        for (int attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+            try {
+                String rawResponse = groqClient.post()
+                        .uri("https://api.groq.com/openai/v1/chat/completions")
+                        .header("Authorization", "Bearer " + groqApiKey)
+                        .header("Content-Type", "application/json")
+                        .bodyValue(body)
+                        .retrieve()
+                        .bodyToMono(String.class)
+                        .block(Duration.ofSeconds(30));
+
+                String content = extractTextFromGroqResponse(rawResponse);
+                AiResponse response = parseAndValidateContent(content);
+                if (response != null) {
+                    long elapsed = System.currentTimeMillis() - start;
+                    metricsService.logInteraction(new AiMetricsService.AiInteractionLog(
+                            "default", useCase, 0, 0, elapsed, true, null, null, null));
+                    return response;
+                }
+            } catch (Exception e) {
+                log.error("Groq API error, attempt {}/{}: {}", attempt + 1, MAX_RETRIES + 1, e.getMessage());
+            }
+        }
+
+        long elapsed = System.currentTimeMillis() - start;
+        metricsService.logInteraction(new AiMetricsService.AiInteractionLog(
+                "default", useCase, 0, 0, elapsed, false, null, null, null));
+        return AiResponse.fallback("Lỗi kết nối Groq AI service. Vui lòng thử lại sau.");
+    }
+
+    // ---- Gemini AI Engine ----
+    private AiResponse chatWithGemini(AiRequest request, AiUseCase useCase, long start) {
         for (int attempt = 0; attempt <= MAX_RETRIES; attempt++) {
             try {
                 GeminiRequestDto geminiRequest = buildRequest(request, useCase);
@@ -117,7 +192,7 @@ public class GeminiService {
                 });
     }
 
-    // ---- Private helpers ----
+    // ---- Helpers ----
 
     private GeminiRequestDto buildRequest(AiRequest request, AiUseCase useCase) {
         List<Content> contents;
@@ -163,15 +238,17 @@ public class GeminiService {
     }
 
     private AiResponse parseAndValidate(String raw) {
-        try {
-            String textContent = extractTextFromGeminiResponse(raw);
-            if (textContent == null || textContent.isBlank()) {
-                log.warn("Empty text content from Gemini response");
-                return null;
-            }
-            // Remove any <thinking> blocks that Gemini might generate
-            String cleaned = textContent.replaceAll("<thinking>[\\s\\S]*?</thinking>", "").trim();
+        String textContent = extractTextFromGeminiResponse(raw);
+        return parseAndValidateContent(textContent);
+    }
 
+    private AiResponse parseAndValidateContent(String textContent) {
+        if (textContent == null || textContent.isBlank()) {
+            log.warn("Empty text content from AI response");
+            return null;
+        }
+        try {
+            String cleaned = textContent.replaceAll("<thinking>[\\s\\S]*?</thinking>", "").trim();
             AiResponse response = objectMapper.readValue(cleaned, AiResponse.class);
             if (response.getMessage() == null || response.getMessage().isBlank()) {
                 throw new AiResponseException("Empty message from AI");
@@ -182,9 +259,7 @@ public class GeminiService {
             return null;
         } catch (JsonProcessingException e) {
             log.error("Failed to parse AI response as JSON: {}", e.getMessage());
-            // Try to wrap plain text as fallback
             try {
-                String textContent = extractTextFromGeminiResponse(raw);
                 String cleaned = textContent.replaceAll("<thinking>[\\s\\S]*?</thinking>", "").trim();
                 return objectMapper.readValue(
                         "{\"message\":\"" + escapeJson(cleaned) + "\"}",
@@ -206,7 +281,16 @@ public class GeminiService {
                     .path("parts").get(0)
                     .path("text").asText();
         } catch (Exception e) {
-            return raw; // fallback: treat whole response as text
+            return raw;
+        }
+    }
+
+    private String extractTextFromGroqResponse(String raw) {
+        try {
+            JsonNode root = objectMapper.readTree(raw);
+            return root.path("choices").get(0).path("message").path("content").asText();
+        } catch (Exception e) {
+            return raw;
         }
     }
 

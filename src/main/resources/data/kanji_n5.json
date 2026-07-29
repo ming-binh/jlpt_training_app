@@ -1,0 +1,17 @@
+[
+  {"character": "日", "meanings": "mặt trời, ngày", "kunReadings": "ひ, -び, -か", "onReadings": "ニチ, ジツ", "jlptLevel": "N5", "grade": 1, "strokeCount": 4},
+  {"character": "月", "meanings": "mặt trăng, tháng", "kunReadings": "つき", "onReadings": "ゲツ, ガツ", "jlptLevel": "N5", "grade": 1, "strokeCount": 4},
+  {"character": "水", "meanings": "nước", "kunReadings": "みず", "onReadings": "スイ", "jlptLevel": "N5", "grade": 1, "strokeCount": 4},
+  {"character": "火", "meanings": "lửa", "kunReadings": "ひ, -び, ほ-", "onReadings": "カ", "jlptLevel": "N5", "grade": 1, "strokeCount": 4},
+  {"character": "木", "meanings": "cây, gỗ", "kunReadings": "き, こ-", "onReadings": "ボク, モク", "jlptLevel": "N5", "grade": 1, "strokeCount": 4},
+  {"character": "金", "meanings": "vàng, tiền", "kunReadings": "かね, かな-", "onReadings": "キン, コン", "jlptLevel": "N5", "grade": 1, "strokeCount": 8},
+  {"character": "土", "meanings": "đất", "kunReadings": "つち", "onReadings": "ド, ト", "jlptLevel": "N5", "grade": 1, "strokeCount": 3},
+  {"character": "山", "meanings": "núi", "kunReadings": "やま", "onReadings": "サン, セン", "jlptLevel": "N5", "grade": 1, "strokeCount": 3},
+  {"character": "川", "meanings": "sông", "kunReadings": "かわ", "onReadings": "セン", "jlptLevel": "N5", "grade": 1, "strokeCount": 3},
+  {"character": "人", "meanings": "người", "kunReadings": "ひと", "onReadings": "ジン, ニン", "jlptLevel": "N5", "grade": 1, "strokeCount": 2},
+  {"character": "学", "meanings": "học", "kunReadings": "まな.ぶ", "onReadings": "ガク", "jlptLevel": "N5", "grade": 1, "strokeCount": 8},
+  {"character": "生", "meanings": "sinh, sống", "kunReadings": "い.きる, う.まれ", "onReadings": "セイ, ショウ", "jlptLevel": "N5", "grade": 1, "strokeCount": 5},
+  {"character": "先", "meanings": "trước, tiên", "kunReadings": "さき, まず", "onReadings": "セン", "jlptLevel": "N5", "grade": 1, "strokeCount": 6},
+  {"character": "私", "meanings": "tư, cá nhân, tôi", "kunReadings": "わたくし, わたし", "onReadings": "シ", "jlptLevel": "N5", "grade": 6, "strokeCount": 7},
+  {"character": "校", "meanings": "trường học", "kunReadings": "", "onReadings": "コウ", "jlptLevel": "N5", "grade": 1, "strokeCount": 10}
+]

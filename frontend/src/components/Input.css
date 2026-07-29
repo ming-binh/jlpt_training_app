@@ -7,9 +7,11 @@
 }
 
 .input-label {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 500;
-  color: var(--color-ink);
+  color: var(--color-ink-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .input-container {
@@ -20,39 +22,44 @@
 
 .input-icon {
   position: absolute;
-  left: 8px;
-  color: var(--color-ink-muted);
+  left: 10px;
+  color: var(--color-ink-subdued);
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
 }
 
 .input-field {
   width: 100%;
-  height: 32px;
+  height: 36px;
   background: var(--color-surface-2);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
-  padding: 0 8px;
+  padding: 0 10px;
   color: var(--color-ink);
   font-family: var(--font-sans);
   font-size: 13px;
-  transition: all var(--duration-fast) var(--easing-standard);
+  transition: border-color var(--duration-fast) var(--easing-standard),
+              box-shadow var(--duration-fast) var(--easing-standard);
   outline: none;
 }
 
 .input-field.has-icon {
-  padding-left: 32px;
+  padding-left: 34px;
 }
 
 .input-field::placeholder {
   color: var(--color-ink-subdued);
 }
 
+.input-field:hover:not(:focus):not(.has-error) {
+  border-color: var(--color-border-strong);
+}
+
 .input-field:focus {
   border-color: var(--color-primary);
-  /* 2px orange focus ring on dark surfaces */
-  box-shadow: 0 0 0 2px rgba(255, 108, 55, 0.3); 
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
 }
 
 .input-field.has-error {
@@ -60,7 +67,7 @@
 }
 
 .input-field.has-error:focus {
-  box-shadow: 0 0 0 2px rgba(244, 73, 62, 0.3);
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.2);
 }
 
 .input-error {

@@ -1,0 +1,142 @@
+[
+  {
+    "title": "〜てしまう",
+    "structure": "Verb て-form + しまう/しまいます",
+    "meaning": "Hoàn thành hành động (không may/tiếc nuối) hoặc làm xong hoàn toàn.",
+    "examples": "[{\"ja\":\"宿題（しゅくだい）を忘（わす）れてしまいました。\",\"vi\":\"Tôi đã lỡ quên bài tập.\"}]",
+    "relatedGrammar": "〜ちゃう (khẩu ngữ)"
+  },
+  {
+    "title": "〜たことがある",
+    "structure": "Verb た-form + ことがある",
+    "meaning": "Đã từng làm ~. Diễn tả kinh nghiệm.",
+    "examples": "[{\"ja\":\"日本（にほん）に行（い）ったことがあります。\",\"vi\":\"Tôi đã từng đi Nhật.\"}]",
+    "relatedGrammar": ""
+  },
+  {
+    "title": "〜たり〜たりする",
+    "structure": "Verb た-form + り + Verb た-form + り + する",
+    "meaning": "Làm những việc như ~ và ~ (liệt kê không đầy đủ).",
+    "examples": "[{\"ja\":\"休（やす）みの日（ひ）は本（ほん）を読（よ）んだり映画（えいが）を見（み）たりします。\",\"vi\":\"Ngày nghỉ tôi đọc sách, xem phim, v.v.\"}]",
+    "relatedGrammar": ""
+  },
+  {
+    "title": "〜ないで",
+    "structure": "Verb ない-form + で",
+    "meaning": "Mà không làm ~. Without doing ~.",
+    "examples": "[{\"ja\":\"朝（あさ）ごはんを食（た）べないで学校（がっこう）に行（い）きました。\",\"vi\":\"Đi học mà không ăn sáng.\"}]",
+    "relatedGrammar": "〜なくて"
+  },
+  {
+    "title": "〜なければならない",
+    "structure": "Verb ない-form (bỏ い) + ければならない",
+    "meaning": "Phải làm ~. Must do ~.",
+    "examples": "[{\"ja\":\"薬（くすり）を飲（の）まなければなりません。\",\"vi\":\"Phải uống thuốc.\"}]",
+    "relatedGrammar": "〜なくてもいい"
+  },
+  {
+    "title": "〜なくてもいい",
+    "structure": "Verb ない-form (bỏ い) + くてもいいです",
+    "meaning": "Không cần phải làm ~. Don't have to ~.",
+    "examples": "[{\"ja\":\"明日（あした）は来（こ）なくてもいいです。\",\"vi\":\"Ngày mai không cần đến cũng được.\"}]",
+    "relatedGrammar": "〜なければならない"
+  },
+  {
+    "title": "〜と思（おも）う",
+    "structure": "Clause + と思う",
+    "meaning": "Tôi nghĩ rằng ~.",
+    "examples": "[{\"ja\":\"明日（あした）は雨（あめ）だと思（おも）います。\",\"vi\":\"Tôi nghĩ ngày mai trời mưa.\"}]",
+    "relatedGrammar": "〜と言（い）う"
+  },
+  {
+    "title": "〜と言（い）う",
+    "structure": "Clause + と言う",
+    "meaning": "Nói rằng ~. (Trích dẫn)",
+    "examples": "[{\"ja\":\"田中（たなか）さんは「明日（あした）来（く）る」と言（い）いました。\",\"vi\":\"Anh Tanaka nói rằng 'Ngày mai tôi sẽ đến.'\"}]",
+    "relatedGrammar": "〜と思う"
+  },
+  {
+    "title": "〜すぎる",
+    "structure": "Verb ます-stem / Adj (bỏ い/な) + すぎる",
+    "meaning": "Quá ~. Too much.",
+    "examples": "[{\"ja\":\"昨日（きのう）食（た）べすぎました。\",\"vi\":\"Hôm qua ăn quá nhiều.\"}]",
+    "relatedGrammar": ""
+  },
+  {
+    "title": "〜やすい / 〜にくい",
+    "structure": "Verb ます-stem + やすい/にくい",
+    "meaning": "Dễ làm ~ / Khó làm ~.",
+    "examples": "[{\"ja\":\"この本（ほん）は読（よ）みやすいです。\",\"vi\":\"Quyển sách này dễ đọc.\"}]",
+    "relatedGrammar": ""
+  },
+  {
+    "title": "〜ほうがいい",
+    "structure": "Verb た-form + ほうがいい / Verb ない-form + ほうがいい",
+    "meaning": "Nên làm ~ / Không nên làm ~. (Lời khuyên)",
+    "examples": "[{\"ja\":\"早（はや）く寝（ね）たほうがいいですよ。\",\"vi\":\"Bạn nên đi ngủ sớm.\"}]",
+    "relatedGrammar": ""
+  },
+  {
+    "title": "〜つもりです",
+    "structure": "Verb Dictionary form + つもりです",
+    "meaning": "Dự định làm ~. Intend to ~.",
+    "examples": "[{\"ja\":\"来年（らいねん）日本（にほん）に行（い）くつもりです。\",\"vi\":\"Năm sau tôi dự định đi Nhật.\"}]",
+    "relatedGrammar": "〜予定（よてい）です"
+  },
+  {
+    "title": "〜ことができる",
+    "structure": "Verb Dictionary form + ことができる",
+    "meaning": "Có thể làm ~. Can do ~.",
+    "examples": "[{\"ja\":\"日本語（にほんご）を話（はな）すことができます。\",\"vi\":\"Tôi có thể nói tiếng Nhật.\"}]",
+    "relatedGrammar": "Potential form"
+  },
+  {
+    "title": "〜前（まえ）に",
+    "structure": "Verb Dictionary form + 前に / Noun の + 前に",
+    "meaning": "Trước khi ~.",
+    "examples": "[{\"ja\":\"寝（ね）る前（まえ）に歯（は）を磨（みが）きます。\",\"vi\":\"Trước khi ngủ tôi đánh răng.\"}]",
+    "relatedGrammar": "〜た後（あと）で"
+  },
+  {
+    "title": "〜た後（あと）で",
+    "structure": "Verb た-form + 後で",
+    "meaning": "Sau khi ~.",
+    "examples": "[{\"ja\":\"ご飯（はん）を食（た）べた後（あと）で散歩（さんぽ）します。\",\"vi\":\"Sau khi ăn cơm tôi đi dạo.\"}]",
+    "relatedGrammar": "〜前に"
+  },
+  {
+    "title": "〜ながら",
+    "structure": "Verb ます-stem + ながら + Verb",
+    "meaning": "Vừa ~ vừa ~. (Hai hành động đồng thời)",
+    "examples": "[{\"ja\":\"音楽（おんがく）を聞（き）きながら勉強（べんきょう）します。\",\"vi\":\"Vừa nghe nhạc vừa học.\"}]",
+    "relatedGrammar": ""
+  },
+  {
+    "title": "〜てあげる / 〜てもらう / 〜てくれる",
+    "structure": "Verb て-form + あげる/もらう/くれる",
+    "meaning": "Cho/Nhận sự giúp đỡ. Giving & receiving favors.",
+    "examples": "[{\"ja\":\"友達（ともだち）が日本語（にほんご）を教（おし）えてくれました。\",\"vi\":\"Bạn tôi đã dạy tiếng Nhật cho tôi.\"}]",
+    "relatedGrammar": ""
+  },
+  {
+    "title": "〜し〜し",
+    "structure": "Clause し, Clause し",
+    "meaning": "Vừa ~ vừa ~. (Liệt kê lý do)",
+    "examples": "[{\"ja\":\"この店（みせ）は安（やす）いし、おいしいし、よく行（い）きます。\",\"vi\":\"Quán này vừa rẻ vừa ngon nên tôi hay đến.\"}]",
+    "relatedGrammar": ""
+  },
+  {
+    "title": "Conditional 〜たら",
+    "structure": "Verb た-form + ら",
+    "meaning": "Nếu / Khi ~ (điều kiện, giả định).",
+    "examples": "[{\"ja\":\"雨（あめ）が降（ふ）ったら、行（い）きません。\",\"vi\":\"Nếu trời mưa thì tôi không đi.\"}]",
+    "relatedGrammar": "〜ば, 〜と, 〜なら"
+  },
+  {
+    "title": "〜てみる",
+    "structure": "Verb て-form + みる",
+    "meaning": "Thử làm ~. Try doing ~.",
+    "examples": "[{\"ja\":\"この料理（りょうり）を食（た）べてみてください。\",\"vi\":\"Hãy thử ăn món này xem.\"}]",
+    "relatedGrammar": ""
+  }
+]

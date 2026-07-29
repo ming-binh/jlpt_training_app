@@ -13,24 +13,36 @@ interface Message {
   content: string;
 }
 
+const USE_CASES = [
+  { value: AiUseCase.CONVERSATION,    label: 'Giao tiếp JLPT',       icon: <MessageSquare size={15} /> },
+  { value: AiUseCase.GRAMMAR_EXPLAIN, label: 'Giải thích Ngữ pháp',  icon: <BookOpen size={15} /> },
+  { value: AiUseCase.WRITING_CHECK,   label: 'Sửa lỗi Viết',         icon: <PenTool size={15} /> },
+  { value: AiUseCase.MOCK_ANALYSIS,   label: 'Phân tích Đề thi',      icon: <Brain size={15} /> },
+];
+
+const SUGGESTIONS = [
+  'て-form の使い方を教えて',
+  'N4の文法を練習したい',
+  'この文を添削してください',
+  '模擬試験を分析して',
+];
+
 export const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedUseCase, setSelectedUseCase] = useState<AiUseCase>(AiUseCase.CONVERSATION);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const handleLogout = () => {
-    authService.logout();
+  const handleLogout = async () => {
+    await authService.logout();
     navigate('/login');
   };
 
@@ -41,7 +53,7 @@ export const ChatPage: React.FC = () => {
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: input,
+      content: input.trim(),
     };
 
     setMessages(prev => [...prev, userMessage]);
@@ -54,15 +66,12 @@ export const ChatPage: React.FC = () => {
         params: { user_message: userMessage.content }
       });
 
-      const modelMessage: Message = {
+      setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(),
         role: 'model',
         content: response.message,
-      };
-      
-      setMessages(prev => [...prev, modelMessage]);
+      }]);
     } catch (error: any) {
-      console.error('Chat error:', error);
       const errorMessage = error.response?.data?.error || 'Đã có lỗi xảy ra. Vui lòng thử lại sau.';
       setMessages(prev => [...prev, {
         id: (Date.now() + 1).toString(),
@@ -74,29 +83,33 @@ export const ChatPage: React.FC = () => {
     }
   };
 
-  const useCases = [
-    { value: AiUseCase.CONVERSATION, label: 'Giao tiếp JLPT', icon: <MessageSquare size={18} /> },
-    { value: AiUseCase.GRAMMAR_EXPLAIN, label: 'Giải thích Ngữ pháp', icon: <BookOpen size={18} /> },
-    { value: AiUseCase.WRITING_CHECK, label: 'Sửa lỗi Viết', icon: <PenTool size={18} /> },
-    { value: AiUseCase.MOCK_ANALYSIS, label: 'Phân tích Đề thi', icon: <Brain size={18} /> }
-  ];
+  const handleSuggestion = (text: string) => {
+    setInput(text);
+    inputRef.current?.focus();
+  };
+
+  const activeUseCase = USE_CASES.find(uc => uc.value === selectedUseCase);
 
   return (
     <div className="chat-layout">
       {/* Sidebar */}
-      <aside className="chat-sidebar glass-panel">
+      <aside className={`chat-sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-header">
-          <h2 className="gradient-text">JLPT AI Tutor</h2>
+          <div className="sidebar-logo-mark">J</div>
+          <span className="sidebar-title"><span>JLPT</span> AI Tutor</span>
         </div>
-        
+
         <div className="sidebar-content">
-          <h3 className="section-title">Chế độ học (Use Case)</h3>
+          <div className="section-label">Chế độ học</div>
           <div className="use-case-list">
-            {useCases.map((uc) => (
+            {USE_CASES.map((uc) => (
               <button
                 key={uc.value}
                 className={`use-case-btn ${selectedUseCase === uc.value ? 'active' : ''}`}
-                onClick={() => setSelectedUseCase(uc.value)}
+                onClick={() => {
+                  setSelectedUseCase(uc.value);
+                  setSidebarOpen(false);
+                }}
               >
                 {uc.icon}
                 <span>{uc.label}</span>
@@ -107,7 +120,7 @@ export const ChatPage: React.FC = () => {
 
         <div className="sidebar-footer">
           <button className="logout-btn" onClick={handleLogout}>
-            <LogOut size={18} />
+            <LogOut size={15} />
             <span>Đăng xuất</span>
           </button>
         </div>
@@ -115,25 +128,58 @@ export const ChatPage: React.FC = () => {
 
       {/* Main Chat Area */}
       <main className="chat-main">
-        <header className="chat-header glass-panel">
-          <div className="mobile-menu-btn"><Menu size={24} /></div>
-          <h3>{useCases.find(uc => uc.value === selectedUseCase)?.label}</h3>
-          <div className="user-profile">
-            <User size={20} />
+        {/* Header / Tab bar */}
+        <header className="chat-header">
+          <div className="chat-header-left">
+            <button
+              className="mobile-menu-btn"
+              onClick={() => setSidebarOpen(prev => !prev)}
+              aria-label="Toggle sidebar"
+            >
+              <Menu size={20} />
+            </button>
+
+            {activeUseCase && (
+              <div className="chat-active-tab">
+                <span className="chat-active-tab-icon">{activeUseCase.icon}</span>
+                {activeUseCase.label}
+              </div>
+            )}
+          </div>
+
+          <div className="user-profile" title="User profile">
+            <User size={16} />
           </div>
         </header>
 
+        {/* Messages */}
         <div className="messages-container">
           {messages.length === 0 ? (
             <div className="empty-state animate-fade-in">
-              <Brain size={48} className="empty-icon" />
-              <h2>Xin chào! Tôi có thể giúp gì cho bạn hôm nay?</h2>
-              <p className="text-secondary">Hãy bắt đầu gửi tin nhắn hoặc chọn một chế độ học ở bên trái.</p>
+              <div className="empty-icon-wrap">
+                <Brain size={24} />
+              </div>
+              <h2>Xin chào! Tôi có thể giúp gì?</h2>
+              <p>Hãy gửi tin nhắn hoặc chọn một gợi ý bên dưới để bắt đầu.</p>
+              <div className="empty-suggestions">
+                {SUGGESTIONS.map((s) => (
+                  <button
+                    key={s}
+                    className="suggestion-chip"
+                    onClick={() => handleSuggestion(s)}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
           ) : (
             messages.map((msg) => (
               <div key={msg.id} className={`message-wrapper ${msg.role} animate-slide-up`}>
-                <div className={`message-bubble ${msg.role === 'user' ? 'user-bubble' : 'model-bubble glass-panel'}`}>
+                {msg.role === 'model' && (
+                  <div className="message-avatar ai-avatar">J</div>
+                )}
+                <div className={`message-bubble ${msg.role === 'user' ? 'user-bubble' : 'model-bubble'}`}>
                   {msg.role === 'model' ? (
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                       {msg.content}
@@ -145,19 +191,24 @@ export const ChatPage: React.FC = () => {
               </div>
             ))
           )}
+
           {isLoading && (
             <div className="message-wrapper model animate-fade-in">
-              <div className="message-bubble model-bubble glass-panel typing-indicator">
-                <span></span><span></span><span></span>
+              <div className="message-avatar ai-avatar">J</div>
+              <div className="message-bubble model-bubble typing-indicator">
+                <span /><span /><span />
               </div>
             </div>
           )}
+
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Input */}
         <div className="chat-input-container">
-          <form onSubmit={handleSend} className="chat-input-form glass-panel">
+          <form onSubmit={handleSend} className="chat-input-form">
             <input
+              ref={inputRef}
               type="text"
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -165,12 +216,13 @@ export const ChatPage: React.FC = () => {
               disabled={isLoading}
               className="chat-input"
             />
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className={`send-btn ${input.trim() ? 'active' : ''}`}
               disabled={!input.trim() || isLoading}
+              aria-label="Send message"
             >
-              <Send size={20} />
+              <Send size={16} />
             </button>
           </form>
           <div className="disclaimer">

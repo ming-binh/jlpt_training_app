@@ -1,36 +1,48 @@
 :root {
-  /* Colors - Postman Theme */
-  --color-primary: #FF6C37;
-  --color-on-primary: #1B1B1B;
-  --color-primary-hover: #FF7F50;
-  --color-primary-pressed: #E25C2E;
-  --color-primary-subtle: #3A2419;
+  /* ═══════════════════════════════════════════════════
+     Sakura Night Theme
+     Canvas: deep space navy · Accent: violet purple
+     ═══════════════════════════════════════════════════ */
 
-  --color-ink: #F2F2F2;
-  --color-ink-muted: #AEB3B9;
-  --color-ink-subdued: #6B7178;
+  /* Primary — Violet Purple */
+  --color-primary: #8B5CF6;
+  --color-on-primary: #FFFFFF;
+  --color-primary-hover: #9D6FF8;
+  --color-primary-pressed: #7A4DE0;
+  --color-primary-subtle: #1A1535;
 
-  --color-canvas: #1B1B1B;
-  --color-surface-1: #262626;
-  --color-surface-2: #2E2E2E;
-  --color-surface-3: #383838;
+  /* Accent — Sakura Pink (highlights, method-post equivalent) */
+  --color-accent: #EC4899;
+  --color-accent-subtle: #2A1228;
 
-  --color-border: #3D3D3D;
-  --color-border-strong: #555555;
+  /* Text */
+  --color-ink: #E8E9F0;
+  --color-ink-muted: #9396B5;
+  --color-ink-subdued: #5A5D7A;
 
-  /* Method & Semantic Colors */
-  --color-method-get: #6BDD9A;
-  --color-method-post: #FFB84D;
-  --color-method-delete: #F4756B;
-  
-  --color-success: #3BB273;
-  --color-warning: #E5A93D;
-  --color-danger: #F4493E;
-  
+  /* Surfaces — deep navy stack */
+  --color-canvas: #0C0D14;
+  --color-surface-1: #141520;
+  --color-surface-2: #1C1E2E;
+  --color-surface-3: #252742;
+
+  /* Borders */
+  --color-border: #252742;
+  --color-border-strong: #383B5C;
+
+  /* Semantic / Method equivalents */
+  --color-method-get: #34D399;    /* emerald green — safe reads */
+  --color-method-post: #FBBF24;   /* amber — writes */
+  --color-method-delete: #F87171; /* red — destructive */
+
+  --color-success: #34D399;
+  --color-warning: #FBBF24;
+  --color-danger: #F87171;
+
   /* Typography */
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
-  
+
   /* Spacing (4px base) */
   --space-1: 4px;
   --space-2: 8px;
@@ -42,18 +54,19 @@
   --space-10: 40px;
   --space-12: 48px;
   --space-16: 64px;
-  
+
   /* Radii */
-  --radius-sm: 3px;
-  --radius-md: 6px;
-  --radius-lg: 10px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
   --radius-pill: 9999px;
-  
-  /* Shadows */
-  --shadow-card: 0 1px 2px rgba(0,0,0,0.4);
-  --shadow-elevated: 0 6px 16px rgba(0,0,0,0.5);
-  --shadow-flyout: 0 16px 40px rgba(0,0,0,0.6);
-  
+
+  /* Shadows — violet-tinted */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-elevated: 0 6px 20px rgba(0, 0, 0, 0.6);
+  --shadow-flyout: 0 16px 48px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 24px rgba(139, 92, 246, 0.2);
+
   /* Motion */
   --duration-fast: 90ms;
   --duration-base: 160ms;
@@ -76,17 +89,17 @@ body {
   box-sizing: border-box;
 }
 
-/* Custom Scrollbar for Dark Canvas */
+/* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: var(--color-canvas);
 }
 ::-webkit-scrollbar-thumb {
   background: var(--color-surface-3);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-pill);
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-border-strong);

@@ -1,12 +1,14 @@
 import api from './api';
 
-export enum AiUseCase {
-  GRAMMAR_EXPLAIN = 'GRAMMAR_EXPLAIN',
-  WRITING_CHECK = 'WRITING_CHECK',
-  QUIZ_EXPLANATION = 'QUIZ_EXPLANATION',
-  CONVERSATION = 'CONVERSATION',
-  MOCK_ANALYSIS = 'MOCK_ANALYSIS'
-}
+export const AiUseCase = {
+  GRAMMAR_EXPLAIN: 'GRAMMAR_EXPLAIN',
+  WRITING_CHECK: 'WRITING_CHECK',
+  QUIZ_EXPLANATION: 'QUIZ_EXPLANATION',
+  CONVERSATION: 'CONVERSATION',
+  MOCK_ANALYSIS: 'MOCK_ANALYSIS',
+} as const;
+
+export type AiUseCase = (typeof AiUseCase)[keyof typeof AiUseCase];
 
 export interface ChatRequest {
   useCase: AiUseCase;

@@ -1,10 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 @import './styles/variables.css';
 @import './styles/animations.css';
 
 /* Global utilities */
 .gradient-text {
-  /* No gradients in Postman theme. Fallback to primary. */
-  color: var(--color-primary);
+  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -25,4 +28,24 @@ a:hover {
 
 .mono-text {
   font-family: var(--font-mono);
+}
+
+.text-secondary {
+  color: var(--color-ink-muted);
+}
+
+.text-subdued {
+  color: var(--color-ink-subdued);
+}
+
+.text-muted {
+  color: var(--color-ink-muted);
+}
+
+.text-orange {
+  color: var(--color-primary);
+}
+
+.text-success {
+  color: var(--color-method-get);
 }

@@ -1,0 +1,22 @@
+[
+  {"word": "私", "reading": "わたし", "meaning": "tôi", "romaji": "watashi", "jlptLevel": "N5"},
+  {"word": "学生", "reading": "がくせい", "meaning": "học sinh, sinh viên", "romaji": "gakusei", "jlptLevel": "N5"},
+  {"word": "先生", "reading": "せんせい", "meaning": "thầy cô giáo", "romaji": "sensei", "jlptLevel": "N5"},
+  {"word": "本", "reading": "ほん", "meaning": "sách", "romaji": "hon", "jlptLevel": "N5"},
+  {"word": "日本", "reading": "にほん", "meaning": "Nhật Bản", "romaji": "nihon", "jlptLevel": "N5"},
+  {"word": "日本語", "reading": "にほんご", "meaning": "tiếng Nhật", "romaji": "nihongo", "jlptLevel": "N5"},
+  {"word": "友達", "reading": "ともだち", "meaning": "bạn bè", "romaji": "tomodachi", "jlptLevel": "N5"},
+  {"word": "学校", "reading": "がっこう", "meaning": "trường học", "romaji": "gakkou", "jlptLevel": "N5"},
+  {"word": "食べる", "reading": "たべる", "meaning": "ăn", "romaji": "taberu", "jlptLevel": "N5"},
+  {"word": "飲む", "reading": "のむ", "meaning": "uống", "romaji": "nomu", "jlptLevel": "N5"},
+  {"word": "行く", "reading": "いく", "meaning": "đi", "romaji": "iku", "jlptLevel": "N5"},
+  {"word": "来る", "reading": "くる", "meaning": "đến", "romaji": "kuru", "jlptLevel": "N5"},
+  {"word": "見る", "reading": "みる", "meaning": "nhìn, xem", "romaji": "miru", "jlptLevel": "N5"},
+  {"word": "聞く", "reading": "きく", "meaning": "nghe, hỏi", "romaji": "kiku", "jlptLevel": "N5"},
+  {"word": "話す", "reading": "はなす", "meaning": "nói chuyện", "romaji": "hanasu", "jlptLevel": "N5"},
+  {"word": "勉強", "reading": "べんきょう", "meaning": "học tập", "romaji": "benkyou", "jlptLevel": "N5"},
+  {"word": "時間", "reading": "じかん", "meaning": "thời gian", "romaji": "jikan", "jlptLevel": "N5"},
+  {"word": "今日", "reading": "きょう", "meaning": "hôm nay", "romaji": "kyou", "jlptLevel": "N5"},
+  {"word": "明日", "reading": "あした", "meaning": "ngày mai", "romaji": "ashita", "jlptLevel": "N5"},
+  {"word": "昨日", "reading": "きのう", "meaning": "hôm qua", "romaji": "kinou", "jlptLevel": "N5"}
+]

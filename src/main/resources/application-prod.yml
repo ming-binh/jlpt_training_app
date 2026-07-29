@@ -1,0 +1,31 @@
+# application-prod.yml — Supabase PostgreSQL profile
+
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 600000
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+        enable_lazy_load_no_trans: false
+  h2:
+    console:
+      enabled: false
+
+supabase:
+  jwt:
+    secret: ${SUPABASE_JWT_SECRET:}
+  url: ${SUPABASE_URL:}

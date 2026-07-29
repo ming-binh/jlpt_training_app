@@ -1,20 +1,30 @@
-# Environment
+# Environment files (CRITICAL: Never commit secrets!)
 .env
+.env.local
+.env.*.local
+frontend/.env.local
 
-# Maven
+# Maven build outputs
 target/
 !.mvn/wrapper/maven-wrapper.jar
 
-# IDE
+# Node / Frontend build outputs
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+
+# IDE & Editor files
 .idea/
 *.iml
 .vscode/
 *.swp
 *.swo
 
-# OS
+# OS generated files
 .DS_Store
 Thumbs.db
 
 # Logs
 *.log
+npm-debug.log*
+yarn-debug.log*

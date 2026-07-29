@@ -1,6 +1,6 @@
 import axios from 'axios';
+import { supabase } from '../lib/supabase';
 
-// Base API URL. In production, this should be an environment variable.
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 const api = axios.create({
@@ -10,32 +10,25 @@ const api = axios.create({
   },
 });
 
-// Request interceptor to attach JWT token
+// Request interceptor — attach Supabase JWT to every request
 api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
+  async (config) => {
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor to handle 401 Unauthorized globally
+// Response interceptor — handle 401 globally
 api.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (error.response && error.response.status === 401) {
-      // Clear token and redirect to login if unauthorized
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      
-      // Avoid redirect loop if already on login page
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      await supabase.auth.signOut();
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
