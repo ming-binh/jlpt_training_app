@@ -1,51 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
-@import './styles/variables.css';
-@import './styles/animations.css';
+@import './styles.css';
 
-/* Global utilities */
-.gradient-text {
-  background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  color: var(--color-ink);
-  font-weight: 600;
-  margin-top: 0;
-  margin-bottom: var(--space-4);
-}
-
-a {
-  color: var(--color-primary);
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-.mono-text {
-  font-family: var(--font-mono);
-}
-
-.text-secondary {
-  color: var(--color-ink-muted);
-}
-
-.text-subdued {
-  color: var(--color-ink-subdued);
-}
-
-.text-muted {
-  color: var(--color-ink-muted);
-}
-
-.text-orange {
-  color: var(--color-primary);
-}
-
-.text-success {
-  color: var(--color-method-get);
+/* Utility overrides */
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
 }

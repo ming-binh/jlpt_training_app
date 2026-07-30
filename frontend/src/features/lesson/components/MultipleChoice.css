@@ -1,0 +1,196 @@
+.mc-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 100%;
+}
+
+/* Question */
+.mc-question {
+  text-align: center;
+  padding: var(--space-6);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.mc-question-label {
+  font-size: 11px;
+  color: var(--color-ink-subdued);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--space-3);
+}
+
+.mc-question-word {
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--color-ink);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.mc-question-furigana {
+  margin-top: var(--space-2);
+  font-size: 14px;
+  color: var(--color-ink-muted);
+  font-family: var(--font-mono);
+}
+
+/* Options grid */
+.mc-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+@media (max-width: 400px) {
+  .mc-options { grid-template-columns: 1fr; }
+}
+
+/* Option button */
+.mc-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-surface-1);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--duration-base) var(--easing-standard);
+  min-height: 56px;
+}
+
+.mc-option:hover:not(:disabled) {
+  border-color: var(--color-primary);
+  background: var(--color-primary-subtle);
+}
+
+.mc-option--selected {
+  border-color: var(--color-primary);
+  background: var(--color-primary-subtle);
+  box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.mc-option--correct {
+  border-color: var(--color-correct) !important;
+  background: var(--color-correct-subtle) !important;
+  box-shadow: var(--color-correct-glow) !important;
+}
+
+.mc-option--incorrect {
+  border-color: var(--color-incorrect) !important;
+  background: var(--color-incorrect-subtle) !important;
+  box-shadow: var(--color-incorrect-glow) !important;
+}
+
+.mc-option--dimmed {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.mc-option-letter {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--color-ink-muted);
+  flex-shrink: 0;
+  transition: background var(--duration-fast);
+}
+
+.mc-option--correct .mc-option-letter {
+  background: var(--color-correct);
+  color: #0C0D14;
+}
+
+.mc-option--incorrect .mc-option-letter {
+  background: var(--color-incorrect);
+  color: white;
+}
+
+.mc-option-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-ink);
+  flex: 1;
+  line-height: 1.4;
+}
+
+.mc-option-furigana {
+  font-size: 10px;
+  color: var(--color-ink-subdued);
+  font-family: var(--font-mono);
+}
+
+/* Feedback banner */
+.mc-feedback {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-lg);
+  border: 1px solid transparent;
+}
+
+.mc-feedback--correct {
+  background: var(--color-correct-subtle);
+  border-color: color-mix(in srgb, var(--color-correct) 30%, transparent);
+}
+
+.mc-feedback--incorrect {
+  background: var(--color-incorrect-subtle);
+  border-color: color-mix(in srgb, var(--color-incorrect) 30%, transparent);
+}
+
+.mc-feedback-icon {
+  font-size: 20px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.mc-feedback--correct .mc-feedback-icon { color: var(--color-correct); }
+.mc-feedback--incorrect .mc-feedback-icon { color: var(--color-incorrect); }
+
+.mc-feedback-text {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+.mc-feedback-explanation {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-ink-muted);
+  margin: var(--space-2) 0 0;
+  line-height: 1.6;
+}
+
+.mc-continue-btn {
+  padding: var(--space-2) var(--space-5);
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--easing-standard);
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.mc-continue-btn:hover {
+  background: var(--color-primary-hover);
+  box-shadow: var(--shadow-glow);
+}

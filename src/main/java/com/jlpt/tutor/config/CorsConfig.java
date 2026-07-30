@@ -10,9 +10,13 @@ public class CorsConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:3000")
+                .allowedOrigins(
+                    "http://localhost:5173",  // Vite dev server
+                    "http://localhost:3000",  // legacy / other setups
+                    "http://127.0.0.1:5173"
+                )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                .allowedHeaders("Content-Type", "X-User-Id")
+                .allowedHeaders("*")
                 .allowCredentials(true);
     }
 }

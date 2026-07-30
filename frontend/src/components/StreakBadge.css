@@ -1,0 +1,28 @@
+.streak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-weight: 600;
+  color: var(--color-streak);
+}
+
+.streak-badge--sm { font-size: 12px; }
+.streak-badge--md { font-size: 14px; }
+.streak-badge--lg { font-size: 20px; }
+
+.streak-flame {
+  display: inline-block;
+  transform-origin: bottom center;
+}
+
+.streak-count {
+  font-family: var(--font-mono);
+  color: var(--color-streak);
+  letter-spacing: -0.02em;
+}
+
+.streak-label {
+  font-size: 0.8em;
+  color: var(--color-ink-muted);
+  font-weight: 400;
+}

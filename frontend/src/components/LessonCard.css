@@ -1,0 +1,152 @@
+.lesson-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-4);
+  background: var(--color-surface-1);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--duration-base) var(--easing-standard);
+  position: relative;
+  overflow: hidden;
+}
+
+.lesson-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  background: var(--color-border);
+  transition: background var(--duration-base);
+}
+
+.lesson-card:hover:not(:disabled) {
+  background: var(--color-surface-2);
+  border-color: var(--color-border-strong);
+  transform: translateX(2px);
+  box-shadow: var(--shadow-card);
+}
+
+.lesson-card:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Category accent colors */
+.lesson-card--vocabulary.lesson-card--available::before,
+.lesson-card--vocabulary.lesson-card--in-progress::before,
+.lesson-card--vocabulary.lesson-card--completed::before { background: var(--color-primary); }
+
+.lesson-card--kanji.lesson-card--available::before,
+.lesson-card--kanji.lesson-card--in-progress::before,
+.lesson-card--kanji.lesson-card--completed::before { background: var(--color-accent); }
+
+.lesson-card--grammar.lesson-card--available::before,
+.lesson-card--grammar.lesson-card--in-progress::before,
+.lesson-card--grammar.lesson-card--completed::before { background: var(--color-n3); }
+
+/* Completed state */
+.lesson-card--completed {
+  border-color: color-mix(in srgb, var(--color-correct) 25%, transparent);
+  background: color-mix(in srgb, var(--color-correct-subtle) 50%, var(--color-surface-1));
+}
+
+/* Category icon */
+.lesson-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  border: 1px solid var(--color-border);
+}
+
+/* Body */
+.lesson-card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.lesson-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.lesson-card-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-ink);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lesson-card-desc {
+  font-size: 12px;
+  color: var(--color-ink-muted);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Progress */
+.lesson-card-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.lesson-card-progress-track {
+  flex: 1;
+  height: 4px;
+  background: var(--color-surface-3);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.lesson-card-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  border-radius: var(--radius-pill);
+  transition: width 0.4s var(--easing-standard);
+}
+
+.lesson-card--completed .lesson-card-progress-fill {
+  background: linear-gradient(90deg, var(--color-correct), #6EE7B7);
+}
+
+.lesson-card-progress-text {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-ink-subdued);
+  white-space: nowrap;
+}
+
+/* Status icon */
+.lesson-card-status {
+  color: var(--color-ink-subdued);
+  flex-shrink: 0;
+  transition: color var(--duration-fast);
+}
+
+.lesson-card--completed .lesson-card-status { color: var(--color-correct); }
+.lesson-card--in-progress .lesson-card-status { color: var(--color-primary); }
+.lesson-card:hover:not(:disabled) .lesson-card-status { color: var(--color-ink-muted); }

@@ -32,7 +32,11 @@ public class SecurityConfig {
                     .requestMatchers("/api/auth/**").permitAll()
                     .requestMatchers("/api/vocabulary/**").permitAll()
                     .requestMatchers("/api/kanji/**").permitAll()
-                    .requestMatchers("/api/grammar/**").permitAll();
+                    .requestMatchers("/api/grammar/**").permitAll()
+                    .requestMatchers("/api/ai/**").permitAll()
+                    .requestMatchers("/api/lessons/**").permitAll()
+                    .requestMatchers("/api/progress/**").permitAll()
+                    .requestMatchers("/api/quiz/**").permitAll();
 
                 // H2 console — only in dev (h2.console.enabled=true)
                 if (h2ConsoleEnabled) {

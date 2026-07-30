@@ -1,0 +1,218 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ * Indigo Nhật — chàm đậm, giấy washi, vàng kim
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-washi: var(--washi);
+  --color-ink: var(--ink);
+  --color-success: var(--success);
+  --font-sans: var(--font-sans);
+  --font-jp: var(--font-jp);
+}
+
+:root {
+  --radius: 0.75rem;
+  /* Indigo Nhật — chàm đậm, giấy washi, vàng kim */
+  --background: oklch(0.19 0.043 268);
+  --foreground: oklch(0.93 0.03 85);
+  --card: oklch(0.235 0.048 268);
+  --card-foreground: oklch(0.93 0.03 85);
+  --popover: oklch(0.235 0.048 268);
+  --popover-foreground: oklch(0.93 0.03 85);
+  --primary: oklch(0.56 0.14 266);
+  --primary-foreground: oklch(0.97 0.02 85);
+  --secondary: oklch(0.3 0.055 268);
+  --secondary-foreground: oklch(0.93 0.03 85);
+  --muted: oklch(0.28 0.05 268);
+  --muted-foreground: oklch(0.74 0.03 85);
+  --accent: oklch(0.78 0.13 78);
+  --accent-foreground: oklch(0.19 0.043 268);
+  --destructive: oklch(0.62 0.2 22);
+  --destructive-foreground: oklch(0.97 0.02 85);
+  --success: oklch(0.7 0.13 165);
+  --border: oklch(0.34 0.05 268);
+  --input: oklch(0.34 0.05 268);
+  --ring: oklch(0.78 0.13 78);
+  --washi: oklch(0.93 0.03 85);
+  --ink: oklch(0.16 0.038 268);
+  --chart-1: oklch(0.56 0.14 266);
+  --chart-2: oklch(0.78 0.13 78);
+  --chart-3: oklch(0.7 0.13 165);
+  --chart-4: oklch(0.66 0.16 20);
+  --chart-5: oklch(0.6 0.1 300);
+  --sidebar: oklch(0.215 0.046 268);
+  --sidebar-foreground: oklch(0.93 0.03 85);
+  --sidebar-primary: oklch(0.56 0.14 266);
+  --sidebar-primary-foreground: oklch(0.97 0.02 85);
+  --sidebar-accent: oklch(0.3 0.055 268);
+  --sidebar-accent-foreground: oklch(0.93 0.03 85);
+  --sidebar-border: oklch(0.34 0.05 268);
+  --sidebar-ring: oklch(0.78 0.13 78);
+
+  --font-sans: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  --font-jp: "Noto Serif JP", "Yu Mincho", serif;
+  --gradient-indigo: linear-gradient(
+    145deg,
+    oklch(0.26 0.06 268) 0%,
+    oklch(0.19 0.043 268) 55%,
+    oklch(0.23 0.07 280) 100%
+  );
+  --gradient-gold: linear-gradient(100deg, oklch(0.82 0.12 88), oklch(0.72 0.14 62));
+  --shadow-lift: 0 18px 40px -22px oklch(0.08 0.04 268 / 0.9);
+  --shadow-glow: 0 0 0 1px oklch(0.78 0.13 78 / 0.28), 0 20px 50px -28px oklch(0.78 0.13 78 / 0.5);
+}
+
+.dark {
+  --background: oklch(0.129 0.042 264.695);
+  --foreground: oklch(0.984 0.003 247.858);
+  --card: oklch(0.208 0.042 265.755);
+  --card-foreground: oklch(0.984 0.003 247.858);
+  --popover: oklch(0.208 0.042 265.755);
+  --popover-foreground: oklch(0.984 0.003 247.858);
+  --primary: oklch(0.929 0.013 255.508);
+  --primary-foreground: oklch(0.208 0.042 265.755);
+  --secondary: oklch(0.279 0.041 260.031);
+  --secondary-foreground: oklch(0.984 0.003 247.858);
+  --muted: oklch(0.279 0.041 260.031);
+  --muted-foreground: oklch(0.704 0.04 256.788);
+  --accent: oklch(0.279 0.041 260.031);
+  --accent-foreground: oklch(0.984 0.003 247.858);
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.984 0.003 247.858);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.551 0.027 264.364);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.208 0.042 265.755);
+  --sidebar-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-accent: oklch(0.279 0.041 260.031);
+  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.551 0.027 264.364);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.015em;
+  }
+}
+
+@utility jp {
+  font-family: var(--font-jp);
+  font-feature-settings: "palt";
+}
+
+/* Hoa văn seigaiha (sóng Nhật) mờ dùng cho nền hero */
+@utility seigaiha {
+  background-image: radial-gradient(
+      circle at 50% 100%,
+      transparent 9px,
+      oklch(0.78 0.13 78 / 0.1) 10px,
+      transparent 11px
+    ),
+    radial-gradient(
+      circle at 0% 100%,
+      transparent 9px,
+      oklch(0.78 0.13 78 / 0.1) 10px,
+      transparent 11px
+    ),
+    radial-gradient(
+      circle at 100% 100%,
+      transparent 9px,
+      oklch(0.78 0.13 78 / 0.1) 10px,
+      transparent 11px
+    );
+  background-size: 40px 20px;
+}
+
+@utility surface-card {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lift);
+}
+
+@utility gradient-indigo {
+  background-image: var(--gradient-indigo);
+}
+
+@utility text-gold {
+  background-image: var(--gradient-gold);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility flip-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@utility backface-hidden {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}

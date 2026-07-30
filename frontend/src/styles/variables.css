@@ -39,6 +39,32 @@
   --color-warning: #FBBF24;
   --color-danger: #F87171;
 
+  /* ── JLPT Level Colors ──────────────────────────── */
+  --color-n5: #34D399;        /* emerald  — beginner */
+  --color-n5-subtle: #0D2D22;
+  --color-n4: #60A5FA;        /* sky blue */
+  --color-n4-subtle: #0D1F3A;
+  --color-n3: #FBBF24;        /* amber */
+  --color-n3-subtle: #2D1F07;
+  --color-n2: #FB923C;        /* orange */
+  --color-n2-subtle: #2D1207;
+  --color-n1: #F87171;        /* red — advanced */
+  --color-n1-subtle: #2D0D0D;
+
+  /* ── Learning State Colors ──────────────────────── */
+  --color-correct: #34D399;
+  --color-correct-subtle: #0D2D22;
+  --color-correct-glow: 0 0 20px rgba(52, 211, 153, 0.35);
+  --color-incorrect: #F87171;
+  --color-incorrect-subtle: #2D0D0D;
+  --color-incorrect-glow: 0 0 20px rgba(248, 113, 113, 0.35);
+
+  /* ── XP & Streak ────────────────────────────────── */
+  --color-xp: #FBBF24;
+  --color-xp-glow: 0 0 16px rgba(251, 191, 36, 0.4);
+  --color-streak: #FB923C;
+  --color-streak-glow: 0 0 16px rgba(251, 146, 60, 0.4);
+
   /* Typography */
   --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
