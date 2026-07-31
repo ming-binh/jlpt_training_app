@@ -57,8 +57,9 @@ public class GeminiService {
         long start = System.currentTimeMillis();
         AiUseCase useCase = request.getUseCase() != null ? request.getUseCase() : AiUseCase.CONVERSATION;
 
+        String cleanApiKey = getCleanGroqApiKey();
         // If Groq API key is present and valid, use Groq
-        if (groqApiKey != null && groqApiKey.startsWith("gsk_")) {
+        if (cleanApiKey.startsWith("gsk_")) {
             return chatWithGroq(request, useCase, start);
         }
 
@@ -66,9 +67,21 @@ public class GeminiService {
         return chatWithGemini(request, useCase, start);
     }
 
+    private String getCleanGroqApiKey() {
+        if (groqApiKey == null) return "";
+        return groqApiKey.replaceAll("^[\"']|[\"']$", "").trim();
+    }
+
+    private String getCleanGroqModel() {
+        if (groqModel == null || groqModel.isBlank()) return "llama-3.3-70b-versatile";
+        return groqModel.replaceAll("^[\"']|[\"']$", "").trim();
+    }
+
     // ---- Groq AI Engine ----
     private AiResponse chatWithGroq(AiRequest request, AiUseCase useCase, long start) {
-        log.info("Calling Groq AI API with model {}...", groqModel);
+        String cleanModel = getCleanGroqModel();
+        String cleanApiKey = getCleanGroqApiKey();
+        log.info("Calling Groq AI API with model {}...", cleanModel);
         WebClient groqClient = WebClient.builder().build();
 
         List<Map<String, String>> messages = new ArrayList<>();
@@ -85,7 +98,7 @@ public class GeminiService {
         }
 
         Map<String, Object> body = new HashMap<>();
-        body.put("model", groqModel);
+        body.put("model", cleanModel);
         body.put("messages", messages);
         body.put("temperature", getTemperature(useCase));
         body.put("response_format", Map.of("type", "json_object"));
@@ -94,7 +107,7 @@ public class GeminiService {
             try {
                 String rawResponse = groqClient.post()
                         .uri("https://api.groq.com/openai/v1/chat/completions")
-                        .header("Authorization", "Bearer " + groqApiKey)
+                        .header("Authorization", "Bearer " + cleanApiKey)
                         .header("Content-Type", "application/json")
                         .bodyValue(body)
                         .retrieve()
