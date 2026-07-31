@@ -73,12 +73,11 @@ public class GeminiService {
 
         List<Map<String, String>> messages = new ArrayList<>();
         String prompt = promptBuilder.build(request);
-        messages.add(Map.of("role", "user", "content", prompt));
+        messages.add(Map.of("role", "system", "content", prompt + "\n\nCRITICAL: You MUST output your response strictly as a valid JSON object."));
 
         if (useCase == AiUseCase.CONVERSATION && request.getHistory() != null && !request.getHistory().isEmpty()) {
             String userMessage = extractUserMessage(request);
             List<Message> context = conversationManager.buildContext(request.getHistory(), userMessage);
-            messages.clear();
             for (Message msg : context) {
                 String role = "model".equals(msg.getRole()) || "assistant".equals(msg.getRole()) ? "assistant" : "user";
                 messages.add(Map.of("role", role, "content", msg.getContent()));
