@@ -20,16 +20,16 @@ public class KanjiController {
     @GetMapping
     public ResponseEntity<Page<Kanji>> getKanji(
             @RequestParam(required = false) String level,
+            @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "100") int size) {
+            @RequestParam(defaultValue = "20") int size) {
 
-        Page<Kanji> result;
-        if (level == null || level.isBlank() || "ALL".equalsIgnoreCase(level)) {
-            result = kanjiRepository.findAll(PageRequest.of(page, size));
-        } else {
-            result = kanjiRepository.findByJlptLevel(
-                    level.toUpperCase(), PageRequest.of(page, size));
-        }
+        String filterLevel = (level != null && !level.isBlank() && !"ALL".equalsIgnoreCase(level)) ? level : null;
+        String filterSearch = (search != null && !search.isBlank()) ? search.trim() : null;
+
+        Page<Kanji> result = kanjiRepository.searchKanji(
+                filterLevel, filterSearch, PageRequest.of(page, size));
+
         return ResponseEntity.ok(result);
     }
 
@@ -43,9 +43,9 @@ public class KanjiController {
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Long>> getStats() {
         return ResponseEntity.ok(Map.of(
-                "N5", kanjiRepository.countByJlptLevel("N5"),
-                "N4", kanjiRepository.countByJlptLevel("N4"),
-                "N3", kanjiRepository.countByJlptLevel("N3"),
+                "N5", kanjiRepository.countByJlptLevelIgnoreCase("N5"),
+                "N4", kanjiRepository.countByJlptLevelIgnoreCase("N4"),
+                "N3", kanjiRepository.countByJlptLevelIgnoreCase("N3"),
                 "total", kanjiRepository.count()
         ));
     }

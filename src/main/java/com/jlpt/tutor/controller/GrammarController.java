@@ -20,16 +20,16 @@ public class GrammarController {
     @GetMapping
     public ResponseEntity<Page<GrammarPoint>> getGrammar(
             @RequestParam(required = false) String level,
+            @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "100") int size) {
+            @RequestParam(defaultValue = "20") int size) {
 
-        Page<GrammarPoint> result;
-        if (level == null || level.isBlank() || "ALL".equalsIgnoreCase(level)) {
-            result = grammarPointRepository.findAll(PageRequest.of(page, size));
-        } else {
-            result = grammarPointRepository.findByJlptLevel(
-                    level.toUpperCase(), PageRequest.of(page, size));
-        }
+        String filterLevel = (level != null && !level.isBlank() && !"ALL".equalsIgnoreCase(level)) ? level : null;
+        String filterSearch = (search != null && !search.isBlank()) ? search.trim() : null;
+
+        Page<GrammarPoint> result = grammarPointRepository.searchGrammar(
+                filterLevel, filterSearch, PageRequest.of(page, size));
+
         return ResponseEntity.ok(result);
     }
 
@@ -43,8 +43,9 @@ public class GrammarController {
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Long>> getStats() {
         return ResponseEntity.ok(Map.of(
-                "N5", grammarPointRepository.countByJlptLevel("N5"),
-                "N4", grammarPointRepository.countByJlptLevel("N4"),
+                "N5", grammarPointRepository.countByJlptLevelIgnoreCase("N5"),
+                "N4", grammarPointRepository.countByJlptLevelIgnoreCase("N4"),
+                "N3", grammarPointRepository.countByJlptLevelIgnoreCase("N3"),
                 "total", grammarPointRepository.count()
         ));
     }

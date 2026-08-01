@@ -1,77 +1,67 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronDown, Search } from "lucide-react";
-import { GRAMMAR, type Level } from "@/data/jlpt";
+import { type Level } from "@/data/jlpt";
 import { LevelBadge, LevelFilter } from "@/components/level-filter";
 import { AppHeader } from "@/components/app-header";
+import { Pagination } from "@/components/pagination";
 import { cn } from "@/lib/utils";
 import { jlptService, type GrammarPointItem } from "@/services/jlpt.service";
 
 export function NihonGrammarPage() {
   const [level, setLevel] = useState<Level | "all">("all");
   const [query, setQuery] = useState("");
+  const [page, setPage] = useState(0);
+  const pageSize = 15;
+
   const [openId, setOpenId] = useState<string | null>(null);
-  const [apiGrammarList, setApiGrammarList] = useState<GrammarPointItem[]>([]);
+  const [grammarList, setGrammarList] = useState<GrammarPointItem[]>([]);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
     jlptService
-      .getGrammar(level, 0, 300)
+      .getGrammar(level, query, page, pageSize)
       .then((res) => {
-        if (res.content && res.content.length > 0) {
-          setApiGrammarList(res.content);
-        } else {
-          setApiGrammarList([]);
-        }
+        setGrammarList(res.content || []);
+        setTotalPages(res.totalPages || 0);
+        setTotalElements(res.totalElements || 0);
       })
-      .catch(() => {
-        setApiGrammarList([]);
+      .catch((err) => {
+        console.error("Failed to load grammar:", err);
+        setGrammarList([]);
+        setTotalPages(0);
+        setTotalElements(0);
       })
       .finally(() => {
         setLoading(false);
       });
-  }, [level]);
+  }, [level, query, page]);
 
-  const sourceList = useMemo(() => {
-    if (apiGrammarList.length > 0) {
-      return apiGrammarList.map((g) => {
-        let examplesArray: { ja: string; vi: string }[] = [];
-        try {
-          if (g.examples) {
-            examplesArray = typeof g.examples === "string" ? JSON.parse(g.examples) : g.examples;
-          }
-        } catch (e) {
-          examplesArray = [];
-        }
-
-        return {
-          id: String(g.id),
-          pattern: g.title,
-          romaji: g.structure || "",
-          meaning: g.meaning,
-          level: (g.jlptLevel?.toLowerCase() || "n5") as Level,
-          note: g.relatedGrammar ? `Liên quan: ${g.relatedGrammar}` : "",
-          examples: examplesArray.map((ex: any) => ({
-            ja: ex.ja || ex.jp || "",
-            vi: ex.vi || "",
-          })),
-        };
-      });
+  const list = grammarList.map((g) => {
+    let examplesArray: any[] = [];
+    try {
+      if (g.examples) {
+        examplesArray = typeof g.examples === "string" ? JSON.parse(g.examples) : g.examples;
+      }
+    } catch (e) {
+      examplesArray = [];
     }
-    return GRAMMAR;
-  }, [apiGrammarList]);
 
-  const list = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return sourceList.filter(
-      (g) =>
-        (level === "all" || g.level === level) &&
-        (q === "" ||
-          g.pattern.includes(q) ||
-          g.romaji.toLowerCase().includes(q) ||
-          g.meaning.toLowerCase().includes(q)),
-    );
-  }, [sourceList, level, query]);
+    return {
+      id: String(g.id),
+      pattern: g.title,
+      romaji: g.structure || "",
+      meaning: g.meaning,
+      level: (g.jlptLevel?.toLowerCase() || "n5") as Level,
+      note: g.relatedGrammar ? `Liên quan: ${g.relatedGrammar}` : "",
+      examples: examplesArray.map((ex: any) => ({
+        ja: ex.ja || ex.jp || "",
+        vi: ex.vi || "",
+      })),
+    };
+  });
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -83,17 +73,26 @@ export function NihonGrammarPage() {
             <p className="jp text-sm font-semibold text-accent">文法</p>
             <h1 className="mt-1 text-3xl font-semibold">Ghi nhớ cấu trúc ngữ pháp</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Mỗi mẫu câu gồm công thức, lưu ý sắc thái và các câu ví dụ song ngữ Nhật - Việt. ({list.length} mẫu)
+              Mỗi mẫu câu gồm công thức, lưu ý sắc thái và các câu ví dụ song ngữ Nhật - Việt. ({totalElements} mẫu)
             </p>
           </div>
-          <LevelFilter value={level} onChange={setLevel} />
+          <LevelFilter
+            value={level}
+            onChange={(l) => {
+              setLevel(l);
+              setPage(0);
+            }}
+          />
         </header>
 
         <div className="relative mt-7">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setPage(0);
+            }}
             placeholder="Tìm mẫu ngữ pháp hoặc ý nghĩa…"
             className="w-full rounded-xl border border-border bg-card py-3 pl-10 pr-4 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring"
           />
@@ -102,7 +101,7 @@ export function NihonGrammarPage() {
         <div className="mt-6 space-y-3">
           {loading ? (
             <div className="surface-card p-8 text-center text-sm text-muted-foreground animate-pulse">
-              Đang tải cấu trúc Ngữ pháp từ Backend Database...
+              Đang tải cấu trúc Ngữ pháp từ cơ sở dữ liệu...
             </div>
           ) : list.length === 0 ? (
             <div className="surface-card p-8 text-center text-sm text-muted-foreground">
@@ -162,6 +161,15 @@ export function NihonGrammarPage() {
             })
           )}
         </div>
+
+        {/* Pagination Controls */}
+        <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          totalElements={totalElements}
+          pageSize={pageSize}
+          onPageChange={setPage}
+        />
       </div>
     </div>
   );

@@ -20,27 +20,27 @@ public class VocabularyController {
     @GetMapping
     public ResponseEntity<Page<Vocabulary>> getVocabulary(
             @RequestParam(required = false) String level,
+            @RequestParam(required = false) String search,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "100") int size) {
+            @RequestParam(defaultValue = "20") int size) {
 
-        Page<Vocabulary> result;
-        if (level == null || level.isBlank() || "ALL".equalsIgnoreCase(level)) {
-            result = vocabularyRepository.findAll(PageRequest.of(page, size));
-        } else {
-            result = vocabularyRepository.findByJlptLevel(
-                    level.toUpperCase(), PageRequest.of(page, size));
-        }
+        String filterLevel = (level != null && !level.isBlank() && !"ALL".equalsIgnoreCase(level)) ? level : null;
+        String filterSearch = (search != null && !search.isBlank()) ? search.trim() : null;
+
+        Page<Vocabulary> result = vocabularyRepository.searchVocabulary(
+                filterLevel, filterSearch, PageRequest.of(page, size));
+
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/stats")
     public ResponseEntity<Map<String, Long>> getStats() {
         return ResponseEntity.ok(Map.of(
-                "N5", vocabularyRepository.countByJlptLevel("N5"),
-                "N4", vocabularyRepository.countByJlptLevel("N4"),
-                "N3", vocabularyRepository.countByJlptLevel("N3"),
-                "N2", vocabularyRepository.countByJlptLevel("N2"),
-                "N1", vocabularyRepository.countByJlptLevel("N1"),
+                "N5", vocabularyRepository.countByJlptLevelIgnoreCase("N5"),
+                "N4", vocabularyRepository.countByJlptLevelIgnoreCase("N4"),
+                "N3", vocabularyRepository.countByJlptLevelIgnoreCase("N3"),
+                "N2", vocabularyRepository.countByJlptLevelIgnoreCase("N2"),
+                "N1", vocabularyRepository.countByJlptLevelIgnoreCase("N1"),
                 "total", vocabularyRepository.count()
         ));
     }

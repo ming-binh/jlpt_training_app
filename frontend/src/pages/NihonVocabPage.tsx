@@ -1,65 +1,58 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, RotateCcw, Search, Volume2 } from "lucide-react";
-import { VOCAB, type Level } from "@/data/jlpt";
+import { type Level } from "@/data/jlpt";
 import { LevelBadge, LevelFilter } from "@/components/level-filter";
 import { AppHeader } from "@/components/app-header";
+import { Pagination } from "@/components/pagination";
 import { cn } from "@/lib/utils";
 import { jlptService, type VocabularyItem } from "@/services/jlpt.service";
 
 export function NihonVocabPage() {
   const [level, setLevel] = useState<Level | "all">("all");
   const [query, setQuery] = useState("");
+  const [page, setPage] = useState(0);
+  const pageSize = 20;
+
+  const [vocabList, setVocabList] = useState<VocabularyItem[]>([]);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+  const [loading, setLoading] = useState(true);
+
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
-  const [apiVocabList, setApiVocabList] = useState<VocabularyItem[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
     jlptService
-      .getVocabulary(level, 0, 300)
+      .getVocabulary(level, query, page, pageSize)
       .then((res) => {
-        if (res.content && res.content.length > 0) {
-          setApiVocabList(res.content);
-        } else {
-          setApiVocabList([]);
-        }
+        setVocabList(res.content || []);
+        setTotalPages(res.totalPages || 0);
+        setTotalElements(res.totalElements || 0);
+        setIndex(0);
+        setFlipped(false);
       })
-      .catch(() => {
-        setApiVocabList([]);
+      .catch((err) => {
+        console.error("Failed to load vocabulary:", err);
+        setVocabList([]);
+        setTotalPages(0);
+        setTotalElements(0);
       })
       .finally(() => {
         setLoading(false);
       });
-  }, [level]);
+  }, [level, query, page]);
 
-  const sourceList = useMemo(() => {
-    if (apiVocabList.length > 0) {
-      return apiVocabList.map((v) => ({
-        id: String(v.id),
-        word: v.word,
-        reading: v.reading,
-        meaning: v.meaning,
-        level: (v.jlptLevel?.toLowerCase() || "n5") as Level,
-        type: "Từ vựng",
-        example: v.word,
-        exampleVi: v.meaning,
-      }));
-    }
-    return VOCAB;
-  }, [apiVocabList]);
-
-  const list = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return sourceList.filter(
-      (v) =>
-        (level === "all" || v.level === level) &&
-        (q === "" ||
-          v.word.includes(q) ||
-          v.reading.includes(q) ||
-          v.meaning.toLowerCase().includes(q)),
-    );
-  }, [sourceList, level, query]);
+  const list = vocabList.map((v) => ({
+    id: String(v.id),
+    word: v.word,
+    reading: v.reading,
+    meaning: v.meaning,
+    level: (v.jlptLevel?.toLowerCase() || "n5") as Level,
+    type: "Từ vựng",
+    example: v.word,
+    exampleVi: v.meaning,
+  }));
 
   const current = list[Math.min(index, Math.max(list.length - 1, 0))];
 
@@ -86,15 +79,14 @@ export function NihonVocabPage() {
             <p className="jp text-sm font-semibold text-accent">単語</p>
             <h1 className="mt-1 text-3xl font-semibold">Ôn từ vựng</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Lật thẻ để kiểm tra trí nhớ, sau đó lướt qua danh sách đầy đủ bên dưới. ({list.length} từ)
+              Lật thẻ để kiểm tra trí nhớ, tìm kiếm và phân trang từ vựng từ cơ sở dữ liệu. ({totalElements} từ)
             </p>
           </div>
           <LevelFilter
             value={level}
             onChange={(l) => {
               setLevel(l);
-              setIndex(0);
-              setFlipped(false);
+              setPage(0);
             }}
           />
         </header>
@@ -196,18 +188,18 @@ export function NihonVocabPage() {
                 value={query}
                 onChange={(e) => {
                   setQuery(e.target.value);
-                  setIndex(0);
+                  setPage(0);
                 }}
                 placeholder="Tìm từ vựng, cách đọc hoặc nghĩa…"
                 className="w-full rounded-xl border border-border bg-card py-3 pl-10 pr-4 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring"
               />
             </div>
 
-            <div className="max-h-[500px] overflow-y-auto rounded-2xl border border-border bg-card">
+            <div className="max-h-[460px] overflow-y-auto rounded-2xl border border-border bg-card">
               <div className="divide-y divide-border">
                 {loading ? (
                   <div className="p-8 text-center text-sm text-muted-foreground animate-pulse">
-                    Đang tải dữ liệu từ Backend Database...
+                    Đang tải dữ liệu từ vựng...
                   </div>
                 ) : list.length === 0 ? (
                   <div className="p-8 text-center text-sm text-muted-foreground">
@@ -223,7 +215,7 @@ export function NihonVocabPage() {
                         setFlipped(false);
                       }}
                       className={cn(
-                        "flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-secondary",
+                        "flex w-full items-center justify-between p-4 text-left transition-colors hover:bg-secondary cursor-pointer",
                         index === i && "bg-secondary/80",
                       )}
                     >
@@ -240,6 +232,15 @@ export function NihonVocabPage() {
                 )}
               </div>
             </div>
+
+            {/* Pagination Controls */}
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalElements={totalElements}
+              pageSize={pageSize}
+              onPageChange={setPage}
+            />
           </div>
         </div>
       </div>

@@ -1,57 +1,58 @@
-import { useEffect, useMemo, useState } from "react";
-import { KANJI, type Level } from "@/data/jlpt";
+import { useEffect, useState } from "react";
+import { Search } from "lucide-react";
+import { type Level } from "@/data/jlpt";
 import { LevelBadge, LevelFilter } from "@/components/level-filter";
 import { AppHeader } from "@/components/app-header";
+import { Pagination } from "@/components/pagination";
 import { cn } from "@/lib/utils";
 import { jlptService, type KanjiItem } from "@/services/jlpt.service";
 
 export function NihonKanjiPage() {
   const [level, setLevel] = useState<Level | "all">("all");
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(0);
+  const pageSize = 24;
+
   const [activeId, setActiveId] = useState<string>("");
-  const [apiKanjiList, setApiKanjiList] = useState<KanjiItem[]>([]);
+  const [kanjiList, setKanjiList] = useState<KanjiItem[]>([]);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
     jlptService
-      .getKanji(level, 0, 300)
+      .getKanji(level, query, page, pageSize)
       .then((res) => {
+        setKanjiList(res.content || []);
+        setTotalPages(res.totalPages || 0);
+        setTotalElements(res.totalElements || 0);
         if (res.content && res.content.length > 0) {
-          setApiKanjiList(res.content);
-        } else {
-          setApiKanjiList([]);
+          setActiveId(String(res.content[0].id));
         }
       })
-      .catch(() => {
-        setApiKanjiList([]);
+      .catch((err) => {
+        console.error("Failed to load kanji:", err);
+        setKanjiList([]);
+        setTotalPages(0);
+        setTotalElements(0);
       })
       .finally(() => {
         setLoading(false);
       });
-  }, [level]);
+  }, [level, query, page]);
 
-  const sourceList = useMemo(() => {
-    if (apiKanjiList.length > 0) {
-      return apiKanjiList.map((k) => ({
-        id: String(k.id),
-        char: k.character,
-        meaning: k.meanings,
-        onyomi: k.onReadings || "—",
-        kunyomi: k.kunReadings || "—",
-        strokes: k.strokeCount || 0,
-        level: (k.jlptLevel?.toLowerCase() || "n5") as Level,
-        words: [],
-      }));
-    }
-    return KANJI;
-  }, [apiKanjiList]);
+  const list = kanjiList.map((k) => ({
+    id: String(k.id),
+    char: k.character,
+    meaning: k.meanings,
+    onyomi: k.onReadings || "—",
+    kunyomi: k.kunReadings || "—",
+    strokes: k.strokeCount || 0,
+    level: (k.jlptLevel?.toLowerCase() || "n5") as Level,
+  }));
 
-  const list = useMemo(
-    () => sourceList.filter((k) => level === "all" || k.level === level),
-    [sourceList, level],
-  );
-
-  const active = sourceList.find((k) => k.id === activeId) ?? list[0];
+  const active = list.find((k) => k.id === activeId) ?? list[0];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -63,25 +64,45 @@ export function NihonKanjiPage() {
             <p className="jp text-sm font-semibold text-accent">漢字</p>
             <h1 className="mt-1 text-3xl font-semibold">Ôn kanji</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Chạm vào một chữ để xem âm đọc, số nét và thông tin chi tiết. ({list.length} chữ)
+              Chạm vào một chữ để xem âm đọc, số nét và thông tin chi tiết. ({totalElements} chữ)
             </p>
           </div>
-          <LevelFilter value={level} onChange={setLevel} />
+          <LevelFilter
+            value={level}
+            onChange={(l) => {
+              setLevel(l);
+              setPage(0);
+            }}
+          />
         </header>
+
+        {/* Search input */}
+        <div className="relative mt-6">
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setPage(0);
+            }}
+            placeholder="Tìm chữ Hán, âm đọc Onyomi/Kunyomi hoặc nghĩa…"
+            className="w-full rounded-xl border border-border bg-card py-3 pl-10 pr-4 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring"
+          />
+        </div>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           {/* Grid of Kanji Cards */}
           <div>
             {loading ? (
               <div className="surface-card p-8 text-center text-sm text-muted-foreground animate-pulse">
-                Đang tải dữ liệu Kanji từ Backend Database...
+                Đang tải dữ liệu Kanji...
               </div>
             ) : list.length === 0 ? (
               <div className="surface-card p-8 text-center text-sm text-muted-foreground">
                 Không tìm thấy Kanji phù hợp.
               </div>
             ) : (
-              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-5 max-h-[600px] overflow-y-auto pr-1">
+              <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6 max-h-[520px] overflow-y-auto pr-1">
                 {list.map((k) => (
                   <button
                     key={k.id}
@@ -100,6 +121,15 @@ export function NihonKanjiPage() {
                 ))}
               </div>
             )}
+
+            {/* Pagination Controls */}
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              totalElements={totalElements}
+              pageSize={pageSize}
+              onPageChange={setPage}
+            />
           </div>
 
           {/* Detailed Inspector Panel */}

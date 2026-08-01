@@ -26,7 +26,7 @@ export function NihonHomePage() {
       jlptService.getVocabStats().catch(() => null),
       jlptService.getKanjiStats().catch(() => null),
       jlptService.getGrammarStats().catch(() => null),
-      jlptService.getVocabulary("N5", 0, 1).catch(() => null),
+      jlptService.getVocabulary("N5", "", 0, 1).catch(() => null),
     ]).then(([vocabRes, kanjiRes, grammarRes, vocabListRes]) => {
       setCounts({
         vocab: vocabRes?.total && vocabRes.total > 0 ? vocabRes.total : VOCAB.length,

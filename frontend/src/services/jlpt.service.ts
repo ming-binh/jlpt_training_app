@@ -48,28 +48,52 @@ export interface StatsResponse {
 }
 
 export const jlptService = {
-  getVocabulary: async (level?: string, page = 0, size = 200): Promise<PageResponse<VocabularyItem>> => {
+  getVocabulary: async (
+    level?: string,
+    search?: string,
+    page = 0,
+    size = 20
+  ): Promise<PageResponse<VocabularyItem>> => {
     const params: Record<string, any> = { page, size };
     if (level && level !== 'all') {
       params.level = level.toUpperCase();
+    }
+    if (search && search.trim()) {
+      params.search = search.trim();
     }
     const response = await api.get<PageResponse<VocabularyItem>>('/vocabulary', { params });
     return response.data;
   },
 
-  getKanji: async (level?: string, page = 0, size = 200): Promise<PageResponse<KanjiItem>> => {
+  getKanji: async (
+    level?: string,
+    search?: string,
+    page = 0,
+    size = 20
+  ): Promise<PageResponse<KanjiItem>> => {
     const params: Record<string, any> = { page, size };
     if (level && level !== 'all') {
       params.level = level.toUpperCase();
+    }
+    if (search && search.trim()) {
+      params.search = search.trim();
     }
     const response = await api.get<PageResponse<KanjiItem>>('/kanji', { params });
     return response.data;
   },
 
-  getGrammar: async (level?: string, page = 0, size = 200): Promise<PageResponse<GrammarPointItem>> => {
+  getGrammar: async (
+    level?: string,
+    search?: string,
+    page = 0,
+    size = 20
+  ): Promise<PageResponse<GrammarPointItem>> => {
     const params: Record<string, any> = { page, size };
     if (level && level !== 'all') {
       params.level = level.toUpperCase();
+    }
+    if (search && search.trim()) {
+      params.search = search.trim();
     }
     const response = await api.get<PageResponse<GrammarPointItem>>('/grammar', { params });
     return response.data;
