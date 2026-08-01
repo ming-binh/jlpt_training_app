@@ -63,13 +63,30 @@ public class ChatController {
         }
 
         AiResponse response = geminiService.chat(request);
+        if (response != null) {
+            response.setConversationId(conversationId);
+        }
 
         // Save AI response
-        if (conversationId != null && response.getMessage() != null) {
+        if (conversationId != null && response != null && response.getMessage() != null) {
             conversationService.saveMessage(conversationId, "model", response.getMessage());
         }
 
         return response;
+    }
+
+    @GetMapping("/conversations")
+    public List<Conversation> getUserConversations(Authentication authentication) {
+        String userId = getUserId(authentication);
+        if (userId == null || userId.isBlank()) {
+            return List.of();
+        }
+        return conversationService.getConversations(userId);
+    }
+
+    @GetMapping("/conversations/{id}/messages")
+    public List<Message> getConversationMessages(@PathVariable("id") String conversationId) {
+        return conversationService.getHistory(conversationId);
     }
 
     @PostMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

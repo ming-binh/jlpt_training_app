@@ -47,6 +47,14 @@ export interface StatsResponse {
   total?: number;
 }
 
+export interface UserProfile {
+  id: string;
+  email: string;
+  username: string;
+  jlptLevel: string;
+  streakDays: number;
+}
+
 export const jlptService = {
   getVocabulary: async (
     level?: string,
@@ -111,6 +119,20 @@ export const jlptService = {
 
   getGrammarStats: async (): Promise<StatsResponse> => {
     const res = await api.get<StatsResponse>('/grammar/stats');
+    return res.data;
+  },
+
+  markProgress: async (
+    entityType: 'VOCABULARY' | 'KANJI' | 'GRAMMAR',
+    entityId: number,
+    status: 'LEARNING' | 'MASTERED' | 'REVIEW_NEEDED' = 'MASTERED'
+  ) => {
+    const res = await api.post('/progress/mark', { entityType, entityId, status, xp: 10 });
+    return res.data;
+  },
+
+  getUserProfile: async (): Promise<UserProfile> => {
+    const res = await api.get<UserProfile>('/users/me');
     return res.data;
   },
 };

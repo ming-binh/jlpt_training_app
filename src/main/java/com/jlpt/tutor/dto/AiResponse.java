@@ -12,6 +12,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AiResponse {
+    private String conversationId;
     private String message;
     private Quiz quiz;
     private List<String> related_grammar;

@@ -163,8 +163,24 @@ export function NihonVocabPage() {
                 {current && (
                   <button
                     type="button"
+                    onClick={async () => {
+                      try {
+                        await jlptService.markProgress("VOCABULARY", Number(current.id), "MASTERED");
+                        alert(`Đã đánh dấu từ "${current.word}" vào bảng Tiến Độ (user_progress)!`);
+                      } catch (err) {
+                        console.error(err);
+                      }
+                    }}
+                    className="flex items-center gap-1.5 rounded-xl border border-accent/50 bg-accent/10 px-3.5 py-3 text-xs font-semibold text-accent transition-colors hover:bg-accent hover:text-accent-foreground cursor-pointer"
+                  >
+                    ✓ Đã thuộc
+                  </button>
+                )}
+                {current && (
+                  <button
+                    type="button"
                     onClick={() => speak(current.word)}
-                    className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-xs font-semibold text-accent transition-colors hover:bg-secondary"
+                    className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-xs font-semibold text-accent transition-colors hover:bg-secondary cursor-pointer"
                   >
                     <Volume2 className="size-4" /> Phát âm
                   </button>
@@ -172,7 +188,7 @@ export function NihonVocabPage() {
                 <button
                   type="button"
                   onClick={() => setFlipped((f) => !f)}
-                  className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-xs font-semibold transition-colors hover:bg-secondary"
+                  className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 text-xs font-semibold transition-colors hover:bg-secondary cursor-pointer"
                 >
                   <RotateCcw className="size-4" /> Lật mặt
                 </button>
