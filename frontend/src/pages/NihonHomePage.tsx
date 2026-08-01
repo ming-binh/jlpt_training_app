@@ -1,42 +1,9 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, BookOpen, Brain, Flame, MessageCircle, PenLine } from "lucide-react";
 import { GRAMMAR, KANJI, VOCAB } from "@/data/jlpt";
 import { AppHeader } from "@/components/app-header";
-
-const FEATURES = [
-  {
-    to: "/tu-vung",
-    kanji: "語",
-    title: "Ôn từ vựng",
-    desc: "Flashcard lật thẻ, ví dụ thực tế, phát âm tiếng Nhật, lọc theo cấp độ.",
-    icon: BookOpen,
-    count: `${VOCAB.length} từ`,
-  },
-  {
-    to: "/kanji",
-    kanji: "漢",
-    title: "Ôn kanji",
-    desc: "Âm On/Kun, số nét và từ ghép thường gặp.",
-    icon: PenLine,
-    count: `${KANJI.length} chữ`,
-  },
-  {
-    to: "/ngu-phap",
-    kanji: "文",
-    title: "Cấu trúc ngữ pháp",
-    desc: "Công thức, sắc thái sử dụng và câu ví dụ song ngữ.",
-    icon: Brain,
-    count: `${GRAMMAR.length} mẫu`,
-  },
-  {
-    to: "/chat",
-    kanji: "AI",
-    title: "Trợ lý AI",
-    desc: "Hỏi đáp ngữ pháp, dịch câu, luyện hội thoại 24/7.",
-    icon: MessageCircle,
-    count: "Chat ngay",
-  },
-];
+import { jlptService, type VocabularyItem } from "@/services/jlpt.service";
 
 const PROGRESS = [
   { label: "Từ vựng", value: 62 },
@@ -45,6 +12,73 @@ const PROGRESS = [
 ];
 
 export function NihonHomePage() {
+  const [counts, setCounts] = useState({
+    vocab: VOCAB.length,
+    kanji: KANJI.length,
+    grammar: GRAMMAR.length,
+  });
+
+  const [wordOfDay, setWordOfDay] = useState<VocabularyItem | null>(null);
+
+  useEffect(() => {
+    // Fetch stats & word of day from backend API
+    Promise.all([
+      jlptService.getVocabStats().catch(() => null),
+      jlptService.getKanjiStats().catch(() => null),
+      jlptService.getGrammarStats().catch(() => null),
+      jlptService.getVocabulary("N5", 0, 1).catch(() => null),
+    ]).then(([vocabRes, kanjiRes, grammarRes, vocabListRes]) => {
+      setCounts({
+        vocab: vocabRes?.total && vocabRes.total > 0 ? vocabRes.total : VOCAB.length,
+        kanji: kanjiRes?.total && kanjiRes.total > 0 ? kanjiRes.total : KANJI.length,
+        grammar: grammarRes?.total && grammarRes.total > 0 ? grammarRes.total : GRAMMAR.length,
+      });
+
+      if (vocabListRes?.content && vocabListRes.content.length > 0) {
+        setWordOfDay(vocabListRes.content[0]);
+      }
+    });
+  }, []);
+
+  const features = [
+    {
+      to: "/tu-vung",
+      kanji: "語",
+      title: "Ôn từ vựng",
+      desc: "Flashcard lật thẻ, ví dụ thực tế, phát âm tiếng Nhật, lọc theo cấp độ.",
+      icon: BookOpen,
+      count: `${counts.vocab} từ`,
+    },
+    {
+      to: "/kanji",
+      kanji: "漢",
+      title: "Ôn kanji",
+      desc: "Âm On/Kun, số nét và từ ghép thường gặp.",
+      icon: PenLine,
+      count: `${counts.kanji} chữ`,
+    },
+    {
+      to: "/ngu-phap",
+      kanji: "文",
+      title: "Cấu trúc ngữ pháp",
+      desc: "Công thức, sắc thái sử dụng và câu ví dụ song ngữ.",
+      icon: Brain,
+      count: `${counts.grammar} mẫu`,
+    },
+    {
+      to: "/chat",
+      kanji: "AI",
+      title: "Trợ lý AI",
+      desc: "Hỏi đáp ngữ pháp, dịch câu, luyện hội thoại 24/7.",
+      icon: MessageCircle,
+      count: "Chat ngay",
+    },
+  ];
+
+  const currentWord = wordOfDay
+    ? { word: wordOfDay.word, reading: wordOfDay.reading, meaning: wordOfDay.meaning }
+    : VOCAB[0];
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <AppHeader />
@@ -88,9 +122,9 @@ export function NihonHomePage() {
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
               Từ của ngày
             </p>
-            <p className="jp mt-4 text-5xl font-bold leading-none md:text-6xl">{VOCAB[0].word}</p>
-            <p className="jp mt-3 text-lg font-medium text-accent">{VOCAB[0].reading}</p>
-            <p className="mt-1 text-sm text-muted-foreground">{VOCAB[0].meaning}</p>
+            <p className="jp mt-4 text-5xl font-bold leading-none md:text-6xl">{currentWord.word}</p>
+            <p className="jp mt-3 text-lg font-medium text-accent">{currentWord.reading}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{currentWord.meaning}</p>
             <div className="mt-6 space-y-4 border-t border-border pt-5">
               {PROGRESS.map((p) => (
                 <div key={p.label}>
@@ -118,7 +152,7 @@ export function NihonHomePage() {
           Chọn kỹ năng bạn muốn rèn hôm nay.
         </p>
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {FEATURES.map((f) => (
+          {features.map((f) => (
             <Link
               key={f.to}
               to={f.to}

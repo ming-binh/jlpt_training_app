@@ -1,19 +1,57 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, RotateCcw, Search, Volume2 } from "lucide-react";
 import { VOCAB, type Level } from "@/data/jlpt";
 import { LevelBadge, LevelFilter } from "@/components/level-filter";
 import { AppHeader } from "@/components/app-header";
 import { cn } from "@/lib/utils";
+import { jlptService, type VocabularyItem } from "@/services/jlpt.service";
 
 export function NihonVocabPage() {
   const [level, setLevel] = useState<Level | "all">("all");
   const [query, setQuery] = useState("");
   const [index, setIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
+  const [apiVocabList, setApiVocabList] = useState<VocabularyItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    jlptService
+      .getVocabulary(level, 0, 300)
+      .then((res) => {
+        if (res.content && res.content.length > 0) {
+          setApiVocabList(res.content);
+        } else {
+          setApiVocabList([]);
+        }
+      })
+      .catch(() => {
+        setApiVocabList([]);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [level]);
+
+  const sourceList = useMemo(() => {
+    if (apiVocabList.length > 0) {
+      return apiVocabList.map((v) => ({
+        id: String(v.id),
+        word: v.word,
+        reading: v.reading,
+        meaning: v.meaning,
+        level: (v.jlptLevel?.toLowerCase() || "n5") as Level,
+        type: "Từ vựng",
+        example: v.word,
+        exampleVi: v.meaning,
+      }));
+    }
+    return VOCAB;
+  }, [apiVocabList]);
 
   const list = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return VOCAB.filter(
+    return sourceList.filter(
       (v) =>
         (level === "all" || v.level === level) &&
         (q === "" ||
@@ -21,7 +59,7 @@ export function NihonVocabPage() {
           v.reading.includes(q) ||
           v.meaning.toLowerCase().includes(q)),
     );
-  }, [level, query]);
+  }, [sourceList, level, query]);
 
   const current = list[Math.min(index, Math.max(list.length - 1, 0))];
 
@@ -48,7 +86,7 @@ export function NihonVocabPage() {
             <p className="jp text-sm font-semibold text-accent">単語</p>
             <h1 className="mt-1 text-3xl font-semibold">Ôn từ vựng</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Lật thẻ để kiểm tra trí nhớ, sau đó lướt qua danh sách đầy đủ bên dưới.
+              Lật thẻ để kiểm tra trí nhớ, sau đó lướt qua danh sách đầy đủ bên dưới. ({list.length} từ)
             </p>
           </div>
           <LevelFilter
@@ -167,7 +205,11 @@ export function NihonVocabPage() {
 
             <div className="max-h-[500px] overflow-y-auto rounded-2xl border border-border bg-card">
               <div className="divide-y divide-border">
-                {list.length === 0 ? (
+                {loading ? (
+                  <div className="p-8 text-center text-sm text-muted-foreground animate-pulse">
+                    Đang tải dữ liệu từ Backend Database...
+                  </div>
+                ) : list.length === 0 ? (
                   <div className="p-8 text-center text-sm text-muted-foreground">
                     Không tìm thấy từ vựng phù hợp.
                   </div>

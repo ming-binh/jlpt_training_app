@@ -19,12 +19,17 @@ public class VocabularyController {
 
     @GetMapping
     public ResponseEntity<Page<Vocabulary>> getVocabulary(
-            @RequestParam(defaultValue = "N5") String level,
+            @RequestParam(required = false) String level,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "100") int size) {
 
-        Page<Vocabulary> result = vocabularyRepository.findByJlptLevel(
-                level.toUpperCase(), PageRequest.of(page, size));
+        Page<Vocabulary> result;
+        if (level == null || level.isBlank() || "ALL".equalsIgnoreCase(level)) {
+            result = vocabularyRepository.findAll(PageRequest.of(page, size));
+        } else {
+            result = vocabularyRepository.findByJlptLevel(
+                    level.toUpperCase(), PageRequest.of(page, size));
+        }
         return ResponseEntity.ok(result);
     }
 

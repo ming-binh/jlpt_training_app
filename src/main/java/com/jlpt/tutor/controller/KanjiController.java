@@ -19,12 +19,17 @@ public class KanjiController {
 
     @GetMapping
     public ResponseEntity<Page<Kanji>> getKanji(
-            @RequestParam(defaultValue = "N5") String level,
+            @RequestParam(required = false) String level,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "100") int size) {
 
-        Page<Kanji> result = kanjiRepository.findByJlptLevel(
-                level.toUpperCase(), PageRequest.of(page, size));
+        Page<Kanji> result;
+        if (level == null || level.isBlank() || "ALL".equalsIgnoreCase(level)) {
+            result = kanjiRepository.findAll(PageRequest.of(page, size));
+        } else {
+            result = kanjiRepository.findByJlptLevel(
+                    level.toUpperCase(), PageRequest.of(page, size));
+        }
         return ResponseEntity.ok(result);
     }
 

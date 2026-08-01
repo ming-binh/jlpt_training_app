@@ -19,12 +19,17 @@ public class GrammarController {
 
     @GetMapping
     public ResponseEntity<Page<GrammarPoint>> getGrammar(
-            @RequestParam(defaultValue = "N5") String level,
+            @RequestParam(required = false) String level,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "100") int size) {
 
-        Page<GrammarPoint> result = grammarPointRepository.findByJlptLevel(
-                level.toUpperCase(), PageRequest.of(page, size));
+        Page<GrammarPoint> result;
+        if (level == null || level.isBlank() || "ALL".equalsIgnoreCase(level)) {
+            result = grammarPointRepository.findAll(PageRequest.of(page, size));
+        } else {
+            result = grammarPointRepository.findByJlptLevel(
+                    level.toUpperCase(), PageRequest.of(page, size));
+        }
         return ResponseEntity.ok(result);
     }
 
