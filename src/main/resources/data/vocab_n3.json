@@ -1,0 +1,22 @@
+[
+  {"word": "解決", "reading": "かいけつ", "meaning": "giải quyết", "romaji": "kaiketsu", "jlptLevel": "N3"},
+  {"word": "確認", "reading": "かくにん", "meaning": "xác nhận, kiểm tra", "romaji": "kakunin", "jlptLevel": "N3"},
+  {"word": "活動", "reading": "かつどう", "meaning": "hoạt động", "romaji": "katsudou", "jlptLevel": "N3"},
+  {"word": "環境", "reading": "かんきょう", "meaning": "môi trường", "romaji": "kankyou", "jlptLevel": "N3"},
+  {"word": "関係", "reading": "かんけい", "meaning": "quan hệ, mối liên hệ", "romaji": "kankei", "jlptLevel": "N3"},
+  {"word": "感情", "reading": "かんじょう", "meaning": "tình cảm, cảm xúc", "romaji": "kanjou", "jlptLevel": "N3"},
+  {"word": "感激", "reading": "かんげき", "meaning": "cảm kích, xúc động", "romaji": "kangeki", "jlptLevel": "N3"},
+  {"word": "感謝", "reading": "かんしゃ", "meaning": "cảm ơn, biết ơn", "romaji": "kansha", "jlptLevel": "N3"},
+  {"word": "管理", "reading": "かんり", "meaning": "quản lý", "romaji": "kanri", "jlptLevel": "N3"},
+  {"word": "完成", "reading": "かんせい", "meaning": "hoàn thành", "romaji": "kansei", "jlptLevel": "N3"},
+  {"word": "期待", "reading": "きたい", "meaning": "kỳ vọng, mong đợi", "romaji": "kitai", "jlptLevel": "N3"},
+  {"word": "機会", "reading": "きかい", "meaning": "cơ hội", "romaji": "kikai", "jlptLevel": "N3"},
+  {"word": "技術", "reading": "ぎじゅつ", "meaning": "kỹ thuật, công nghệ", "romaji": "gijutsu", "jlptLevel": "N3"},
+  {"word": "協力", "reading": "きょうりょく", "meaning": "hợp tác, hiệp lực", "romaji": "kyouryoku", "jlptLevel": "N3"},
+  {"word": "結果", "reading": "けっか", "meaning": "kết quả", "romaji": "kekka", "jlptLevel": "N3"},
+  {"word": "計画", "reading": "けいかく", "meaning": "kế hoạch", "romaji": "keikaku", "jlptLevel": "N3"},
+  {"word": "参加", "reading": "さんか", "meaning": "tham gia", "romaji": "sanka", "jlptLevel": "N3"},
+  {"word": "成功", "reading": "せいこう", "meaning": "thành công", "romaji": "seikou", "jlptLevel": "N3"},
+  {"word": "成長", "reading": "せいちょう", "meaning": "trưởng thành, phát triển", "romaji": "seichou", "jlptLevel": "N3"},
+  {"word": "判断", "reading": "はんだん", "meaning": "phán đoán, đánh giá", "romaji": "handan", "jlptLevel": "N3"}
+]

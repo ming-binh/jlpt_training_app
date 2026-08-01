@@ -1,0 +1,17 @@
+[
+  {"character": "解", "meanings": "giải, giải quyết, cởi bỏ", "kunReadings": "と.く, と.かす, と.ける", "onReadings": "カイ, ゲ", "jlptLevel": "N3", "grade": 5, "strokeCount": 13},
+  {"character": "確", "meanings": "xác, chính xác, chắc chắn", "kunReadings": "たしか, たしか.める", "onReadings": "カク, コウ", "jlptLevel": "N3", "grade": 5, "strokeCount": 15},
+  {"character": "認", "meanings": "nhận, công nhận, thừa nhận", "kunReadings": "认.める", "onReadings": "ニン", "jlptLevel": "N3", "grade": 6, "strokeCount": 14},
+  {"character": "活", "meanings": "hoạt, linh hoạt, sinh hoạt", "kunReadings": "い.きる, い.かす", "onReadings": "カツ", "jlptLevel": "N3", "grade": 2, "strokeCount": 9},
+  {"character": "環", "meanings": "hoàn, vòng, môi trường", "kunReadings": "わ", "onReadings": "カン", "jlptLevel": "N3", "grade": 8, "strokeCount": 17},
+  {"character": "境", "meanings": "cảnh, biên giới, ranh giới", "kunReadings": "さかい", "onReadings": "キョウ, ケイ", "jlptLevel": "N3", "grade": 5, "strokeCount": 14},
+  {"character": "関", "meanings": "quan, liên quan, cửa ải", "kunReadings": "せき, かか.わる", "onReadings": "カン", "jlptLevel": "N3", "grade": 4, "strokeCount": 14},
+  {"character": "係", "meanings": "hệ, mối quan hệ, người phụ trách", "kunReadings": "かか.る, かかり", "onReadings": "ケイ", "jlptLevel": "N3", "grade": 3, "strokeCount": 9},
+  {"character": "情", "meanings": "tình, tình cảm, thông tin", "kunReadings": "なさ.け", "onReadings": "ジョウ, セイ", "jlptLevel": "N3", "grade": 5, "strokeCount": 11},
+  {"character": "謝", "meanings": "tạ, cảm ơn, xin lỗi", "kunReadings": "あやま.る", "onReadings": "シャ", "jlptLevel": "N3", "grade": 5, "strokeCount": 17},
+  {"character": "管", "meanings": "quản, ống, quản lý", "kunReadings": "くだ", "onReadings": "カン", "jlptLevel": "N3", "grade": 4, "strokeCount": 14},
+  {"character": "理", "meanings": "lý, lý thuyết, quản lý", "kunReadings": "ことわり", "onReadings": "リ", "jlptLevel": "N3", "grade": 2, "strokeCount": 11},
+  {"character": "成", "meanings": "thành, hoàn thành, trở thành", "kunReadings": "な.る, な.す", "onReadings": "セイ, ジョウ", "jlptLevel": "N3", "grade": 4, "strokeCount": 6},
+  {"character": "果", "meanings": "quả, kết quả, hoa quả", "kunReadings": "は.たす, は.てる", "onReadings": "カ", "jlptLevel": "N3", "grade": 4, "strokeCount": 8},
+  {"character": "計", "meanings": "kế, kế hoạch, đo lường", "kunReadings": "はか.る, はか.らう", "onReadings": "ケイ", "jlptLevel": "N3", "grade": 2, "strokeCount": 9}
+]

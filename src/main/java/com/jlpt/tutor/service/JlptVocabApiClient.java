@@ -27,13 +27,16 @@ public class JlptVocabApiClient {
      * Skips words that already exist in DB.
      */
     public int syncVocabulary(String level) {
-        log.info("Syncing vocabulary for level {}...", level);
+        log.info("Syncing vocabulary for level {} from external API...", level);
 
-        WebClient client = WebClient.builder().baseUrl(BASE_URL).build();
+        WebClient client = WebClient.builder()
+                .baseUrl(BASE_URL)
+                .codecs(config -> config.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
+                .build();
 
         try {
             String response = client.get()
-                    .uri("?level=" + level.replace("N", ""))
+                    .uri("?level=" + level.replace("N", "") + "&limit=3000")
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
@@ -44,9 +47,16 @@ public class JlptVocabApiClient {
             }
 
             JsonNode root = objectMapper.readTree(response);
+            JsonNode wordsArray = root.has("words") ? root.get("words") : root;
+
+            if (wordsArray == null || !wordsArray.isArray()) {
+                log.warn("Invalid words array from JLPT Vocab API for level {}", level);
+                return 0;
+            }
+
             List<Vocabulary> toSave = new ArrayList<>();
 
-            for (JsonNode node : root) {
+            for (JsonNode node : wordsArray) {
                 String word = node.has("word") ? node.get("word").asText() : "";
                 if (word.isBlank() || vocabularyRepository.existsByWordAndJlptLevel(word, level)) {
                     continue;
@@ -65,7 +75,7 @@ public class JlptVocabApiClient {
             if (!toSave.isEmpty()) {
                 vocabularyRepository.saveAll(toSave);
             }
-            log.info("Saved {} new vocabulary entries for level {}", toSave.size(), level);
+            log.info("Saved {} new vocabulary entries from API for level {}", toSave.size(), level);
             return toSave.size();
 
         } catch (Exception e) {

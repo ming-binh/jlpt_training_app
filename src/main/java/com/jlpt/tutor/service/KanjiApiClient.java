@@ -35,10 +35,11 @@ public class KanjiApiClient {
                 .build();
 
         try {
-            // Step 1: Get list of kanji characters for the level (kanjiapi.dev uses 5, 4, 3, 2, 1)
+            // Step 1: Get list of kanji characters for the level (kanjiapi.dev uses jlpt-5, jlpt-4, jlpt-3, etc.)
             String levelNum = level.toUpperCase().replace("N", "");
             String listResponse = client.get()
-                    .uri("/kanji/" + levelNum)
+                    .uri("/kanji/jlpt-" + levelNum)
+                    .header("User-Agent", "Mozilla/5.0")
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();
@@ -60,6 +61,7 @@ public class KanjiApiClient {
                 try {
                     String detailResponse = client.get()
                             .uri("/kanji/" + character)
+                            .header("User-Agent", "Mozilla/5.0")
                             .retrieve()
                             .bodyToMono(String.class)
                             .block();

@@ -1,0 +1,22 @@
+[
+  {"word": "案内", "reading": "あんない", "meaning": "hướng dẫn, dẫn đường", "romaji": "annai", "jlptLevel": "N4"},
+  {"word": "安心", "reading": "あんしん", "meaning": "an tâm, yên tâm", "romaji": "anshin", "jlptLevel": "N4"},
+  {"word": "安全", "reading": "あんぜん", "meaning": "an toàn", "romaji": "anzen", "jlptLevel": "N4"},
+  {"word": "意見", "reading": "いけん", "meaning": "ý kiến", "romaji": "iken", "jlptLevel": "N4"},
+  {"word": "医者", "reading": "いしゃ", "meaning": "bác sĩ", "romaji": "isha", "jlptLevel": "N4"},
+  {"word": "意味", "reading": "いみ", "meaning": "ý nghĩa", "romaji": "imi", "jlptLevel": "N4"},
+  {"word": "運動", "reading": "うんどう", "meaning": "vận động, tập thể dục", "romaji": "undou", "jlptLevel": "N4"},
+  {"word": "運転", "reading": "うんてん", "meaning": "lái xe", "romaji": "unten", "jlptLevel": "N4"},
+  {"word": "説明", "reading": "せつめい", "meaning": "giải thích, thuyết minh", "romaji": "setsumei", "jlptLevel": "N4"},
+  {"word": "質問", "reading": "しつもん", "meaning": "câu hỏi, hỏi", "romaji": "shitsumon", "jlptLevel": "N4"},
+  {"word": "問題", "reading": "もんだい", "meaning": "vấn đề, câu hỏi bài tập", "romaji": "mondai", "jlptLevel": "N4"},
+  {"word": "利用", "reading": "りよう", "meaning": "sử dụng, tận dụng", "romaji": "riyou", "jlptLevel": "N4"},
+  {"word": "注意", "reading": "ちゅうい", "meaning": "chú ý, cẩn thận", "romaji": "chuui", "jlptLevel": "N4"},
+  {"word": "準備", "reading": "じゅんび", "meaning": "chuẩn bị", "romaji": "junbi", "jlptLevel": "N4"},
+  {"word": "約束", "reading": "やくそく", "meaning": "lời hứa, hẹn", "romaji": "yakusoku", "jlptLevel": "N4"},
+  {"word": "予約", "reading": "よやく", "meaning": "đặt trước, đặt chỗ", "romaji": "yoyaku", "jlptLevel": "N4"},
+  {"word": "連絡", "reading": "れんらく", "meaning": "liên lạc", "romaji": "renraku", "jlptLevel": "N4"},
+  {"word": "相談", "reading": "そうだん", "meaning": "thảo luận, bàn bạc", "romaji": "soudan", "jlptLevel": "N4"},
+  {"word": "経験", "reading": "けいけん", "meaning": "kinh nghiệm", "romaji": "keiken", "jlptLevel": "N4"},
+  {"word": "最近", "reading": "さいきん", "meaning": "gần đây", "romaji": "saikin", "jlptLevel": "N4"}
+]

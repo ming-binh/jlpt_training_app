@@ -1,0 +1,107 @@
+[
+  {
+    "title": "〜わけがない / 〜わけはない",
+    "structure": "Plain form + わけがない (V / A-い / A-な+な / N+の)",
+    "meaning": "Tuyệt đối không thể nào ~, Không có lý nào ~. Thể hiện sự phủ định tuyệt đối dựa trên căn cứ lý do.",
+    "examples": "[{\"ja\":\"彼（かれ）がそんな嘘（うそ）をつくわけがない。\",\"vi\":\"Không đời nào anh ấy lại nói dối như thế.\"}]",
+    "relatedGrammar": "〜はずがない, 〜わけではない"
+  },
+  {
+    "title": "〜ようにする",
+    "structure": "Verb (dictionary-form / ない-form) + ようにする",
+    "meaning": "Cố gắng làm ~ (thói quen, nỗ lực bản thân).",
+    "examples": "[{\"ja\":\"毎日（まいにち）野菜（やさい）を食（た）べるようにしています。\",\"vi\":\"Tôi đang cố gắng ăn rau mỗi ngày.\"}]",
+    "relatedGrammar": "〜 bao giờ / ようにする, ようにしている"
+  },
+  {
+    "title": "〜ばかりか / 〜ばかりでなく",
+    "structure": "N / Verb / Adj + ばかりか〜も / ばかりでなく〜も",
+    "meaning": "Không chỉ ~ mà còn ~. Thường đi với đuôi も.",
+    "examples": "[{\"ja\":\"彼（かれ）は日本語（にほんご）ばかりか英語（えいご）も話（はな）せる。\",\"vi\":\"Anh ấy không chỉ nói được tiếng Nhật mà còn nói được cả tiếng Anh.\"}]",
+    "relatedGrammar": "〜だけでなく, 〜のみならず"
+  },
+  {
+    "title": "〜について / 〜 me についての",
+    "structure": "Noun + について / についての + Noun",
+    "meaning": "Về ~, Liên quan đến ~.",
+    "examples": "[{\"ja\":\"日本（にほん）の culture（カルチャー）について勉強（べんきょう）しています。\",\"vi\":\"Tôi đang học về văn hóa Nhật Bản.\"}]",
+    "relatedGrammar": "〜に関して"
+  },
+  {
+    "title": "〜に関して / 〜に関する",
+    "structure": "Noun + に関して / に関する + Noun",
+    "meaning": "Về ~, Liên quan tới ~ (trang trọng hơn について).",
+    "examples": "[{\"ja\":\"この問題（もんだい）に関する意見（いけん）を述（の）べてください。\",\"vi\":\"Xin hãy nêu ý kiến liên quan đến vấn đề này.\"}]",
+    "relatedGrammar": "〜について"
+  },
+  {
+    "title": "〜に違いない",
+    "structure": "Plain form + に違いない (V / A-い / A-な / N)",
+    "meaning": "Chắc chắn là ~, Không thể sai được. Thể hiện sự phán đoán chủ quan mạnh mẽ.",
+    "examples": "[{\"ja\":\"犯人（はんにん）は彼（かれ）に違（ちが）いない。\",\"vi\":\"Thủ phạm chắc chắn là anh ta.\"}]",
+    "relatedGrammar": "〜はずだ, 〜に相違ない"
+  },
+  {
+    "title": "〜はずだ / 〜はずがない",
+    "structure": "Plain form + はずだ / はずがない (A-な+な, N+の)",
+    "meaning": "Chắc chắn là ~ / Chắc chắn không thể ~ (dựa trên căn cứ lý do rõ ràng).",
+    "examples": "[{\"ja\":\"田中（たなか）さんは今日（きょう）来（く）るはずです。\",\"vi\":\"Anh Tanaka chắc chắn hôm nay sẽ đến.\"}]",
+    "relatedGrammar": "〜に違いない"
+  },
+  {
+    "title": "〜たびに",
+    "structure": "Verb (dictionary-form) / Noun+の + たびに",
+    "meaning": "Mỗi lần ~, Cứ mỗi khi ~ thì lại ~.",
+    "examples": "[{\"ja\":\"この写真（しゃしん）を見るたびに、故郷（ふるさと）を思（おも）い出（だ）す。\",\"vi\":\"Mỗi lần xem bức ảnh này, tôi lại nhớ về quê hương.\"}]",
+    "relatedGrammar": "〜につけて"
+  },
+  {
+    "title": "〜とおりに / 〜どおりに",
+    "structure": "Verb (dictionary-form / た-form) + とおりに / Noun + とおりに/どおりに",
+    "meaning": "Theo như ~, Đúng như ~. Làm theo hướng dẫn/thực tế.",
+    "examples": "[{\"ja\":\"説明書（せつめいしょ）のとおりに組み立て（くみたて）てください。\",\"vi\":\"Hãy lắp ráp theo đúng như sách hướng dẫn.\"}]",
+    "relatedGrammar": "〜ように"
+  },
+  {
+    "title": "〜を中心に / 〜を中心として",
+    "structure": "Noun + を me 中心に / を me 中心として",
+    "meaning": "Lấy ~ làm trung tâm, Tập trung vào ~.",
+    "examples": "[{\"ja\":\"東京（とうきょう）を中心に大雨（おおあめ）が降（ふ）っている。\",\"vi\":\"Mưa lớn đang rơi tập trung ở khu vực Tokyo.\"}]",
+    "relatedGrammar": "〜をはじめ"
+  },
+  {
+    "title": "〜をはじめ / 〜をはじめとする",
+    "structure": "Noun + をはじめ / をはじめとする + Noun",
+    "meaning": "Trước tiên phải kể đến ~, Tiêu biểu là ~.",
+    "examples": "[{\"ja\":\"社長（しゃちょう）をはじめ、社員（しゃいん）全員（ぜんいん）が参加（さんか）した。\",\"vi\":\"Tiêu biểu là giám đốc, toàn thể nhân viên đã tham gia.\"}]",
+    "relatedGrammar": "〜を中心に"
+  },
+  {
+    "title": "〜最中に / 〜最中だ",
+    "structure": "Verb (ている-form) / Noun+の + 最中に",
+    "meaning": "Đúng lúc đang ~ thì (hành động khác chen vào).",
+    "examples": "[{\"ja\":\"食事（しょくじ）の最中（さいちゅう）に電話（でんわ）がかかってきた。\",\"vi\":\"Đúng lúc đang ăn cơm thì có điện thoại gọi đến.\"}]",
+    "relatedGrammar": "〜最中"
+  },
+  {
+    "title": "〜うちに / 〜ないうちに",
+    "structure": "V-る / V-ている / V-ない / Adj / N+の + うちに",
+    "meaning": "Trong khi còn ~ (tranh thủ làm trước khi trạng thái thay đổi).",
+    "examples": "[{\"ja\":\"温（あたた）かいうちに召（め me）し上（あ）がってください。\",\"vi\":\"Xin mời ăn trong lúc còn nóng ạ.\"}]",
+    "relatedGrammar": "〜あいだに"
+  },
+  {
+    "title": "〜気味 (ぎみ)",
+    "structure": "Verb (stem) / Noun + 気味",
+    "meaning": "Có cảm giác hơi ~, Có xu hướng hơi ~ (thường mang nét nghĩa tiêu cực như mệt, cảm, trễ).",
+    "examples": "[{\"ja\":\"最近（さいきん）風邪（かぜ）気味（ぎみ）で体調（たいちょう）が良（よ）くない。\",\"vi\":\"Dạo này có cảm giác hơi cảm cúm nên sức khỏe không tốt.\"}]",
+    "relatedGrammar": "〜がち"
+  },
+  {
+    "title": "〜がち",
+    "structure": "Verb (stem) / Noun + がち",
+    "meaning": "Thường hay ~, Thường có xu hướng ~ (xảy ra ngoài ý muốn).",
+    "examples": "[{\"ja\":\"一人暮らし（ひとりぐらし）は栄養（えいよう）が偏（かたよ）りがちだ。\",\"vi\":\"Sống một mình thì thường hay bị thiếu hụt dinh dưỡng.\"}]",
+    "relatedGrammar": "〜気味"
+  }
+]

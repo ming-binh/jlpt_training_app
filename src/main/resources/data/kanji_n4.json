@@ -1,0 +1,17 @@
+[
+  {"character": "説", "meanings": "thuyết, giải thích", "kunReadings": "と.く", "onReadings": "セツ, ゼツ", "jlptLevel": "N4", "grade": 4, "strokeCount": 14},
+  {"character": "明", "meanings": "minh, sáng, rõ ràng", "kunReadings": "あか.るい, あき.らか", "onReadings": "メイ, ミョウ", "jlptLevel": "N4", "grade": 2, "strokeCount": 8},
+  {"character": "質", "meanings": "chất, chất lượng, hỏi", "kunReadings": "たち, ただ.す", "onReadings": "シツ, シチ, チ", "jlptLevel": "N4", "grade": 5, "strokeCount": 15},
+  {"character": "問", "meanings": "vấn, câu hỏi", "kunReadings": "to.う, と.い", "onReadings": "モン", "jlptLevel": "N4", "grade": 3, "strokeCount": 11},
+  {"character": "題", "meanings": "đề, chủ đề", "kunReadings": "", "onReadings": "ダイ", "jlptLevel": "N4", "grade": 3, "strokeCount": 18},
+  {"character": "験", "meanings": "nghiệm, thử nghiệm", "kunReadings": "ため.す", "onReadings": "ケン, ゲン", "jlptLevel": "N4", "grade": 4, "strokeCount": 18},
+  {"character": "試", "meanings": "thí, dùng thử", "kunReadings": "こころ.みる, ため.す", "onReadings": "シ", "jlptLevel": "N4", "grade": 4, "strokeCount": 13},
+  {"character": "意", "meanings": "ý, ý chí, ý nghĩa", "kunReadings": "", "onReadings": "イ", "jlptLevel": "N4", "grade": 3, "strokeCount": 13},
+  {"character": "味", "meanings": "vị, hương vị", "kunReadings": "あじ, あじ.わる", "onReadings": "ミ", "jlptLevel": "N4", "grade": 3, "strokeCount": 8},
+  {"character": "運", "meanings": "vận, vận chuyển, may mắn", "kunReadings": "はこ.ぶ", "onReadings": "ウン", "jlptLevel": "N4", "grade": 3, "strokeCount": 12},
+  {"character": "動", "meanings": "động, chuyển động", "kunReadings": "うご.く, うご.かす", "onReadings": "ドウ", "jlptLevel": "N4", "grade": 3, "strokeCount": 11},
+  {"character": "転", "meanings": "chuyển, quay", "kunReadings": "ころ.がる, ころ.ぶ", "onReadings": "テン", "jlptLevel": "N4", "grade": 3, "strokeCount": 11},
+  {"character": "選", "meanings": "tuyển, lựa chọn", "kunReadings": "えら.ぶ", "onReadings": "セン", "jlptLevel": "N4", "grade": 4, "strokeCount": 15},
+  {"character": "練", "meanings": "luyện, rèn luyện", "kunReadings": "ね.る", "onReadings": "レン", "jlptLevel": "N4", "grade": 3, "strokeCount": 14},
+  {"character": "習", "meanings": "tập, học tập", "kunReadings": "なさ.う", "onReadings": "シュウ, ジュ", "jlptLevel": "N4", "grade": 3, "strokeCount": 11}
+]

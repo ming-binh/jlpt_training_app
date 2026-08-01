@@ -41,7 +41,7 @@ public class JlptDataSyncService {
         // 2. Sync vocabulary (try external API, fallback to local JSON)
         if (vocabularyRepository.count() == 0) {
             log.info("Vocabulary table is empty. Syncing from external API...");
-            for (String level : List.of("N5", "N4", "N3", "N2", "N1")) {
+            for (String level : List.of("N5", "N4", "N3")) {
                 vocabApiClient.syncVocabulary(level);
             }
             if (vocabularyRepository.count() == 0) {
@@ -71,13 +71,44 @@ public class JlptDataSyncService {
                 vocabularyRepository.count(), kanjiRepository.count(), grammarPointRepository.count());
     }
 
+    /**
+     * Force sync all N5, N4, N3 data from live open APIs and local resources.
+     */
+    public Map<String, Object> forceSyncAll() {
+        log.info("=== Force Syncing All JLPT Data N5-N3 from Live APIs ===");
+        
+        // Seed Grammar
+        seedGrammar();
+
+        // Sync Vocab from API for N5, N4, N3
+        int vocabCount = 0;
+        for (String level : List.of("N5", "N4", "N3")) {
+            vocabCount += vocabApiClient.syncVocabulary(level);
+        }
+
+        // Sync Kanji from API for N5, N4, N3
+        int kanjiCount = 0;
+        for (String level : List.of("N5", "N4", "N3")) {
+            kanjiCount += kanjiApiClient.syncKanji(level);
+        }
+
+        return Map.of(
+            "status", "success",
+            "newVocabSynced", vocabCount,
+            "newKanjiSynced", kanjiCount,
+            "totalVocabulary", vocabularyRepository.count(),
+            "totalKanji", kanjiRepository.count(),
+            "totalGrammar", grammarPointRepository.count()
+        );
+    }
+
     private void seedGrammar() {
         if (grammarPointRepository.count() > 0) {
             log.info("Grammar table already has {} entries. Skipping seed.", grammarPointRepository.count());
             return;
         }
 
-        for (String level : List.of("n5", "n4")) {
+        for (String level : List.of("n5", "n4", "n3")) {
             String filename = "data/grammar_" + level + ".json";
             try {
                 ClassPathResource resource = new ClassPathResource(filename);
@@ -107,32 +138,36 @@ public class JlptDataSyncService {
     }
 
     private void seedLocalVocab() {
-        String filename = "data/vocab_n5.json";
-        try {
-            ClassPathResource resource = new ClassPathResource(filename);
-            if (!resource.exists()) return;
+        for (String level : List.of("n5", "n4", "n3")) {
+            String filename = "data/vocab_" + level + ".json";
+            try {
+                ClassPathResource resource = new ClassPathResource(filename);
+                if (!resource.exists()) continue;
 
-            InputStream is = resource.getInputStream();
-            List<Vocabulary> vocabList = objectMapper.readValue(is, new TypeReference<>() {});
-            vocabularyRepository.saveAll(vocabList);
-            log.info("Seeded {} local vocabulary entries from {}", vocabList.size(), filename);
-        } catch (Exception e) {
-            log.error("Failed to seed local vocabulary: {}", e.getMessage());
+                InputStream is = resource.getInputStream();
+                List<Vocabulary> vocabList = objectMapper.readValue(is, new TypeReference<>() {});
+                vocabularyRepository.saveAll(vocabList);
+                log.info("Seeded {} local vocabulary entries from {}", vocabList.size(), filename);
+            } catch (Exception e) {
+                log.error("Failed to seed local vocabulary from {}: {}", filename, e.getMessage());
+            }
         }
     }
 
     private void seedLocalKanji() {
-        String filename = "data/kanji_n5.json";
-        try {
-            ClassPathResource resource = new ClassPathResource(filename);
-            if (!resource.exists()) return;
+        for (String level : List.of("n5", "n4", "n3")) {
+            String filename = "data/kanji_" + level + ".json";
+            try {
+                ClassPathResource resource = new ClassPathResource(filename);
+                if (!resource.exists()) continue;
 
-            InputStream is = resource.getInputStream();
-            List<Kanji> kanjiList = objectMapper.readValue(is, new TypeReference<>() {});
-            kanjiRepository.saveAll(kanjiList);
-            log.info("Seeded {} local kanji entries from {}", kanjiList.size(), filename);
-        } catch (Exception e) {
-            log.error("Failed to seed local kanji: {}", e.getMessage());
+                InputStream is = resource.getInputStream();
+                List<Kanji> kanjiList = objectMapper.readValue(is, new TypeReference<>() {});
+                kanjiRepository.saveAll(kanjiList);
+                log.info("Seeded {} local kanji entries from {}", kanjiList.size(), filename);
+            } catch (Exception e) {
+                log.error("Failed to seed local kanji from {}: {}", filename, e.getMessage());
+            }
         }
     }
 }
