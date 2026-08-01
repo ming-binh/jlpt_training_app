@@ -38,9 +38,9 @@ public class JlptDataSyncService {
         // 1. Seed grammar from local JSON files
         seedGrammar();
 
-        // 2. Sync vocabulary (try external API, fallback to local JSON)
+        // 2. Sync vocabulary (only if table is empty)
         if (vocabularyRepository.count() == 0) {
-            log.info("Vocabulary table is empty. Syncing from external API...");
+            log.info("Vocabulary table is empty. Syncing from external API for N5, N4, N3...");
             for (String level : List.of("N5", "N4", "N3")) {
                 vocabApiClient.syncVocabulary(level);
             }
@@ -52,9 +52,9 @@ public class JlptDataSyncService {
             log.info("Vocabulary table already has {} entries. Skipping sync.", vocabularyRepository.count());
         }
 
-        // 3. Sync kanji (try external API, fallback to local JSON)
+        // 3. Sync kanji (only if table is empty)
         if (kanjiRepository.count() == 0) {
-            log.info("Kanji table is empty. Syncing from external API...");
+            log.info("Kanji table is empty. Syncing from external API for N5, N4, N3...");
             for (String level : List.of("N5", "N4", "N3")) {
                 kanjiApiClient.syncKanji(level);
             }
