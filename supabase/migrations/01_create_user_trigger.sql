@@ -1,26 +1,27 @@
--- Migration: Auto sync auth.users to public.users and setup-- Safe Trigger function to copy new Supabase Auth users to public.users table
--- Exception handling ensures registration never fails even if public schema differs
+-- Migration: Auto sync auth.users to public.users (matching exact DB columns)
 
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.users (id, email, jlpt_level, role)
+  INSERT INTO public.users (id, email, username, jlpt_level, streak_days, role)
   VALUES (
     NEW.id,
     NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'name', SPLIT_PART(NEW.email, '@', 1)),
     'N5',
+    0,
     'USER'
   )
   ON CONFLICT (id) DO UPDATE SET
-    email = EXCLUDED.email;
+    email = EXCLUDED.email,
+    username = COALESCE(EXCLUDED.username, public.users.username);
   RETURN NEW;
 EXCEPTION WHEN OTHERS THEN
-  -- Prevent trigger failure from aborting account registration
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Drop and recreate the trigger
+-- Drop and recreate trigger
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
