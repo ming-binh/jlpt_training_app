@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { CheckCircle2, AlertCircle, X, Info } from "lucide-react";
 
 export interface ToastMessage {
@@ -41,7 +41,7 @@ export const toast = {
   },
 };
 
-export function Toaster({ position = "top-right", richColors = true }: { position?: string; richColors?: boolean }) {
+export function Toaster(_props?: { position?: string; richColors?: boolean }) {
   const [items, setItems] = useState<ToastMessage[]>([]);
 
   useEffect(() => {

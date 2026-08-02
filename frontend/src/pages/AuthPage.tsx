@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff, Loader2, MailCheck } from "lucide-react";
 import { toast } from "../components/ui/toast";
@@ -12,7 +12,7 @@ const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.
 export function AuthPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const redirectTarget = searchParams.get("redirect") || "/chat";
+  const redirectTarget = searchParams.get("redirect") || "/";
   const initialMode = searchParams.get("mode") === "dang-ky" ? "dang-ky" : "dang-nhap";
 
   const [tab, setTab] = useState<"dang-nhap" | "dang-ky">(initialMode);

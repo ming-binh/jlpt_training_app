@@ -56,7 +56,7 @@ export function AppHeader() {
           </span>
         </Link>
 
-        <nav className="ml-auto flex items-center gap-1 overflow-x-auto">
+        <nav className="ml-auto flex items-center gap-1 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-1">
           {NAV.map((item) => {
             const isActive = item.to === "/"
               ? location.pathname === "/"
@@ -77,7 +77,7 @@ export function AppHeader() {
             );
           })}
 
-          <div className="ml-2 border-l border-border pl-3 flex items-center gap-2">
+          <div className="ml-2 border-l border-border pl-3 flex items-center gap-2 shrink-0">
             {userEmail ? (
               <div className="flex items-center gap-2">
                 <span className="text-xs font-medium text-muted-foreground max-w-[120px] truncate hidden lg:inline">
@@ -96,7 +96,7 @@ export function AppHeader() {
             ) : (
               <Link
                 to="/login"
-                className="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground shadow-sm transition-transform hover:scale-105"
+                className="flex shrink-0 items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground shadow-sm transition-colors hover:bg-accent/90 cursor-pointer"
               >
                 <UserIcon className="size-3.5" />
                 <span>Đăng nhập</span>

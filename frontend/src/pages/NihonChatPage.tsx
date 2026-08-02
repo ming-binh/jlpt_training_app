@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Send, Sparkles, User, Loader2, MessageSquare, PlusCircle } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { AppHeader } from "@/components/app-header";
 import { chatService, AiUseCase, type ConversationItem } from "@/services/chat.service";
+import { supabase } from "@/lib/supabase";
 
 interface MessageItem {
   id: string;
@@ -20,6 +22,9 @@ const SUGGESTIONS = [
 ];
 
 export function NihonChatPage() {
+  const navigate = useNavigate();
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [userName, setUserName] = useState("Học Viên");
   const [messages, setMessages] = useState<MessageItem[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -58,10 +63,19 @@ export function NihonChatPage() {
       });
   };
 
-  // Load user conversation list from DB on mount
+  // Require user authentication for AI Chat
   useEffect(() => {
-    fetchConversations();
-  }, []);
+    supabase.auth.getUser().then(({ data }) => {
+      if (!data.user) {
+        navigate("/login?redirect=/chat", { replace: true });
+      } else {
+        const name = data.user.user_metadata?.name || data.user.email?.split("@")[0] || "Học Viên";
+        setUserName(name);
+        setCheckingAuth(false);
+        fetchConversations();
+      }
+    });
+  }, [navigate]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -96,7 +110,7 @@ export function NihonChatPage() {
           grammar_point: query,
         },
         userContext: {
-          user_name: "Học Viên",
+          user_name: userName,
           jlpt_level: "N4",
         },
       });
@@ -142,6 +156,20 @@ export function NihonChatPage() {
       setLoading(false);
     }
   };
+
+  if (checkingAuth) {
+    return (
+      <div className="flex flex-col min-h-screen bg-background text-foreground">
+        <AppHeader />
+        <div className="flex-1 grid place-items-center">
+          <div className="flex items-center gap-3 text-muted-foreground text-sm font-medium">
+            <Loader2 className="size-6 animate-spin text-accent" />
+            Đang kiểm tra đăng nhập...
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
