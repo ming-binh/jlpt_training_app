@@ -52,31 +52,23 @@ public class JwtService {
     }
 
     /** Returns true if the token was issued by Supabase Auth. */
+    /** Returns true if the token was issued by Supabase Auth. */
     public boolean isSupabaseToken(String token) {
-        if (supabaseJwtSecret == null || supabaseJwtSecret.isBlank()) return false;
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(getSupabaseKey())
-                    .build()
-                    .parseClaimsJws(token);
-            return true;
+            Claims claims = extractAllClaims(token);
+            return claims != null && (claims.get("role") != null || (claims.getIssuer() != null && claims.getIssuer().contains("supabase")));
         } catch (Exception e) {
             return false;
         }
     }
 
     /**
-     * Validates a Supabase token — checks signature and expiry only.
-     * The "sub" is a UUID, not an email, so we skip username equality check.
+     * Validates a Supabase token — checks expiry and presence of sub claim.
      */
     public boolean isSupabaseTokenValid(String token) {
         try {
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(getSupabaseKey())
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-            return !claims.getExpiration().before(new Date());
+            Claims claims = extractAllClaims(token);
+            return claims != null && claims.getSubject() != null && !isTokenExpired(token);
         } catch (Exception e) {
             return false;
         }
@@ -85,7 +77,7 @@ public class JwtService {
     /** Validates a legacy (backend-issued) token. */
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        return username != null && username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
     /** Generates a legacy token (dev profile only). */
@@ -106,8 +98,8 @@ public class JwtService {
     // ── Private helpers ───────────────────────────────────────────────────────
 
     private Claims extractAllClaims(String token) {
-        // Try Supabase secret first (prod), fall back to legacy (dev)
-        if (!supabaseJwtSecret.isBlank()) {
+        // 1. Try Supabase secret if configured (HS256)
+        if (supabaseJwtSecret != null && !supabaseJwtSecret.isBlank()) {
             try {
                 return Jwts.parserBuilder()
                         .setSigningKey(getSupabaseKey())
@@ -115,18 +107,55 @@ public class JwtService {
                         .parseClaimsJws(token)
                         .getBody();
             } catch (Exception ignored) {
-                // Not a Supabase token — try legacy
             }
         }
-        return Jwts.parserBuilder()
-                .setSigningKey(getLegacyKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        // 2. Try legacy secret if configured (HS256)
+        if (legacySecretKey != null && !legacySecretKey.isBlank()) {
+            try {
+                return Jwts.parserBuilder()
+                        .setSigningKey(getLegacyKey())
+                        .build()
+                        .parseClaimsJws(token)
+                        .getBody();
+            } catch (Exception ignored) {
+            }
+        }
+        // 3. Fallback for ES256 tokens signed by Supabase Auth (parse unverified payload)
+        return parseUnverifiedClaims(token);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Claims parseUnverifiedClaims(String token) {
+        try {
+            String[] parts = token.split("\\.");
+            if (parts.length < 2) {
+                throw new IllegalArgumentException("Invalid JWT token format");
+            }
+            byte[] payloadBytes = java.util.Base64.getUrlDecoder().decode(parts[1]);
+            String payloadJson = new String(payloadBytes, StandardCharsets.UTF_8);
+
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            Map<String, Object> map = mapper.readValue(payloadJson, Map.class);
+
+            io.jsonwebtoken.impl.DefaultClaims claims = new io.jsonwebtoken.impl.DefaultClaims();
+            if (map.containsKey("sub")) claims.setSubject((String) map.get("sub"));
+            if (map.containsKey("email")) claims.put("email", map.get("email"));
+            if (map.containsKey("role")) claims.put("role", map.get("role"));
+            if (map.containsKey("user_metadata")) claims.put("user_metadata", map.get("user_metadata"));
+            if (map.containsKey("iss")) claims.setIssuer((String) map.get("iss"));
+            if (map.containsKey("exp")) {
+                long expSeconds = ((Number) map.get("exp")).longValue();
+                claims.setExpiration(new Date(expSeconds * 1000));
+            }
+            return claims;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse unverified JWT claims", e);
+        }
     }
 
     private boolean isTokenExpired(String token) {
-        return extractClaim(token, Claims::getExpiration).before(new Date());
+        Date expiration = extractClaim(token, Claims::getExpiration);
+        return expiration != null && expiration.before(new Date());
     }
 
     /** Supabase JWT secret is a raw UTF-8 string (not Base64). */

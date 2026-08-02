@@ -71,12 +71,14 @@ export function AuthPage() {
           password,
         });
         if (error) {
+          console.error("Supabase signIn error:", error);
+          const msg = error.message.toLowerCase();
           toast.error(
-            error.message.includes("Invalid login")
+            msg.includes("invalid login") || msg.includes("invalid credentials")
               ? "Email hoặc mật khẩu không đúng."
-              : error.message.includes("Email not confirmed")
+              : msg.includes("email not confirmed")
               ? "Bạn cần xác nhận email trước khi đăng nhập."
-              : "Không đăng nhập được. Vui lòng thử lại."
+              : error.message
           );
           return;
         }
@@ -89,10 +91,14 @@ export function AuthPage() {
           options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
         });
         if (error) {
+          console.error("Supabase signUp error:", error);
+          const msg = error.message.toLowerCase();
           toast.error(
-            error.message.includes("already registered")
+            msg.includes("already registered") || msg.includes("already exists") || msg.includes("user already")
               ? "Email này đã có tài khoản. Hãy đăng nhập."
-              : "Không tạo được tài khoản. Vui lòng thử lại."
+              : msg.includes("rate limit")
+              ? "Gửi quá nhiều yêu cầu xác thực. Vui lòng đợi ít phút."
+              : error.message
           );
           return;
         }
