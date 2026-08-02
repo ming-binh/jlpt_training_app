@@ -6,6 +6,7 @@ import { supabase } from "../lib/supabase";
 import { AuthShell, GoogleMark } from "../components/auth/auth-shell";
 import { AppHeader } from "../components/app-header";
 import { cn } from "../lib/utils";
+import api from "../services/api";
 
 const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
@@ -25,22 +26,24 @@ export function AuthPage() {
   const [sentConfirm, setSentConfirm] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        navigate(redirectTarget, { replace: true });
-      }
-    });
+  supabase.auth.getSession().then(({ data }) => {
+    if (data.session) {
+      api.get("/ai/conversations").catch(() => {});
+      navigate(redirectTarget, { replace: true });
+    }
+  });
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        navigate(redirectTarget, { replace: true });
-      }
-    });
+  const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+    if (session) {
+      api.get("/ai/conversations").catch(() => {});
+      navigate(redirectTarget, { replace: true });
+    }
+  });
 
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, [navigate, redirectTarget]);
+  return () => {
+    authListener.subscription.unsubscribe();
+  };
+}, [navigate, redirectTarget]);
 
   const validate = () => {
     const next: Record<string, string> = {};
