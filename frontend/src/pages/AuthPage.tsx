@@ -72,13 +72,16 @@ export function AuthPage() {
         });
         if (error) {
           console.error("Supabase signIn error:", error);
-          const msg = error.message.toLowerCase();
+          const rawMsg = typeof error.message === "string" ? error.message.trim() : "";
+          const msg = rawMsg.toLowerCase();
           toast.error(
-            msg.includes("invalid login") || msg.includes("invalid credentials")
+            !rawMsg || rawMsg === "{}" || rawMsg === "[object Object]"
+              ? "Không đăng nhập được. Vui lòng kiểm tra lại email và mật khẩu."
+              : msg.includes("invalid login") || msg.includes("invalid credentials")
               ? "Email hoặc mật khẩu không đúng."
               : msg.includes("email not confirmed")
               ? "Bạn cần xác nhận email trước khi đăng nhập."
-              : error.message
+              : rawMsg
           );
           return;
         }
@@ -92,13 +95,16 @@ export function AuthPage() {
         });
         if (error) {
           console.error("Supabase signUp error:", error);
-          const msg = error.message.toLowerCase();
+          const rawMsg = typeof error.message === "string" ? error.message.trim() : "";
+          const msg = rawMsg.toLowerCase();
           toast.error(
-            msg.includes("already registered") || msg.includes("already exists") || msg.includes("user already")
-              ? "Email này đã có tài khoản. Hãy đăng nhập."
+            !rawMsg || rawMsg === "{}" || rawMsg === "[object Object]"
+              ? "Email này có thể đã được đăng ký hoặc bị giới hạn xác thực. Vui lòng thử lại hoặc dùng email khác."
+              : msg.includes("already registered") || msg.includes("already exists") || msg.includes("user already")
+              ? "Email này đã có tài khoản. Hãy chuyển sang Đăng nhập."
               : msg.includes("rate limit")
               ? "Gửi quá nhiều yêu cầu xác thực. Vui lòng đợi ít phút."
-              : error.message
+              : rawMsg
           );
           return;
         }

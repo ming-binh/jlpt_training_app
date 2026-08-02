@@ -16,22 +16,44 @@ function notify() {
   listeners.forEach((l) => l([...toasts]));
 }
 
+function formatToastText(text: unknown, fallback: string): string {
+  if (text === null || text === undefined) return fallback;
+  if (typeof text === "string") {
+    const trimmed = text.trim();
+    if (!trimmed || trimmed === "{}" || trimmed === "[object Object]") return fallback;
+    return trimmed;
+  }
+  if (typeof text === "object") {
+    try {
+      const str = JSON.stringify(text);
+      if (str === "{}" || str === "[]") return fallback;
+      return str;
+    } catch {
+      return fallback;
+    }
+  }
+  return String(text);
+}
+
 export const toast = {
-  success: (text: string) => {
+  success: (text: unknown) => {
     const id = String(Date.now() + Math.random());
-    toasts = [...toasts, { id, type: "success", text }];
+    const displayText = formatToastText(text, "Thao tác thành công!");
+    toasts = [...toasts, { id, type: "success", text: displayText }];
     notify();
     setTimeout(() => toast.dismiss(id), 4000);
   },
-  error: (text: string) => {
+  error: (text: unknown) => {
     const id = String(Date.now() + Math.random());
-    toasts = [...toasts, { id, type: "error", text }];
+    const displayText = formatToastText(text, "Có lỗi xảy ra. Vui lòng thử lại.");
+    toasts = [...toasts, { id, type: "error", text: displayText }];
     notify();
     setTimeout(() => toast.dismiss(id), 5000);
   },
-  info: (text: string) => {
+  info: (text: unknown) => {
     const id = String(Date.now() + Math.random());
-    toasts = [...toasts, { id, type: "info", text }];
+    const displayText = formatToastText(text, "Thông báo từ hệ thống.");
+    toasts = [...toasts, { id, type: "info", text: displayText }];
     notify();
     setTimeout(() => toast.dismiss(id), 4000);
   },
