@@ -55,7 +55,7 @@ public class ChatController {
         rateLimitService.checkRateLimit(userId, request.getUseCase());
 
         // Ensure we have a conversation to persist messages
-        String conversationId = resolveConversationId(userId, request);
+        String conversationId = resolveConversationId(userId, request, userMessage);
 
         // Save user message
         if (conversationId != null) {
@@ -79,7 +79,7 @@ public class ChatController {
     public List<Conversation> getUserConversations(Authentication authentication) {
         String userId = getUserId(authentication);
         if (userId == null || userId.isBlank()) {
-            return List.of();
+            userId = "guest";
         }
         return conversationService.getConversations(userId);
     }
@@ -148,16 +148,15 @@ public class ChatController {
     /**
      * Resolve or create a conversation ID for message persistence.
      */
-    private String resolveConversationId(String userId, AiRequest request) {
+    private String resolveConversationId(String userId, AiRequest request, String userMessage) {
+        String effectiveUserId = (userId != null && !userId.isBlank()) ? userId : "guest";
         if (request.getConversationId() != null && !request.getConversationId().isBlank()) {
+            conversationService.updateTitleIfDefault(request.getConversationId(), userMessage);
             return request.getConversationId();
         }
-        if (userId != null && !userId.isBlank()) {
-            Conversation conversation = conversationService.createConversation(userId);
-            request.setConversationId(conversation.getId());
-            return conversation.getId();
-        }
-        return null;
+        Conversation conversation = conversationService.createConversation(effectiveUserId, userMessage);
+        request.setConversationId(conversation.getId());
+        return conversation.getId();
     }
 
     /** Extract the user's actual message from the request, using params if available. */

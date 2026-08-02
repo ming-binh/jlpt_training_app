@@ -27,18 +27,19 @@ export function NihonChatPage() {
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Load user conversation list from DB on mount
-  useEffect(() => {
+  const fetchConversations = (selectConvId?: string) => {
     chatService
       .getConversations()
       .then((convs) => {
         if (convs && convs.length > 0) {
           setConversations(convs);
-          const latestConv = convs[0];
-          setConversationId(latestConv.id);
-          // Load messages for latest conversation
-          chatService.getMessages(latestConv.id).then((history) => {
-            if (history && history.length > 0) {
+          const targetId = selectConvId || conversationId || convs[0].id;
+          const exists = convs.some((c) => c.id === targetId);
+          const finalId = exists ? targetId : convs[0].id;
+          setConversationId(finalId);
+
+          chatService.getMessages(finalId).then((history) => {
+            if (history) {
               const loadedMsgs: MessageItem[] = history.map((m, idx) => ({
                 id: String(idx),
                 sender: m.role === "user" ? "user" : "ai",
@@ -55,6 +56,11 @@ export function NihonChatPage() {
       .catch((err) => {
         console.warn("Could not load conversations from server:", err);
       });
+  };
+
+  // Load user conversation list from DB on mount
+  useEffect(() => {
+    fetchConversations();
   }, []);
 
   useEffect(() => {
@@ -95,7 +101,9 @@ export function NihonChatPage() {
         },
       });
 
+      let currentConvId = conversationId;
       if (res.conversationId) {
+        currentConvId = res.conversationId;
         setConversationId(res.conversationId);
       }
 
@@ -117,6 +125,11 @@ export function NihonChatPage() {
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
       setMessages((prev) => [...prev, aiMsg]);
+
+      // Refresh sidebar conversation list
+      if (currentConvId) {
+        fetchConversations(currentConvId);
+      }
     } catch (err) {
       const aiMsg: MessageItem = {
         id: String(Date.now() + 1),

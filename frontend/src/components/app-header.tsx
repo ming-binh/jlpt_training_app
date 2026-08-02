@@ -1,6 +1,8 @@
-import { Link, useLocation } from "react-router-dom";
-import { BookOpen, Brain, MessageCircle, PenLine, Home } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { BookOpen, Brain, MessageCircle, PenLine, Home, User as UserIcon, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
 
 const NAV = [
   { to: "/", label: "Trang chủ", icon: Home },
@@ -12,6 +14,32 @@ const NAV = [
 
 export function AppHeader() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        setUserEmail(data.user.email || "Học Viên");
+      } else {
+        setUserEmail(null);
+      }
+    });
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserEmail(session?.user?.email || null);
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setUserEmail(null);
+    navigate("/login");
+  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/70 bg-background/85 backdrop-blur-xl">
@@ -48,6 +76,33 @@ export function AppHeader() {
               </Link>
             );
           })}
+
+          <div className="ml-2 border-l border-border pl-3 flex items-center gap-2">
+            {userEmail ? (
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-muted-foreground max-w-[120px] truncate hidden lg:inline">
+                  {userEmail}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  title="Đăng xuất"
+                  className="flex items-center gap-1.5 rounded-lg border border-border bg-secondary/50 px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive cursor-pointer"
+                >
+                  <LogOut className="size-3.5" />
+                  <span className="hidden sm:inline">Thoát</span>
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-accent-foreground shadow-sm transition-transform hover:scale-105"
+              >
+                <UserIcon className="size-3.5" />
+                <span>Đăng nhập</span>
+              </Link>
+            )}
+          </div>
         </nav>
       </div>
     </header>

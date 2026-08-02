@@ -23,6 +23,8 @@ public class Conversation {
     @Column(name = "user_id")
     private String userId;
 
+    private String title;
+
     private LocalDateTime createdAt;
     
     @PrePersist
