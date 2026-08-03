@@ -137,13 +137,8 @@ public class JwtService {
             com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
             Map<String, Object> map = mapper.readValue(payloadJson, Map.class);
 
-            io.jsonwebtoken.impl.DefaultClaims claims = new io.jsonwebtoken.impl.DefaultClaims();
-            if (map.containsKey("sub")) claims.setSubject((String) map.get("sub"));
-            if (map.containsKey("email")) claims.put("email", map.get("email"));
-            if (map.containsKey("role")) claims.put("role", map.get("role"));
-            if (map.containsKey("user_metadata")) claims.put("user_metadata", map.get("user_metadata"));
-            if (map.containsKey("iss")) claims.setIssuer((String) map.get("iss"));
-            if (map.containsKey("exp")) {
+            Claims claims = Jwts.claims(map);
+            if (map.containsKey("exp") && map.get("exp") instanceof Number) {
                 long expSeconds = ((Number) map.get("exp")).longValue();
                 claims.setExpiration(new Date(expSeconds * 1000));
             }
