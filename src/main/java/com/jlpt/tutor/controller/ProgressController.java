@@ -116,6 +116,15 @@ public class ProgressController {
         return ResponseEntity.ok(saved);
     }
 
+    @GetMapping("/my-items")
+    public ResponseEntity<List<UserProgress>> getMyProgress(Authentication authentication) {
+        String userId = getUserId(authentication);
+        if (userId == null) {
+            return ResponseEntity.ok(List.of());
+        }
+        return ResponseEntity.ok(userProgressRepository.findByUserId(userId));
+    }
+
     @GetMapping("/streak")
     public ResponseEntity<List<Map<String, Object>>> getStreak(
             Authentication authentication) {

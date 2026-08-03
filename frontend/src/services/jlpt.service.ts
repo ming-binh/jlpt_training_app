@@ -131,6 +131,21 @@ export const jlptService = {
     return res.data;
   },
 
+  getUserProgressMap: async (): Promise<Record<string, 'LEARNING' | 'MASTERED'>> => {
+    try {
+      const res = await api.get<Array<{ entityType: string; entityId: number; status: 'LEARNING' | 'MASTERED' }>>('/progress/my-items');
+      const map: Record<string, 'LEARNING' | 'MASTERED'> = {};
+      if (res.data && Array.isArray(res.data)) {
+        res.data.forEach(item => {
+          map[`${item.entityType}_${item.entityId}`] = item.status;
+        });
+      }
+      return map;
+    } catch {
+      return {};
+    }
+  },
+
   getUserProfile: async (): Promise<UserProfile> => {
     const res = await api.get<UserProfile>('/users/me');
     return res.data;

@@ -15,3 +15,8 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
     show-sql: false
+
+logging:
+  level:
+    org.springframework.web.servlet.handler.HandlerMappingIntrospector: ERROR
+

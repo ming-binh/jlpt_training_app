@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { BookOpen, Brain, MessageCircle, PenLine, Home, User as UserIcon, LogOut, ChevronDown } from "lucide-react";
+import { BookOpen, Brain, MessageCircle, PenLine, Home, User as UserIcon, LogOut, UserCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import { userService } from "@/services/user.service";
@@ -13,14 +13,14 @@ const NAV = [
   { to: "/chat", label: "Trợ lý AI", icon: MessageCircle },
 ] as const;
 
-const JLPT_LEVELS = ["N5", "N4", "N3", "N2", "N1"] as const;
-
 export function AppHeader() {
   const location = useLocation();
   const navigate = useNavigate();
   const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [jlptLevel, setJlptLevel] = useState<string>("N5");
-  const [showLevelMenu, setShowLevelMenu] = useState(false);
+  const [username, setUsername] = useState<string | null>(null);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -28,13 +28,14 @@ export function AppHeader() {
         setUserEmail(data.user.email || "Học Viên");
         userService.getCurrentUser()
           .then((profile) => {
-            if (profile && profile.jlptLevel) {
-              setJlptLevel(profile.jlptLevel);
+            if (profile && profile.username) {
+              setUsername(profile.username);
             }
           })
           .catch(() => null);
       } else {
         setUserEmail(null);
+        setUsername(null);
       }
     });
 
@@ -47,26 +48,32 @@ export function AppHeader() {
     };
   }, []);
 
-  const handleLevelChange = async (level: string) => {
-    setJlptLevel(level);
-    setShowLevelMenu(false);
-    try {
-      await userService.updateProfile({ jlptLevel: level });
-    } catch (err) {
-      console.warn("Could not save JLPT level to server:", err);
-    }
-  };
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const handleLogout = async () => {
+    setShowUserMenu(false);
     await supabase.auth.signOut();
     setUserEmail(null);
+    setUsername(null);
     navigate("/login");
   };
 
+  const initial = (username?.[0] || userEmail?.[0] || "M").toUpperCase();
+
   return (
     <header className="sticky top-0 z-50 border-b border-border/70 bg-background/85 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
-        <Link to="/" className="flex items-center gap-3">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-3 shrink-0">
           <span className="jp grid size-10 place-items-center rounded-xl bg-primary text-lg text-primary-foreground shadow-[var(--shadow-lift)]">
             日
           </span>
@@ -78,74 +85,86 @@ export function AppHeader() {
           </span>
         </Link>
 
-        <nav className="ml-auto flex items-center gap-1 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-1">
-          {NAV.map((item) => {
-            const isActive = item.to === "/"
-              ? location.pathname === "/"
-              : location.pathname.startsWith(item.to);
+        {/* Right Section: Navigation Links & Avatar grouped together */}
+        <div className="flex items-center gap-3">
+          {/* Navigation Bar */}
+          <nav className="flex items-center gap-1 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden py-1">
+            {NAV.map((item) => {
+              const isActive = item.to === "/"
+                ? location.pathname === "/"
+                : location.pathname.startsWith(item.to);
 
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={cn(
-                  "flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
-                  isActive && "bg-secondary text-accent font-medium"
-                )}
-              >
-                <item.icon className="size-4" />
-                <span className="hidden md:inline">{item.label}</span>
-              </Link>
-            );
-          })}
-
-          <div className="ml-2 border-l border-border pl-3 flex items-center gap-2 shrink-0">
-            {userEmail ? (
-              <div className="flex items-center gap-2">
-                {/* Level selector dropdown */}
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setShowLevelMenu(!showLevelMenu)}
-                    className="flex items-center gap-1.5 rounded-lg border border-accent/40 bg-accent/10 px-2.5 py-1 text-xs font-bold text-accent transition-colors hover:bg-accent/20 cursor-pointer"
-                    title="Chọn cấp độ JLPT mục tiêu"
-                  >
-                    <span>{jlptLevel}</span>
-                    <ChevronDown className="size-3" />
-                  </button>
-
-                  {showLevelMenu && (
-                    <div className="absolute right-0 mt-1 w-24 rounded-xl border border-border bg-card p-1 shadow-xl z-50">
-                      {JLPT_LEVELS.map((lvl) => (
-                        <button
-                          key={lvl}
-                          type="button"
-                          onClick={() => handleLevelChange(lvl)}
-                          className={cn(
-                            "w-full text-left rounded-lg px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer",
-                            jlptLevel === lvl ? "bg-accent text-accent-foreground font-bold" : "hover:bg-secondary text-foreground"
-                          )}
-                        >
-                          {lvl}
-                        </button>
-                      ))}
-                    </div>
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className={cn(
+                    "flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
+                    isActive && "bg-secondary text-accent font-medium"
                   )}
-                </div>
+                >
+                  <item.icon className="size-4" />
+                  <span className="hidden md:inline">{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
 
-                <span className="text-xs font-medium text-muted-foreground max-w-[120px] truncate hidden lg:inline">
-                  {userEmail}
-                </span>
+          {/* Separator line | */}
+          <div className="h-5 w-px bg-border/80 shrink-0" aria-hidden="true" />
 
+          {/* User Profile Avatar Section */}
+          <div ref={menuRef} className="flex items-center gap-2 shrink-0 relative">
+            {userEmail ? (
+              <div className="relative">
                 <button
                   type="button"
-                  onClick={handleLogout}
-                  title="Đăng xuất"
-                  className="flex items-center gap-1.5 rounded-lg border border-border bg-secondary/50 px-2.5 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive cursor-pointer"
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                  className="grid size-9 place-items-center rounded-full border border-accent/50 bg-secondary text-sm font-bold text-accent transition-all hover:ring-2 hover:ring-accent/50 cursor-pointer shadow-md"
+                  title="Tài khoản cá nhân (Bấm để xem Menu)"
                 >
-                  <LogOut className="size-3.5" />
-                  <span className="hidden sm:inline">Thoát</span>
+                  {initial}
                 </button>
+
+                {/* User Dropdown Menu */}
+                {showUserMenu && (
+                  <div className="absolute right-0 mt-2 w-56 rounded-xl border border-border bg-card p-2 shadow-2xl z-50 divide-y divide-border animate-in fade-in slide-in-from-top-2">
+                    <div className="px-3 py-2">
+                      <p className="truncate text-xs font-bold text-foreground">{username || "Học Viên"}</p>
+                      <p className="truncate text-[11px] text-muted-foreground">{userEmail}</p>
+                    </div>
+
+                    <div className="py-1">
+                      <Link
+                        to="/profile"
+                        onClick={() => setShowUserMenu(false)}
+                        className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-secondary cursor-pointer"
+                      >
+                        <UserCheck className="size-4 text-accent" />
+                        <span>Trang cá nhân</span>
+                      </Link>
+                      <Link
+                        to="/chat"
+                        onClick={() => setShowUserMenu(false)}
+                        className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-secondary cursor-pointer"
+                      >
+                        <MessageCircle className="size-4 text-accent" />
+                        <span>Phòng chat của tôi</span>
+                      </Link>
+                    </div>
+
+                    <div className="pt-1">
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold text-destructive transition-colors hover:bg-destructive/10 cursor-pointer"
+                      >
+                        <LogOut className="size-4" />
+                        <span>Đăng xuất</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <Link
@@ -157,7 +176,7 @@ export function AppHeader() {
               </Link>
             )}
           </div>
-        </nav>
+        </div>
       </div>
     </header>
   );

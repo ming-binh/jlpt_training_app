@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { ChevronDown, Search } from "lucide-react";
+import { ChevronDown, Search, CheckCircle2, Bookmark } from "lucide-react";
 import { type Level } from "@/data/jlpt";
 import { LevelBadge, LevelFilter } from "@/components/common/level-filter";
 import { AppHeader } from "@/components/common/app-header";
 import { Pagination } from "@/components/common/pagination";
+import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import { jlptService, type GrammarPointItem } from "@/services/jlpt.service";
 
@@ -18,25 +19,24 @@ export function NihonGrammarPage() {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [progressMap, setProgressMap] = useState<Record<string, "LEARNING" | "MASTERED">>({});
 
   useEffect(() => {
     setLoading(true);
-    jlptService
-      .getGrammar(level, query, page, pageSize)
-      .then((res) => {
+    Promise.all([
+      jlptService.getGrammar(level, query, page, pageSize).catch(() => null),
+      jlptService.getUserProgressMap().catch(() => ({})),
+    ]).then(([res, map]) => {
+      if (res) {
         setGrammarList(res.content || []);
         setTotalPages(res.totalPages || 0);
         setTotalElements(res.totalElements || 0);
-      })
-      .catch((err) => {
-        console.error("Failed to load grammar:", err);
-        setGrammarList([]);
-        setTotalPages(0);
-        setTotalElements(0);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+      }
+      if (map) {
+        setProgressMap(map);
+      }
+      setLoading(false);
+    });
   }, [level, query, page]);
 
   const list = grammarList.map((g) => {
@@ -63,6 +63,21 @@ export function NihonGrammarPage() {
     };
   });
 
+  const handleMarkProgress = async (grammarId: string, pattern: string, status: "LEARNING" | "MASTERED") => {
+    try {
+      await jlptService.markProgress("GRAMMAR", Number(grammarId), status);
+      setProgressMap((prev) => ({ ...prev, [`GRAMMAR_${grammarId}`]: status }));
+      if (status === "MASTERED") {
+        toast.success(`Đã lưu mẫu ngữ pháp "${pattern}" vào Đã thuộc (+10 XP)!`);
+      } else {
+        toast.info(`Đã lưu mẫu ngữ pháp "${pattern}" vào Cần học lại.`);
+      }
+    } catch (err) {
+      console.error("Mark progress failed", err);
+      toast.error("Không thể lưu tiến độ. Vui lòng đăng nhập!");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <AppHeader />
@@ -70,8 +85,8 @@ export function NihonGrammarPage() {
       <div className="mx-auto max-w-4xl px-4 py-10">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="jp text-sm font-semibold text-accent">文法</p>
-            <h1 className="mt-1 text-3xl font-semibold">Ghi nhớ cấu trúc ngữ pháp</h1>
+            <p className="jp text-sm font-semibold text-accent">文法 · GRAMMAR</p>
+            <h1 className="mt-1 text-3xl font-semibold">Ghi nhớ cấu trúc ngữ pháp JLPT</h1>
             <p className="mt-2 text-sm text-muted-foreground">
               Mỗi mẫu câu gồm công thức, lưu ý sắc thái và các câu ví dụ song ngữ Nhật - Việt. ({totalElements} mẫu)
             </p>
@@ -110,12 +125,15 @@ export function NihonGrammarPage() {
           ) : (
             list.map((g) => {
               const open = openId === g.id;
+              const status = progressMap[`GRAMMAR_${g.id}`];
+
               return (
                 <article
                   key={g.id}
                   className={cn(
-                    "surface-card overflow-hidden transition-colors",
+                    "surface-card overflow-hidden transition-colors border border-border",
                     open && "border-accent/60",
+                    status === "MASTERED" && "border-emerald-500/40 bg-emerald-500/5"
                   )}
                 >
                   <button
@@ -124,7 +142,19 @@ export function NihonGrammarPage() {
                     className="flex w-full items-center gap-4 px-6 py-5 text-left cursor-pointer"
                   >
                     <span className="min-w-0 flex-1">
-                      <span className="jp block text-xl font-bold">{g.pattern}</span>
+                      <span className="flex items-center gap-2">
+                        <span className="jp text-xl font-bold">{g.pattern}</span>
+                        {status === "MASTERED" && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 text-[11px] font-bold text-emerald-400">
+                            <CheckCircle2 className="size-3" /> Đã thuộc
+                          </span>
+                        )}
+                        {status === "LEARNING" && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 border border-amber-500/30 px-2.5 py-0.5 text-[11px] font-bold text-amber-400">
+                            <Bookmark className="size-3" /> Cần học lại
+                          </span>
+                        )}
+                      </span>
                       <span className="mt-1 block text-sm text-muted-foreground">
                         {g.meaning} · <span className="italic">{g.romaji}</span>
                       </span>
@@ -154,6 +184,24 @@ export function NihonGrammarPage() {
                           ))}
                         </div>
                       ) : null}
+
+                      {/* Action buttons for saving progress */}
+                      <div className="mt-4 flex items-center justify-end gap-2 pt-2 border-t border-border/60">
+                        <button
+                          type="button"
+                          onClick={() => handleMarkProgress(g.id, g.pattern, "LEARNING")}
+                          className="flex items-center gap-1.5 rounded-xl border border-amber-500/40 bg-amber-500/10 px-3.5 py-2 text-xs font-bold text-amber-400 transition-colors hover:bg-amber-500/20 cursor-pointer"
+                        >
+                          <Bookmark className="size-3.5" /> Cần học lại
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleMarkProgress(g.id, g.pattern, "MASTERED")}
+                          className="flex items-center gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-2 text-xs font-bold text-emerald-400 transition-colors hover:bg-emerald-500 hover:text-emerald-950 cursor-pointer"
+                        >
+                          <CheckCircle2 className="size-3.5" /> Đã thuộc (+10 XP)
+                        </button>
+                      </div>
                     </div>
                   )}
                 </article>
