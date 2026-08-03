@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sword, ChevronRight } from 'lucide-react';
-import type { JlptLevel, ContentType } from '../services/lesson.service';
-import { LevelBadge } from '../components/LevelBadge';
+import type { JlptLevel, ContentType } from '@/services/lesson.service';
+import { LevelBadge } from '@/components/LevelBadge';
 import './PracticePage.css';
 
 const LEVELS: JlptLevel[] = ['N5', 'N4', 'N3', 'N2', 'N1'];

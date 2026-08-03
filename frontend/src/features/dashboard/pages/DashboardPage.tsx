@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, RotateCcw, Sword, TrendingUp, ChevronRight, Zap } from 'lucide-react';
-import { StreakBadge } from '../components/StreakBadge';
-import { XPBar } from '../components/XPBar';
-import { LevelBadge } from '../components/LevelBadge';
-import { progressService } from '../services/lesson.service';
-import type { ProgressSummary, JlptLevel } from '../services/lesson.service';
-import { supabase } from '../lib/supabase';
+import { StreakBadge } from '@/components/StreakBadge';
+import { XPBar } from '@/components/XPBar';
+import { LevelBadge } from '@/components/LevelBadge';
+import { progressService } from '@/services/lesson.service';
+import type { ProgressSummary, JlptLevel } from '@/services/lesson.service';
+import { supabase } from '@/lib/supabase';
 import './DashboardPage.css';
 
 

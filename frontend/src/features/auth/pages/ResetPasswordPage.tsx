@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
-import { toast } from "../components/ui/toast";
-import { supabase } from "../lib/supabase";
-import { AuthShell } from "../components/auth/auth-shell";
-import { AppHeader } from "../components/app-header";
+import { toast } from "@/components/ui/toast";
+import { supabase } from "@/lib/supabase";
+import { AuthShell } from "../components/auth-shell";
+import { AppHeader } from "@/components/common/app-header";
 
 export function ResetPasswordPage() {
   const navigate = useNavigate();

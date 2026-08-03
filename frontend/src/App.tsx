@@ -2,23 +2,25 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from './components/ui/toast';
 
-// Lovable Japanese Aesthetic Pages
-import { NihonHomePage } from './pages/NihonHomePage';
-import { NihonVocabPage } from './pages/NihonVocabPage';
-import { NihonKanjiPage } from './pages/NihonKanjiPage';
-import { NihonGrammarPage } from './pages/NihonGrammarPage';
-import { NihonChatPage } from './pages/NihonChatPage';
+// Japanese Journey Feature Pages
+import { NihonHomePage } from './features/dashboard/pages/NihonHomePage';
+import { NihonVocabPage } from './features/vocab/pages/NihonVocabPage';
+import { NihonKanjiPage } from './features/kanji/pages/NihonKanjiPage';
+import { NihonGrammarPage } from './features/grammar/pages/NihonGrammarPage';
+import { NihonChatPage } from './features/ai-chat/pages/NihonChatPage';
 
-// Auth Pages & System
-import { AuthPage } from './pages/AuthPage';
-import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
-import { ResetPasswordPage } from './pages/ResetPasswordPage';
-import { AuthCallbackPage } from './pages/AuthCallbackPage';
-import { DashboardPage } from './pages/DashboardPage';
-import { LessonPage } from './pages/LessonPage';
-import { PracticePage } from './pages/PracticePage';
-import { ReviewPage } from './pages/ReviewPage';
-import { ProgressPage } from './pages/ProgressPage';
+// Auth Feature Pages
+import { AuthPage } from './features/auth/pages/AuthPage';
+import { ForgotPasswordPage } from './features/auth/pages/ForgotPasswordPage';
+import { ResetPasswordPage } from './features/auth/pages/ResetPasswordPage';
+import { AuthCallbackPage } from './features/auth/pages/AuthCallbackPage';
+
+// Learning & Dashboard Feature Pages
+import { DashboardPage } from './features/dashboard/pages/DashboardPage';
+import { ProgressPage } from './features/dashboard/pages/ProgressPage';
+import { LessonPage } from './features/lesson/pages/LessonPage';
+import { PracticePage } from './features/lesson/pages/PracticePage';
+import { ReviewPage } from './features/lesson/pages/ReviewPage';
 import { MainLayout } from './layouts/MainLayout';
 
 const App: React.FC = () => {
@@ -26,7 +28,7 @@ const App: React.FC = () => {
     <BrowserRouter>
       <Toaster position="top-right" richColors />
       <Routes>
-        {/* ── Lovable Japanese Journey Pages ─────────────────── */}
+        {/* ── Japanese Journey Primary Pages ─────────────────── */}
         <Route path="/" element={<NihonHomePage />} />
         <Route path="/tu-vung" element={<NihonVocabPage />} />
         <Route path="/kanji" element={<NihonKanjiPage />} />
@@ -40,6 +42,7 @@ const App: React.FC = () => {
         <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
+        {/* ── Dashboard & Learning Modules ────────────────── */}
         <Route path="/dashboard" element={
           <MainLayout>
             <DashboardPage />

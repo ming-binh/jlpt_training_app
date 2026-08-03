@@ -108,7 +108,7 @@ class ConversationServiceTest {
             Conversation.builder().id("conv-2").userId("user-001").build(),
             Conversation.builder().id("conv-1").userId("user-001").build()
         );
-        when(conversationRepository.findByUserIdOrderByCreatedAtDesc("user-001"))
+        when(conversationRepository.findByUserIdOrderByUpdatedAtDescCreatedAtDesc("user-001"))
                 .thenReturn(conversations);
 
         List<Conversation> result = conversationService.getConversations("user-001");

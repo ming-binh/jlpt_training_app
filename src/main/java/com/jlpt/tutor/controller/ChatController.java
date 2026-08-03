@@ -84,9 +84,47 @@ public class ChatController {
         return conversationService.getConversations(userId);
     }
 
+    @PostMapping("/conversations")
+    public Conversation createConversation(Authentication authentication, @RequestBody(required = false) Map<String, String> body) {
+        String userId = getUserId(authentication);
+        if (userId == null || userId.isBlank()) {
+            userId = "guest";
+        }
+        String title = (body != null && body.containsKey("title")) ? body.get("title") : "Cuộc trò chuyện mới";
+        return conversationService.createConversation(userId, title);
+    }
+
     @GetMapping("/conversations/{id}/messages")
     public List<Message> getConversationMessages(@PathVariable("id") String conversationId) {
         return conversationService.getHistory(conversationId);
+    }
+
+    @PatchMapping("/conversations/{id}/title")
+    public org.springframework.http.ResponseEntity<?> updateConversationTitle(
+            Authentication authentication,
+            @PathVariable("id") String conversationId,
+            @RequestBody Map<String, String> body) {
+        String userId = getUserId(authentication);
+        if (userId == null || userId.isBlank()) userId = "guest";
+        String title = body != null ? body.get("title") : null;
+        boolean updated = conversationService.updateTitle(conversationId, title, userId);
+        if (updated) {
+            return org.springframework.http.ResponseEntity.ok(Map.of("success", true, "title", title));
+        }
+        return org.springframework.http.ResponseEntity.badRequest().body(Map.of("error", "Failed to update title or unauthorized"));
+    }
+
+    @DeleteMapping("/conversations/{id}")
+    public org.springframework.http.ResponseEntity<?> deleteConversation(
+            Authentication authentication,
+            @PathVariable("id") String conversationId) {
+        String userId = getUserId(authentication);
+        if (userId == null || userId.isBlank()) userId = "guest";
+        boolean deleted = conversationService.deleteConversation(conversationId, userId);
+        if (deleted) {
+            return org.springframework.http.ResponseEntity.ok(Map.of("success", true));
+        }
+        return org.springframework.http.ResponseEntity.badRequest().body(Map.of("error", "Failed to delete conversation or unauthorized"));
     }
 
     @PostMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

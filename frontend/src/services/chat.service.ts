@@ -53,8 +53,23 @@ export const chatService = {
     return response.data;
   },
 
+  createConversation: async (title?: string): Promise<ConversationItem> => {
+    const response = await api.post('/ai/conversations', { title });
+    return response.data;
+  },
+
   getMessages: async (conversationId: string): Promise<MessageHistoryItem[]> => {
     const response = await api.get(`/ai/conversations/${conversationId}/messages`);
+    return response.data;
+  },
+
+  updateConversationTitle: async (conversationId: string, title: string): Promise<any> => {
+    const response = await api.patch(`/ai/conversations/${conversationId}/title`, { title });
+    return response.data;
+  },
+
+  deleteConversation: async (conversationId: string): Promise<any> => {
+    const response = await api.delete(`/ai/conversations/${conversationId}`);
     return response.data;
   },
 };

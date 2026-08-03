@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { TrendingUp, Star, Zap } from 'lucide-react';
-import { StreakBadge } from '../components/StreakBadge';
-import { XPBar } from '../components/XPBar';
-import { LevelBadge } from '../components/LevelBadge';
-import { progressService } from '../services/lesson.service';
-import type { ProgressSummary, JlptLevel } from '../services/lesson.service';
+import { StreakBadge } from '@/components/StreakBadge';
+import { XPBar } from '@/components/XPBar';
+import { LevelBadge } from '@/components/LevelBadge';
+import { progressService } from '@/services/lesson.service';
+import type { ProgressSummary, JlptLevel } from '@/services/lesson.service';
 import './ProgressPage.css';
 
 const DEFAULT: ProgressSummary = {

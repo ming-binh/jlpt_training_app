@@ -1,12 +1,12 @@
 import React, { useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ExerciseProgress } from '../features/lesson/components/ExerciseProgress';
-import { FlashCard } from '../features/lesson/components/FlashCard';
-import { MultipleChoice } from '../features/lesson/components/MultipleChoice';
-import { FillBlank } from '../features/lesson/components/FillBlank';
-import { LessonComplete } from '../features/lesson/components/LessonComplete';
-import { useLessonState } from '../features/lesson/hooks/useLessonState';
-import { lessonService } from '../services/lesson.service';
+import { ExerciseProgress } from '../components/ExerciseProgress';
+import { FlashCard } from '../components/FlashCard';
+import { MultipleChoice } from '../components/MultipleChoice';
+import { FillBlank } from '../components/FillBlank';
+import { LessonComplete } from '../components/LessonComplete';
+import { useLessonState } from '../hooks/useLessonState';
+import { lessonService } from '@/services/lesson.service';
 import './LessonPage.css';
 
 export const LessonPage: React.FC = () => {

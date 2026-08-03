@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, Sparkles } from 'lucide-react';
-import { supabase } from '../lib/supabase';
-import { Card } from '../components/Card';
+import { supabase } from '@/lib/supabase';
+import { Card } from '@/components/Card';
 import './AuthPage.css';
 
 export const AuthCallbackPage: React.FC = () => {

@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff, Loader2, MailCheck } from "lucide-react";
-import { toast } from "../components/ui/toast";
-import { supabase } from "../lib/supabase";
-import { AuthShell, GoogleMark } from "../components/auth/auth-shell";
-import { AppHeader } from "../components/app-header";
-import { cn } from "../lib/utils";
-import api from "../services/api";
+import { toast } from "@/components/ui/toast";
+import { supabase } from "@/lib/supabase";
+import { AuthShell, GoogleMark } from "../components/auth-shell";
+import { AppHeader } from "@/components/common/app-header";
+import { cn } from "@/lib/utils";
+import api from "@/services/api";
 
 const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 

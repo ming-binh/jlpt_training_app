@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import type { Exercise, ExerciseOption } from '../../../services/lesson.service';
+import type { Exercise, ExerciseOption } from '@/services/lesson.service';
 import type { AnswerState } from '../types';
 import './MultipleChoice.css';
 

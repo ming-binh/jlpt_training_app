@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, RotateCcw, Search, Volume2 } from "lucide-react";
 import { type Level } from "@/data/jlpt";
-import { LevelBadge, LevelFilter } from "@/components/level-filter";
-import { AppHeader } from "@/components/app-header";
-import { Pagination } from "@/components/pagination";
+import { LevelBadge, LevelFilter } from "@/components/common/level-filter";
+import { AppHeader } from "@/components/common/app-header";
+import { Pagination } from "@/components/common/pagination";
 import { cn } from "@/lib/utils";
 import { jlptService, type VocabularyItem } from "@/services/jlpt.service";
 

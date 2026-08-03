@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Exercise } from '../../../services/lesson.service';
+import type { Exercise } from '@/services/lesson.service';
 import type { AnswerState } from '../types';
 import './FlashCard.css';
 

@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Loader2, MailCheck } from "lucide-react";
-import { toast } from "../components/ui/toast";
-import { supabase } from "../lib/supabase";
-import { AuthShell } from "../components/auth/auth-shell";
-import { AppHeader } from "../components/app-header";
+import { toast } from "@/components/ui/toast";
+import { supabase } from "@/lib/supabase";
+import { AuthShell } from "../components/auth-shell";
+import { AppHeader } from "@/components/common/app-header";
 
 const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 

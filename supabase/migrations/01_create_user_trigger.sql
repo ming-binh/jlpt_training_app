@@ -1,16 +1,23 @@
 -- Migration: Auto sync auth.users to public.users (matching exact DB columns)
 
+-- 1. Remove redundant password column if exists, and ensure weak_sections & last_active_at exist
+ALTER TABLE IF EXISTS public.users DROP COLUMN IF EXISTS password;
+ALTER TABLE IF EXISTS public.users ADD COLUMN IF NOT EXISTS weak_sections VARCHAR(255);
+ALTER TABLE IF EXISTS public.users ADD COLUMN IF NOT EXISTS last_active_at TIMESTAMP;
+
+-- 2. Trigger function to handle new users from Supabase auth.users
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.users (id, email, username, jlpt_level, streak_days, role)
+  INSERT INTO public.users (id, email, username, jlpt_level, streak_days, role, last_active_at)
   VALUES (
     NEW.id,
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'name', SPLIT_PART(NEW.email, '@', 1)),
     'N5',
-    0,
-    'USER'
+    1,
+    'USER',
+    NOW()
   )
   ON CONFLICT (id) DO UPDATE SET
     email = EXCLUDED.email,
@@ -27,12 +34,17 @@ CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
--- 3. Enable RLS on conversations and chat_messages
+-- 3. Enable RLS on users, conversations and chat_messages
 ALTER TABLE IF EXISTS public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.conversations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS public.chat_messages ENABLE ROW LEVEL SECURITY;
 
--- 4. RLS Policies (for public schema tables when accessed directly via Supabase client)
+-- 4. RLS Policies
+DROP POLICY IF EXISTS "Users can view own profile" ON public.users;
+CREATE POLICY "Users can view own profile" ON public.users
+  FOR SELECT TO authenticated
+  USING ((select auth.uid()) = id);
+
 DROP POLICY IF EXISTS "Users can view own conversations" ON public.conversations;
 CREATE POLICY "Users can view own conversations" ON public.conversations
   FOR SELECT TO authenticated

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RotateCcw, CheckCircle2 } from 'lucide-react';
-import { quizService } from '../services/lesson.service';
-import type { Exercise } from '../services/lesson.service';
+import { quizService } from '@/services/lesson.service';
+import type { Exercise } from '@/services/lesson.service';
 import './ReviewPage.css';
 
 export const ReviewPage: React.FC = () => {

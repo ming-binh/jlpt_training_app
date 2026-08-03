@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ConversationRepository extends JpaRepository<Conversation, String> {
-    List<Conversation> findByUserIdOrderByCreatedAtDesc(String userId);
+    List<Conversation> findByUserIdOrderByUpdatedAtDescCreatedAtDesc(String userId);
 }
