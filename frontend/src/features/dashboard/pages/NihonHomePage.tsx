@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, BookOpen, Brain, Flame, MessageCircle, PenLine, Sparkles } from "lucide-react";
+import { ArrowRight, BookOpen, Brain, Flame, MessageCircle, Sparkles, GraduationCap, Play, PenLine } from "lucide-react";
 import { GRAMMAR, KANJI, VOCAB } from "@/data/jlpt";
 import { AppHeader } from "@/components/common/app-header";
 import { jlptService, type VocabularyItem } from "@/services/jlpt.service";
@@ -46,6 +46,14 @@ export function NihonHomePage() {
   }, []);
 
   const features = [
+    {
+      to: "/bai-hoc",
+      kanji: "業",
+      title: "Bài học cấu trúc",
+      desc: "Học theo từng bài bản N5-N3, làm bài tập Quiz trắc nghiệm tích lũy XP.",
+      icon: GraduationCap,
+      count: "Xem bài học",
+    },
     {
       to: "/tu-vung",
       kanji: "語",
@@ -100,7 +108,7 @@ export function NihonHomePage() {
 
   const dynamicProgress = [
     { label: "Từ vựng", value: vocabPct, count: `${userStats?.completedVocab ?? 0}/${counts.vocab}` },
-    { label: "Kanji", value: kanjiPct, count: `${userStats?.completedKanji ?? 0}/${counts.kanji}` },
+    { label: "Kanji", value: kanjiPct, count: `${userStats?.completedKanji ?? 0}/${counts.grammar}` },
     { label: "Ngữ pháp", value: grammarPct, count: `${userStats?.completedGrammar ?? 0}/${counts.grammar}` },
   ];
 
@@ -129,14 +137,14 @@ export function NihonHomePage() {
               15 phút mỗi ngày
             </h1>
             <p className="mt-5 max-w-lg text-base leading-relaxed text-muted-foreground">
-              Lộ trình JLPT {userLevel} được cá nhân hóa qua 4 thói quen nhỏ: lật thẻ từ vựng, tập viết kanji, làm chủ ngữ pháp và đối thoại 24/7 cùng trợ lý Sensei AI.
+              Lộ trình JLPT {userLevel} được cá nhân hóa qua bài học bài bản, lật thẻ từ vựng, tập viết kanji, làm chủ ngữ pháp và đối thoại 24/7 cùng trợ lý Sensei AI.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                to="/tu-vung"
-                className="inline-flex items-center gap-2 rounded-xl bg-accent px-6 py-3.5 text-sm font-semibold text-accent-foreground shadow-lg transition-transform hover:-translate-y-0.5"
+                to="/bai-hoc"
+                className="inline-flex items-center gap-2 rounded-xl bg-accent px-6 py-3.5 text-sm font-bold text-accent-foreground shadow-lg transition-transform hover:-translate-y-0.5"
               >
-                Bắt đầu ôn hôm nay <ArrowRight className="size-4" />
+                <GraduationCap className="size-5" /> Vào Học Bài Học <ArrowRight className="size-4" />
               </Link>
               <Link
                 to="/chat"
@@ -180,13 +188,36 @@ export function NihonHomePage() {
         </div>
       </section>
 
-      {/* 4 Skill Rooms */}
-      <section className="mx-auto max-w-6xl px-4 py-14">
-        <h2 className="text-2xl font-semibold">Bốn phòng luyện tập</h2>
+      {/* Promoted Lesson Banner */}
+      <section className="mx-auto max-w-6xl px-4 pt-10">
+        <div className="surface-card relative overflow-hidden p-8 border border-accent/40 bg-gradient-to-r from-accent/10 via-background to-accent/5 rounded-3xl">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="space-y-2 text-center md:text-left">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-accent/20 border border-accent/40 px-3 py-1 text-xs font-bold text-accent">
+                <GraduationCap className="size-4" /> Mới cập nhật
+              </span>
+              <h2 className="text-2xl font-bold">Bài Học Cấu Trúc JLPT ({userLevel})</h2>
+              <p className="text-sm text-muted-foreground max-w-xl">
+                Hệ thống các bài học được biên soạn theo lộ trình N5 ➔ N3. Mỗi bài gồm Flashcard lý thuyết và Quiz trắc nghiệm đánh giá năng lực tích lũy XP.
+              </p>
+            </div>
+            <Link
+              to="/bai-hoc"
+              className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-accent px-6 py-3.5 text-sm font-bold text-accent-foreground shadow-md transition-transform hover:scale-105"
+            >
+              <Play className="size-4 fill-current" /> Xem Danh Sách Bài Học
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 5 Skill Rooms */}
+      <section className="mx-auto max-w-6xl px-4 py-12">
+        <h2 className="text-2xl font-semibold">Các phòng luyện tập & bài học</h2>
         <p className="mt-1 text-sm text-muted-foreground">
           Chọn kỹ năng bạn muốn rèn hôm nay cho trình độ {userLevel}.
         </p>
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f) => (
             <Link
               key={f.to}
@@ -196,7 +227,11 @@ export function NihonHomePage() {
               <span className="jp pointer-events-none absolute -right-3 -top-6 text-8xl text-secondary/70 transition-colors group-hover:text-primary/40">
                 {f.kanji}
               </span>
-              <f.icon className="relative size-6 text-accent" />
+              {f.to === "/kanji" ? (
+                <span className="jp relative text-base font-bold text-accent">漢</span>
+              ) : (
+                <f.icon className="relative size-6 text-accent" />
+              )}
               <h3 className="relative mt-5 text-base font-semibold">{f.title}</h3>
               <p className="relative mt-2 text-sm leading-relaxed text-muted-foreground">
                 {f.desc}

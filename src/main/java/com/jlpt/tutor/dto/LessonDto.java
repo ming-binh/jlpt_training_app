@@ -59,6 +59,8 @@ public class LessonDto {
         private String userAnswer;
         private Boolean correct;
         private Long timeMs;
+        private String entityType;
+        private Long entityId;
     }
 
     @Data

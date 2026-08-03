@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { BookOpen, Brain, MessageCircle, PenLine, Home, User as UserIcon, LogOut, UserCheck } from "lucide-react";
+import { BookOpen, Brain, MessageCircle, PenLine, Home, GraduationCap, User as UserIcon, LogOut, UserCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import { userService } from "@/services/user.service";
 
 const NAV = [
   { to: "/", label: "Trang chủ", icon: Home },
+  { to: "/bai-hoc", label: "Bài học", icon: GraduationCap },
   { to: "/tu-vung", label: "Từ vựng", icon: BookOpen },
   { to: "/kanji", label: "Kanji", icon: PenLine },
   { to: "/ngu-phap", label: "Ngữ pháp", icon: Brain },
@@ -103,7 +104,11 @@ export function AppHeader() {
                     isActive && "bg-secondary text-accent font-medium"
                   )}
                 >
-                  <item.icon className="size-4" />
+                  {item.to === "/kanji" ? (
+                    <span className="jp font-bold text-xs">漢</span>
+                  ) : (
+                    <item.icon className="size-4" />
+                  )}
                   <span className="hidden md:inline">{item.label}</span>
                 </Link>
               );

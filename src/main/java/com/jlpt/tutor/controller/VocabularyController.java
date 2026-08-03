@@ -39,8 +39,6 @@ public class VocabularyController {
                 "N5", vocabularyRepository.countByJlptLevelIgnoreCase("N5"),
                 "N4", vocabularyRepository.countByJlptLevelIgnoreCase("N4"),
                 "N3", vocabularyRepository.countByJlptLevelIgnoreCase("N3"),
-                "N2", vocabularyRepository.countByJlptLevelIgnoreCase("N2"),
-                "N1", vocabularyRepository.countByJlptLevelIgnoreCase("N1"),
                 "total", vocabularyRepository.count()
         ));
     }

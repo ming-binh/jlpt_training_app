@@ -6,7 +6,6 @@ import {
   CalendarClock,
   Flame,
   Mail,
-  PenLine,
   ShieldCheck,
   Sparkles,
   Target,
@@ -20,9 +19,7 @@ const WEEK_DAYS = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
 const NEXT_LEVEL_MAP: Record<string, string> = {
   N5: "N4",
   N4: "N3",
-  N3: "N2",
-  N2: "N1",
-  N1: "Chinh phục N1!",
+  N3: "Chinh phục N3!",
 };
 
 export function NihonProfilePage() {
@@ -213,7 +210,7 @@ export function NihonProfilePage() {
           {/* Quick Study Shortcuts */}
           <section className="mt-6 grid gap-3 sm:grid-cols-3">
             <ShortcutLink to="/tu-vung" icon={<BookOpen className="size-4" />} label="Ôn từ vựng" />
-            <ShortcutLink to="/kanji" icon={<PenLine className="size-4" />} label="Ôn kanji" />
+            <ShortcutLink to="/kanji" icon={<span className="jp font-bold text-xs">漢</span>} label="Ôn kanji" />
             <ShortcutLink to="/ngu-phap" icon={<Brain className="size-4" />} label="Ngữ pháp" />
           </section>
         </main>

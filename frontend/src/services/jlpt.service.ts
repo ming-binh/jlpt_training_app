@@ -30,6 +30,31 @@ export interface GrammarPointItem {
   relatedGrammar: string;
 }
 
+export interface LessonItem {
+  id: number;
+  title: string;
+  description: string;
+  jlptLevel: string;
+  contentType: 'VOCABULARY' | 'KANJI' | 'GRAMMAR';
+  orderIndex: number;
+  itemCount: number;
+  completedCount: number;
+  status: 'available' | 'in_progress' | 'completed' | 'locked';
+}
+
+export interface QuizSessionItem {
+  id: number;
+  userId: string;
+  lessonId: number | null;
+  sessionType: 'LESSON' | 'PRACTICE' | 'REVIEW';
+  score: number;
+  xpEarned: number;
+  correctCount: number;
+  totalCount: number;
+  totalTimeMs: number;
+  completedAt: string;
+}
+
 export interface PageResponse<T> {
   content: T[];
   totalElements: number;
@@ -148,6 +173,31 @@ export const jlptService = {
 
   getUserProfile: async (): Promise<UserProfile> => {
     const res = await api.get<UserProfile>('/users/me');
+    return res.data;
+  },
+
+  // ── Lesson & Quiz APIs ──────────────────────────────────────────────────
+
+  getLessons: async (level?: string, type?: string): Promise<LessonItem[]> => {
+    const params: Record<string, any> = {};
+    if (level && level.toLowerCase() !== 'all') params.level = level.toUpperCase();
+    if (type && type.toLowerCase() !== 'all') params.type = type.toUpperCase();
+    const res = await api.get<LessonItem[]>('/lessons', { params });
+    return res.data;
+  },
+
+  getLessonExercises: async (lessonId: number) => {
+    const res = await api.get(`/lessons/${lessonId}/exercises`);
+    return res.data;
+  },
+
+  completeLesson: async (lessonId: number, durationSeconds: number, results: any[]) => {
+    const res = await api.post(`/lessons/${lessonId}/complete`, { durationSeconds, results });
+    return res.data;
+  },
+
+  getQuizHistory: async (): Promise<QuizSessionItem[]> => {
+    const res = await api.get<QuizSessionItem[]>('/quiz/history');
     return res.data;
   },
 };

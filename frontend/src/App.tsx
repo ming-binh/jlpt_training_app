@@ -5,6 +5,7 @@ import { Toaster } from './components/ui/toast';
 // Japanese Journey Feature Pages
 import { NihonHomePage } from './features/dashboard/pages/NihonHomePage';
 import { NihonProfilePage } from './features/dashboard/pages/NihonProfilePage';
+import { NihonLessonListPage } from './features/lesson/pages/NihonLessonListPage';
 import { NihonVocabPage } from './features/vocab/pages/NihonVocabPage';
 import { NihonKanjiPage } from './features/kanji/pages/NihonKanjiPage';
 import { NihonGrammarPage } from './features/grammar/pages/NihonGrammarPage';
@@ -32,6 +33,7 @@ const App: React.FC = () => {
         {/* ── Japanese Journey Primary Pages ─────────────────── */}
         <Route path="/" element={<NihonHomePage />} />
         <Route path="/profile" element={<NihonProfilePage />} />
+        <Route path="/bai-hoc" element={<NihonLessonListPage />} />
         <Route path="/tu-vung" element={<NihonVocabPage />} />
         <Route path="/kanji" element={<NihonKanjiPage />} />
         <Route path="/ngu-phap" element={<NihonGrammarPage />} />
@@ -51,7 +53,7 @@ const App: React.FC = () => {
           </MainLayout>
         } />
 
-        <Route path="/learn" element={<NihonVocabPage />} />
+        <Route path="/learn" element={<NihonLessonListPage />} />
 
         <Route path="/lesson/:id" element={
           <MainLayout fullscreen>

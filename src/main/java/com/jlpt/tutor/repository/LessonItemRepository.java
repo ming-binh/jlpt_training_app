@@ -12,5 +12,7 @@ public interface LessonItemRepository extends JpaRepository<LessonItem, Long> {
 
     List<LessonItem> findByLessonIdOrderByOrderIndex(Long lessonId);
 
+    List<LessonItem> findByLessonIdIn(List<Long> lessonIds);
+
     List<LessonItem> findByLessonIdAndEntityType(Long lessonId, UserProgress.EntityType entityType);
 }

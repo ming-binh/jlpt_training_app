@@ -78,7 +78,9 @@ export function NihonKanjiPage() {
       <div className="mx-auto max-w-6xl px-4 py-10">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="jp text-sm font-semibold text-accent">漢字 · KANJI</p>
+            <p className="jp text-sm font-semibold text-accent flex items-center gap-1.5">
+              <span className="jp font-bold text-xs">漢</span> 漢字 · KANJI
+            </p>
             <h1 className="mt-1 text-3xl font-semibold">Ôn tập Kanji JLPT</h1>
             <p className="mt-2 text-sm text-muted-foreground">
               Chạm vào một chữ để xem âm đọc, số nét và thông tin chi tiết. ({totalElements} chữ)
