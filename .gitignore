@@ -37,4 +37,6 @@ frontend/*.md
 # AI Agent workspace skills & scratch files
 .agents/
 .gemini/
+skills-lock.json
+AGENT.md
 
