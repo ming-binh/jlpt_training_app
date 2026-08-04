@@ -41,6 +41,8 @@ export interface QuizResult {
   userAnswer: string;
   correct: boolean;
   timeMs?: number;
+  entityType?: string;
+  entityId?: number | string;
 }
 
 export interface LessonCompleteRequest {

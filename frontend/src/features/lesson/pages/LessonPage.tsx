@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { AppHeader } from '@/components/common/app-header';
 import { ExerciseProgress } from '../components/ExerciseProgress';
 import { FlashCard } from '../components/FlashCard';
 import { MultipleChoice } from '../components/MultipleChoice';
@@ -25,9 +26,15 @@ export const LessonPage: React.FC = () => {
 
   const lessonId = Number(id);
 
-  // Fetch exercises on mount
+  const [lessonInfo, setLessonInfo] = React.useState<any>(null);
+
+  // Fetch exercises and lesson info on mount
   useEffect(() => {
     if (!lessonId) return;
+    lessonService.getLesson(lessonId)
+      .then(setLessonInfo)
+      .catch(console.error);
+
     lessonService.getExercises(lessonId)
       .then(exercises => loadExercises(exercises))
       .catch(() => navigate('/learn'));
@@ -44,6 +51,8 @@ export const LessonPage: React.FC = () => {
         userAnswer: r.userAnswer,
         correct: r.correct,
         timeMs: r.timeMs,
+        entityType: r.entityType,
+        entityId: r.entityId,
       })),
       totalTimeMs,
     }).catch(console.error);
@@ -71,9 +80,12 @@ export const LessonPage: React.FC = () => {
   // ── Loading ────────────────────────────────────────────────────────────────
   if (state.phase === 'loading') {
     return (
-      <div className="lesson-page-loading">
-        <div className="lesson-loading-spinner" />
-        <p>Đang tải bài học...</p>
+      <div className="min-h-screen bg-background text-foreground">
+        <AppHeader />
+        <div className="lesson-page-loading">
+          <div className="lesson-loading-spinner" />
+          <p>Đang tải bài học...</p>
+        </div>
       </div>
     );
   }
@@ -81,13 +93,16 @@ export const LessonPage: React.FC = () => {
   // ── Complete ───────────────────────────────────────────────────────────────
   if (state.phase === 'complete') {
     return (
-      <div className="lesson-page-complete">
-        <LessonComplete
-          results={results}
-          xpEarned={Math.round(score / 10) * 5}
-          lessonTitle={`Bài ${id}`}
-          onRetry={handleRetry}
-        />
+      <div className="min-h-screen bg-background text-foreground">
+        <AppHeader />
+        <div className="lesson-page-complete">
+          <LessonComplete
+            results={results}
+            xpEarned={Math.round(score / 10) * 5}
+            lessonTitle={lessonInfo?.title || `Bài ${id}`}
+            onRetry={handleRetry}
+          />
+        </div>
       </div>
     );
   }
@@ -96,14 +111,19 @@ export const LessonPage: React.FC = () => {
   if (!currentExercise) return null;
 
   const correctCount = results.filter(r => r.correct).length;
+  const categoryStr = lessonInfo?.contentType === 'VOCABULARY' ? 'TỪ VỰNG' : lessonInfo?.contentType === 'KANJI' ? 'KANJI' : lessonInfo?.contentType === 'GRAMMAR' ? 'NGỮ PHÁP' : (currentExercise?.entityType === 'VOCABULARY' ? 'TỪ VỰNG' : currentExercise?.entityType === 'KANJI' ? 'KANJI' : 'NGỮ PHÁP');
 
   return (
-    <div className="lesson-page">
+    <div className="lesson-page min-h-screen bg-background text-foreground">
+      <AppHeader />
       {/* Progress */}
       <ExerciseProgress
         current={state.currentIndex}
         total={state.exercises.length}
         correctCount={correctCount}
+        categoryLabel={categoryStr}
+        levelLabel={lessonInfo?.jlptLevel || 'N5'}
+        timerText="Không giới hạn"
         onExit={() => navigate('/learn')}
       />
 

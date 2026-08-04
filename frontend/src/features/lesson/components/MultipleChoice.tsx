@@ -45,8 +45,10 @@ export const MultipleChoice: React.FC<MultipleChoiceProps> = ({
     <div className="mc-wrapper">
       {/* Question */}
       <div className="mc-question">
-        <div className="mc-question-label">Chọn nghĩa đúng</div>
-        <div className="mc-question-word">{exercise.question}</div>
+        <div className="mc-question-label">CHỌN NGHĨA ĐÚNG</div>
+        <div className={`mc-question-word ${exercise.question.length > 12 ? 'mc-question-word--sentence' : ''}`}>
+          {exercise.question}
+        </div>
         {exercise.questionFurigana && (
           <div className="mc-question-furigana">{exercise.questionFurigana}</div>
         )}

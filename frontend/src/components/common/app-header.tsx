@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { BookOpen, Brain, MessageCircle, PenLine, Home, GraduationCap, User as UserIcon, LogOut, UserCheck } from "lucide-react";
+import { BookOpen, Brain, MessageCircle, PenLine, Home, GraduationCap, Layers, User as UserIcon, LogOut, UserCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
 import { userService } from "@/services/user.service";
@@ -11,6 +11,7 @@ const NAV = [
   { to: "/tu-vung", label: "Từ vựng", icon: BookOpen },
   { to: "/kanji", label: "Kanji", icon: PenLine },
   { to: "/ngu-phap", label: "Ngữ pháp", icon: Brain },
+  { to: "/practice", label: "Câu hỏi ôn tập", icon: Layers },
   { to: "/chat", label: "Trợ lý AI", icon: MessageCircle },
 ] as const;
 

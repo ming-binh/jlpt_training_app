@@ -22,5 +22,6 @@ public class RegisterRequest {
     @NotBlank(message = "Username không được để trống")
     private String username;
 
-    private String jlptLevel = "N5"; // Default
+    @Builder.Default
+    private String jlptLevel = "N5";
 }

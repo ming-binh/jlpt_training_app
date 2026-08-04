@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/lessons")
@@ -40,13 +41,15 @@ public class LessonController {
     }
 
     /**
-     * GET /api/lessons?level=N5&type=VOCABULARY
-     * Lấy danh sách bài học theo JLPT level và content type.
+     * GET /api/lessons?level=N5&type=VOCABULARY&page=0&size=12
+     * Lấy danh sách bài học theo JLPT level và content type, hỗ trợ phân trang.
      */
     @GetMapping
-    public ResponseEntity<List<LessonDto.LessonResponse>> getLessons(
+    public ResponseEntity<?> getLessons(
             @RequestParam(required = false) String level,
             @RequestParam(required = false) String type,
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size,
             Authentication authentication) {
 
         String userId = getUserId(authentication);
@@ -124,6 +127,28 @@ public class LessonController {
             })
             .collect(Collectors.toList());
 
+        if (page != null || size != null) {
+            int pageNum = page != null ? Math.max(0, page) : 0;
+            int pageSize = size != null ? Math.max(1, size) : 12;
+
+            int totalElements = response.size();
+            int totalPages = (int) Math.ceil((double) totalElements / pageSize);
+
+            int start = Math.min(pageNum * pageSize, totalElements);
+            int end = Math.min(start + pageSize, totalElements);
+
+            List<LessonDto.LessonResponse> content = response.subList(start, end);
+
+            Map<String, Object> pageResult = new LinkedHashMap<>();
+            pageResult.put("content", content);
+            pageResult.put("totalElements", totalElements);
+            pageResult.put("totalPages", totalPages);
+            pageResult.put("size", pageSize);
+            pageResult.put("number", pageNum);
+
+            return ResponseEntity.ok(pageResult);
+        }
+
         return ResponseEntity.ok(response);
     }
 
@@ -166,18 +191,22 @@ public class LessonController {
 
         List<LessonItem> items = lessonItemRepository.findByLessonIdOrderByOrderIndex(id);
         List<ExerciseDto> exercises = new ArrayList<>();
+        List<Vocabulary> allVocabs = vocabularyRepository.findAll();
 
         for (LessonItem item : items) {
             if (item.getEntityType() == UserProgress.EntityType.VOCABULARY) {
                 vocabularyRepository.findById(item.getEntityId()).ifPresent(v -> {
+                    String meaningStr = v.getDisplayMeaning();
+                    String readingStr = v.getReading() != null ? v.getReading() : "";
+
                     exercises.add(ExerciseDto.builder()
                         .id(UUID.randomUUID().toString())
                         .type("flashcard")
                         .question(v.getWord())
-                        .questionFurigana(v.getReading())
-                        .questionMeaning(v.getMeaning())
-                        .correctAnswer(v.getMeaning())
-                        .explanation("Từ vựng: " + v.getWord() + " (" + v.getReading() + ") = " + v.getMeaning())
+                        .questionFurigana(readingStr)
+                        .questionMeaning(meaningStr)
+                        .correctAnswer(meaningStr)
+                        .explanation("Từ vựng: " + v.getWord() + " (" + readingStr + ") = " + meaningStr)
                         .entityType("VOCABULARY")
                         .entityId(v.getId())
                         .build());
@@ -185,39 +214,41 @@ public class LessonController {
                     exercises.add(ExerciseDto.builder()
                         .id(UUID.randomUUID().toString())
                         .type("multiple_choice")
-                        .question("Từ \"" + v.getWord() + "\" (" + v.getReading() + ") có nghĩa là gì?")
-                        .questionFurigana(v.getReading())
-                        .options(generateVocabOptions(v))
-                        .correctAnswer(v.getMeaning())
-                        .explanation("Nghĩa đúng của " + v.getWord() + " là: " + v.getMeaning())
+                        .question("Từ \"" + v.getWord() + "\" (" + readingStr + ") có nghĩa là gì?")
+                        .questionFurigana(readingStr)
+                        .options(generateVocabOptions(v, allVocabs))
+                        .correctAnswer(meaningStr)
+                        .explanation("Nghĩa đúng của " + v.getWord() + " là: " + meaningStr)
                         .entityType("VOCABULARY")
                         .entityId(v.getId())
                         .build());
                 });
             } else if (item.getEntityType() == UserProgress.EntityType.KANJI) {
                 kanjiRepository.findById(item.getEntityId()).ifPresent(k -> {
+                    String meaningStr = k.getDisplayMeaning();
                     exercises.add(ExerciseDto.builder()
                         .id(UUID.randomUUID().toString())
                         .type("flashcard")
                         .question(k.getCharacter())
                         .questionFurigana("Âm On: " + (k.getOnReadings() != null ? k.getOnReadings() : "—"))
-                        .questionMeaning(k.getMeanings())
-                        .correctAnswer(k.getMeanings())
-                        .explanation("Chữ Hán: " + k.getCharacter() + " | Âm Kun: " + (k.getKunReadings() != null ? k.getKunReadings() : "—"))
+                        .questionMeaning(meaningStr)
+                        .correctAnswer(meaningStr)
+                        .explanation("Chữ Hán: " + k.getCharacter() + " | Nghĩa: " + meaningStr + " | Âm Kun: " + (k.getKunReadings() != null ? k.getKunReadings() : "—"))
                         .entityType("KANJI")
                         .entityId(k.getId())
                         .build());
                 });
             } else if (item.getEntityType() == UserProgress.EntityType.GRAMMAR) {
                 grammarPointRepository.findById(item.getEntityId()).ifPresent(g -> {
+                    String meaningStr = g.getMeaning() != null ? g.getMeaning() : "";
                     exercises.add(ExerciseDto.builder()
                         .id(UUID.randomUUID().toString())
                         .type("flashcard")
                         .question(g.getTitle())
                         .questionFurigana(g.getStructure() != null ? g.getStructure() : "")
-                        .questionMeaning(g.getMeaning())
-                        .correctAnswer(g.getMeaning())
-                        .explanation("Cấu trúc: " + g.getStructure() + "\n" + g.getMeaning())
+                        .questionMeaning(meaningStr)
+                        .correctAnswer(meaningStr)
+                        .explanation("Cấu trúc: " + g.getStructure() + "\n" + meaningStr)
                         .entityType("GRAMMAR")
                         .entityId(g.getId())
                         .build());
@@ -313,12 +344,35 @@ public class LessonController {
             .build());
     }
 
-    private List<ExerciseDto.OptionDto> generateVocabOptions(Vocabulary v) {
+    private List<ExerciseDto.OptionDto> generateVocabOptions(Vocabulary v, List<Vocabulary> allVocabs) {
         List<ExerciseDto.OptionDto> options = new ArrayList<>();
-        options.add(ExerciseDto.OptionDto.builder().id(v.getMeaning()).text(v.getMeaning()).build());
-        options.add(ExerciseDto.OptionDto.builder().id("ăn uống").text("ăn uống").build());
-        options.add(ExerciseDto.OptionDto.builder().id("đi lại").text("đi lại").build());
-        options.add(ExerciseDto.OptionDto.builder().id("học tập").text("học tập").build());
+        String correctAnswer = v.getDisplayMeaning();
+        options.add(ExerciseDto.OptionDto.builder().id(correctAnswer).text(correctAnswer).build());
+
+        List<String> distractors = allVocabs.stream()
+                .filter(other -> !other.getId().equals(v.getId()))
+                .map(Vocabulary::getDisplayMeaning)
+                .filter(m -> m != null && !m.isBlank() && !m.equalsIgnoreCase(correctAnswer))
+                .distinct()
+                .collect(Collectors.toList());
+
+        Collections.shuffle(distractors);
+
+        for (int i = 0; i < Math.min(3, distractors.size()); i++) {
+            String wrongAnswer = distractors.get(i);
+            options.add(ExerciseDto.OptionDto.builder().id(wrongAnswer).text(wrongAnswer).build());
+        }
+
+        // Fallback distractors if less than 3
+        String[] defaultWrong = {"ăn uống", "đi lại", "học tập", "thời gian", "nghỉ ngơi"};
+        int fallbackIdx = 0;
+        while (options.size() < 4 && fallbackIdx < defaultWrong.length) {
+            String fb = defaultWrong[fallbackIdx++];
+            if (options.stream().noneMatch(o -> o.getText().equalsIgnoreCase(fb))) {
+                options.add(ExerciseDto.OptionDto.builder().id(fb).text(fb).build());
+            }
+        }
+
         Collections.shuffle(options);
         return options;
     }

@@ -10,6 +10,7 @@ import { NihonVocabPage } from './features/vocab/pages/NihonVocabPage';
 import { NihonKanjiPage } from './features/kanji/pages/NihonKanjiPage';
 import { NihonGrammarPage } from './features/grammar/pages/NihonGrammarPage';
 import { NihonChatPage } from './features/ai-chat/pages/NihonChatPage';
+import { NihonQuizPage } from './features/lesson/pages/NihonQuizPage';
 
 // Auth Feature Pages
 import { AuthPage } from './features/auth/pages/AuthPage';
@@ -21,7 +22,6 @@ import { AuthCallbackPage } from './features/auth/pages/AuthCallbackPage';
 import { DashboardPage } from './features/dashboard/pages/DashboardPage';
 import { ProgressPage } from './features/dashboard/pages/ProgressPage';
 import { LessonPage } from './features/lesson/pages/LessonPage';
-import { PracticePage } from './features/lesson/pages/PracticePage';
 import { ReviewPage } from './features/lesson/pages/ReviewPage';
 import { MainLayout } from './layouts/MainLayout';
 
@@ -37,6 +37,8 @@ const App: React.FC = () => {
         <Route path="/tu-vung" element={<NihonVocabPage />} />
         <Route path="/kanji" element={<NihonKanjiPage />} />
         <Route path="/ngu-phap" element={<NihonGrammarPage />} />
+        <Route path="/practice" element={<NihonQuizPage />} />
+        <Route path="/quiz" element={<NihonQuizPage />} />
         <Route path="/chat" element={<NihonChatPage />} />
 
         {/* ── Auth System ─────────────────────────────────── */}
@@ -55,17 +57,7 @@ const App: React.FC = () => {
 
         <Route path="/learn" element={<NihonLessonListPage />} />
 
-        <Route path="/lesson/:id" element={
-          <MainLayout fullscreen>
-            <LessonPage />
-          </MainLayout>
-        } />
-
-        <Route path="/practice" element={
-          <MainLayout>
-            <PracticePage />
-          </MainLayout>
-        } />
+        <Route path="/lesson/:id" element={<LessonPage />} />
 
         <Route path="/review" element={
           <MainLayout>

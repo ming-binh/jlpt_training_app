@@ -26,10 +26,20 @@ public class Vocabulary {
     @Column(nullable = false)
     private String meaning;
 
+    @Column(name = "meaning_vi")
+    private String meaningVi;
+
     private String romaji;
 
     @Column(nullable = false, length = 2)
     private String jlptLevel; // N5, N4, N3, N2, N1
 
     private String partOfSpeech;
+
+    public String getDisplayMeaning() {
+        if (meaningVi != null && !meaningVi.isBlank()) {
+            return meaningVi;
+        }
+        return meaning != null ? meaning : "";
+    }
 }

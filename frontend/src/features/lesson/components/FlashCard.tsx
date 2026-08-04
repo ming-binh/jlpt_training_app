@@ -40,7 +40,7 @@ export const FlashCard: React.FC<FlashCardProps> = ({
       >
         {/* Front */}
         <div className="flashcard-face flashcard-face--front">
-          <div className="flashcard-hint">Tap để xem nghĩa</div>
+          <div className="flashcard-hint">LẬT THẺ XEM NGHĨA</div>
           <div className="flashcard-word">{exercise.question}</div>
           {exercise.questionFurigana && (
             <div className="flashcard-furigana">{exercise.questionFurigana}</div>
@@ -63,20 +63,20 @@ export const FlashCard: React.FC<FlashCardProps> = ({
 
       {/* Actions — shown after reveal */}
       {isRevealed && answerState === 'revealed' && (
-        <div className="flashcard-actions animate-bounce">
+        <div className="flashcard-actions">
           <button
             id="flashcard-didnt-know-btn"
             className="flashcard-btn flashcard-btn--incorrect"
             onClick={onDidntKnow}
           >
-            😕 Chưa nhớ
+            Chưa nhớ
           </button>
           <button
             id="flashcard-knew-btn"
             className="flashcard-btn flashcard-btn--correct"
             onClick={onKnew}
           >
-            ✓ Đã nhớ!
+            Đã nhớ!
           </button>
         </div>
       )}

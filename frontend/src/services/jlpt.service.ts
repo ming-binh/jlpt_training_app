@@ -178,11 +178,18 @@ export const jlptService = {
 
   // ── Lesson & Quiz APIs ──────────────────────────────────────────────────
 
-  getLessons: async (level?: string, type?: string): Promise<LessonItem[]> => {
+  getLessons: async (
+    level?: string,
+    type?: string,
+    page?: number,
+    size?: number
+  ): Promise<PageResponse<LessonItem> | LessonItem[]> => {
     const params: Record<string, any> = {};
     if (level && level.toLowerCase() !== 'all') params.level = level.toUpperCase();
     if (type && type.toLowerCase() !== 'all') params.type = type.toUpperCase();
-    const res = await api.get<LessonItem[]>('/lessons', { params });
+    if (page !== undefined) params.page = page;
+    if (size !== undefined) params.size = size;
+    const res = await api.get<PageResponse<LessonItem> | LessonItem[]>('/lessons', { params });
     return res.data;
   },
 

@@ -20,6 +20,12 @@ export interface ExerciseResult {
   userAnswer: string;
   correct: boolean;
   timeMs: number;
+  question?: string;
+  questionFurigana?: string;
+  correctAnswer?: string;
+  explanation?: string;
+  entityType?: string;
+  entityId?: string;
 }
 
 export interface LessonState {
@@ -79,6 +85,12 @@ export function lessonReducer(state: LessonState, action: LessonAction): LessonS
         userAnswer: action.answer,
         correct,
         timeMs,
+        question: current.question,
+        questionFurigana: current.questionFurigana,
+        correctAnswer: current.correctAnswer,
+        explanation: current.explanation,
+        entityType: current.entityType,
+        entityId: current.entityId,
       };
       return {
         ...state,

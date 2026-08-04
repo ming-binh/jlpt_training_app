@@ -25,4 +25,5 @@ public interface VocabularyRepository extends JpaRepository<Vocabulary, Long> {
 
     long countByJlptLevel(String jlptLevel);
     boolean existsByWordAndJlptLevel(String word, String jlptLevel);
+    java.util.Optional<Vocabulary> findFirstByWord(String word);
 }

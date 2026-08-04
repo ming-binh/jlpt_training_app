@@ -38,33 +38,11 @@ public class JlptDataSyncService {
         // 1. Seed grammar from local JSON files
         seedGrammar();
 
-        // 2. Sync vocabulary (only if table is empty)
-        if (vocabularyRepository.count() == 0) {
-            log.info("Vocabulary table is empty. Syncing from external API for N5, N4, N3...");
-            for (String level : List.of("N5", "N4", "N3")) {
-                vocabApiClient.syncVocabulary(level);
-            }
-            if (vocabularyRepository.count() == 0) {
-                log.info("External Vocab API returned 0 items. Seeding from local JSON...");
-                seedLocalVocab();
-            }
-        } else {
-            log.info("Vocabulary table already has {} entries. Skipping sync.", vocabularyRepository.count());
-        }
+        // 2. Seed Vietnamese vocabulary from local JSON files (Primary source)
+        seedLocalVocab();
 
-        // 3. Sync kanji (only if table is empty)
-        if (kanjiRepository.count() == 0) {
-            log.info("Kanji table is empty. Syncing from external API for N5, N4, N3...");
-            for (String level : List.of("N5", "N4", "N3")) {
-                kanjiApiClient.syncKanji(level);
-            }
-            if (kanjiRepository.count() == 0) {
-                log.info("External Kanji API returned 0 items. Seeding from local JSON...");
-                seedLocalKanji();
-            }
-        } else {
-            log.info("Kanji table already has {} entries. Skipping sync.", kanjiRepository.count());
-        }
+        // 3. Seed Vietnamese kanji from local JSON files (Primary source)
+        seedLocalKanji();
 
         log.info("=== JLPT Data Sync: Complete ===");
         log.info("Stats: Vocabulary={}, Kanji={}, Grammar={}",
@@ -79,23 +57,11 @@ public class JlptDataSyncService {
         
         // Seed Grammar
         seedGrammar();
-
-        // Sync Vocab from API for N5, N4, N3
-        int vocabCount = 0;
-        for (String level : List.of("N5", "N4", "N3")) {
-            vocabCount += vocabApiClient.syncVocabulary(level);
-        }
-
-        // Sync Kanji from API for N5, N4, N3
-        int kanjiCount = 0;
-        for (String level : List.of("N5", "N4", "N3")) {
-            kanjiCount += kanjiApiClient.syncKanji(level);
-        }
+        seedLocalVocab();
+        seedLocalKanji();
 
         return Map.of(
             "status", "success",
-            "newVocabSynced", vocabCount,
-            "newKanjiSynced", kanjiCount,
             "totalVocabulary", vocabularyRepository.count(),
             "totalKanji", kanjiRepository.count(),
             "totalGrammar", grammarPointRepository.count()
@@ -146,8 +112,20 @@ public class JlptDataSyncService {
 
                 InputStream is = resource.getInputStream();
                 List<Vocabulary> vocabList = objectMapper.readValue(is, new TypeReference<>() {});
-                vocabularyRepository.saveAll(vocabList);
-                log.info("Seeded {} local vocabulary entries from {}", vocabList.size(), filename);
+                for (Vocabulary v : vocabList) {
+                    if (v.getMeaningVi() == null || v.getMeaningVi().isBlank()) {
+                        v.setMeaningVi(v.getMeaning());
+                    }
+                    vocabularyRepository.findFirstByWord(v.getWord())
+                        .ifPresentOrElse(existing -> {
+                            existing.setMeaning(v.getMeaning());
+                            existing.setMeaningVi(v.getMeaning());
+                            existing.setReading(v.getReading());
+                            existing.setRomaji(v.getRomaji());
+                            vocabularyRepository.save(existing);
+                        }, () -> vocabularyRepository.save(v));
+                }
+                log.info("Seeded/Updated local Vietnamese vocabulary from {}", filename);
             } catch (Exception e) {
                 log.error("Failed to seed local vocabulary from {}: {}", filename, e.getMessage());
             }
@@ -163,8 +141,20 @@ public class JlptDataSyncService {
 
                 InputStream is = resource.getInputStream();
                 List<Kanji> kanjiList = objectMapper.readValue(is, new TypeReference<>() {});
-                kanjiRepository.saveAll(kanjiList);
-                log.info("Seeded {} local kanji entries from {}", kanjiList.size(), filename);
+                for (Kanji k : kanjiList) {
+                    if (k.getMeaningsVi() == null || k.getMeaningsVi().isBlank()) {
+                        k.setMeaningsVi(k.getMeanings());
+                    }
+                    kanjiRepository.findByCharacter(k.getCharacter())
+                        .ifPresentOrElse(existing -> {
+                            existing.setMeanings(k.getMeanings());
+                            existing.setMeaningsVi(k.getMeanings());
+                            existing.setKunReadings(k.getKunReadings());
+                            existing.setOnReadings(k.getOnReadings());
+                            kanjiRepository.save(existing);
+                        }, () -> kanjiRepository.save(k));
+                }
+                log.info("Seeded/Updated local Vietnamese kanji from {}", filename);
             } catch (Exception e) {
                 log.error("Failed to seed local kanji from {}: {}", filename, e.getMessage());
             }
