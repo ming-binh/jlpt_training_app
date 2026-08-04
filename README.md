@@ -1,117 +1,185 @@
-# JLPT AI Tutor - Hướng dẫn Cài đặt & Khởi chạy
+# 🌸 NIHON JOURNEY — JLPT AI TUTOR (N5 ➔ N3)
 
-JLPT AI Tutor là một hệ thống Full-stack hoàn chỉnh dành riêng cho việc luyện thi tiếng Nhật. Hệ thống bao gồm:
-- **Backend (Spring Boot 3.2)**: Quản lý Logic, Security (JWT), và đóng vai trò làm Orchestrator gọi đến Google Gemini API (đóng vai trò gia sư "Sensei").
-- **Frontend (React 18 + Vite + TypeScript)**: Giao diện người dùng theo phong cách **Postman Dark Workbench** (chuyên nghiệp, mượt mà, tối màu để tập trung code/học).
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![React](https://img.shields.io/badge/React-18-blue.svg)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL%20%26%20Auth-emerald.svg)](https://supabase.com/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
 
----
-
-## 🛠 Yêu cầu Hệ thống
-
-Trước khi bắt đầu, hãy đảm bảo máy tính của bạn đã cài đặt các công cụ sau:
-- **Java 17** (JDK 17 trở lên)
-- **Node.js** (v18 trở lên) & **npm** (Dùng cho Frontend)
-- **Maven** (không bắt buộc vì đã có sẵn Maven Wrapper `.mvn/wrapper` trong dự án)
-- **PostgreSQL** (chỉ cần nếu muốn chạy ở môi trường Production)
+**Nihon Journey** là hệ thống Full-stack học & luyện thi tiếng Nhật thông minh từ cấp độ **JLPT N5 đến N3**. Ứng dụng kết hợp giữa **Lộ trình bài học cấu trúc**, kho dữ liệu từ vựng - kanji - ngữ pháp phong phú, và **Gia sư AI Sensei** tương tác 24/7.
 
 ---
 
-## ⚙️ Cấu hình Môi trường (.env)
+## 🌟 Tính Năng Nổi Bật
 
-Dự án sử dụng file `.env` ở thư mục gốc để quản lý các cấu hình nhạy cảm.
+### 1. 🎓 Lộ Trình Bài Học Cấu Trúc (`Lesson` & `QuizSession`)
+- Chia nhỏ dữ liệu thành các Bài học chuẩn hóa cho **N5, N4, N3**:
+  - **Bài học Từ vựng**: 15 từ / bài
+  - **Bài học Kanji**: 12 chữ / bài
+  - **Bài học Ngữ pháp**: 10 cấu trúc / bài
+- **Sinh bài tập Quiz tự động**: Kết hợp Flashcard lật thẻ và Trắc nghiệm 4 lựa chọn.
+- **Tối ưu hóa Batch Query**: Tốc độ xử lý siêu tốc, giảm từ 4.000+ câu lệnh SQL xuống chỉ **3 SQL queries** trên 1 request.
 
-1. Copy file `.env.example` và đổi tên thành `.env`.
-2. Mở file `.env` và cấu hình các giá trị cần thiết:
+### 2. 📖 Kho Từ Vựng Tiếng Nhật (3,000+ Từ)
+- Tìm kiếm tức thì, lọc theo trình độ (N5 ➔ N3), hiển thị Furigana, ví dụ thực tế và phát âm.
+- Đánh dấu tương tác **`🟢 Đã thuộc (+10 XP)`** hoặc **`🔴 Cần học lại`** lưu trực tiếp vào cơ sở dữ liệu.
 
+### 3. 漢 Kho Kanji (600+ Chữ Hán)
+- Tra cứu âm On/Kun, số nét, ý nghĩa Hán Việt và từ ghép liên quan.
+
+### 4. 文 Cấu Trúc Ngữ Pháp (50+ Mẫu)
+- Công thức chia động từ, giải thích sắc thái sử dụng và câu ví dụ song ngữ Nhật - Việt.
+
+### 5. 🤖 Trợ Lý Gia Sư AI Sensei (24/7)
+- Tích hợp đa mô hình AI tiên tiến: **Google Gemini 1.5 Flash** & **Groq Llama 3.3 70B**.
+- Giải thích ngữ pháp, sửa bài viết, dịch câu và luyện hội thoại phản xạ.
+
+### 6. 🔥 Trang Cá Nhân & Thống Kê Chuỗi Ngày Học (Streak)
+- Theo dõi chuỗi ngày học liên tục (7-day streak tracker), điểm kinh nghiệm XP, cấp độ mục tiêu và phần kỹ năng cần cải thiện.
+
+---
+
+## 🏗️ Kiến Trúc & Công Nghệ (Tech Stack)
+
+```
+                        ┌───────────────────────────────┐
+                        │   React 18 + Vite + TS        │
+                        │   (Nihon Journey UI / Tailwind)│
+                        └──────────────┬────────────────┘
+                                       │ REST API (Axios + Supabase Bearer JWT)
+                                       ▼
+                        ┌───────────────────────────────┐
+                        │   Spring Boot 3.2 (Java 17)   │
+                        │   • Spring Security + JWT     │
+                        │   • HikariCP (20 connections) │
+                        │   • JPA / Hibernate           │
+                        └──────┬─────────────────┬──────┘
+                               │                 │
+            ┌──────────────────┴──┐           ┌──┴──────────────────┐
+            ▼                     ▼           ▼                     ▼
+┌───────────────────────┐ ┌───────────────┐ ┌───────────────────┐ ┌────────────────┐
+│ Supabase PostgreSQL   │ │ Supabase Auth │ │ Google Gemini API │ │ Groq Llama 3.3 │
+│ (3,000+ Vocab/Kanji)  │ │ (JWT Session) │ │ (Sensei Tutor AI) │ │ (Fast AI Chat) │
+└───────────────────────┘ └───────────────┘ └───────────────────┘ └────────────────┘
+```
+
+- **Backend**: Java 17, Spring Boot 3.2.0, Spring Security, Spring Data JPA, HikariCP.
+- **Frontend**: React 18, Vite 5, TypeScript, Tailwind CSS, Lucide Icons.
+- **Database & Auth**: Supabase PostgreSQL Cloud, Supabase Auth (JWT Validation).
+- **Containerization**: Docker, Docker Compose (`docker-compose.yml` & `docker-compose.prod.yml`), Nginx Alpine.
+
+---
+
+## ⚙️ Cấu Hình Môi Trường (.env)
+
+### 1. File `.env` ở thư mục gốc (Backend)
+Sao chép từ `.env.example`:
 ```env
-# Lấy API key tại: https://aistudio.google.com/apikey
-GEMINI_API_KEY=your_gemini_api_key_here
+# AI Provider Keys
+GROQ_API_KEY=gsk_your_groq_key
+GROQ_MODEL=llama-3.3-70b-versatile
 
-# JWT Secret Key (Tự tạo một chuỗi ngẫu nhiên dài ít nhất 256 bits)
-JWT_SECRET=404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+GEMINI_API_KEY=your_gemini_key
+GEMINI_BASE_URL=https://generativelanguage.googleapis.com
+GEMINI_MODEL=gemini-1.5-flash
 
-# Cấu hình Database (Dùng cho Production)
-DB_URL=jdbc:postgresql://localhost:5432/jlpt_tutor
-DB_USERNAME=postgres
-DB_PASSWORD=postgres
+# Supabase Database Configuration
+DB_URL=jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
+DB_USERNAME=postgres.your_project_ref
+DB_PASSWORD=your_db_password
+
+# Supabase Auth Configuration
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_JWT_SECRET=your_supabase_jwt_secret
+
+SPRING_PROFILES_ACTIVE=prod
 ```
-> **Quan trọng:** Bạn BẮT BUỘC phải điền `GEMINI_API_KEY` để AI hoạt động và `JWT_SECRET` để hệ thống Đăng nhập (Auth) hoạt động.
+
+### 2. File `frontend/.env.local` (Frontend)
+Sao chép từ `frontend/.env.example`:
+```env
+VITE_API_URL=http://localhost:8080/api
+VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
 
 ---
 
-## 🚀 Cách Khởi chạy Dự án
+## 🚀 Hướng Dẫn Khởi Chạy Dự Án
 
-Để chạy ứng dụng hoàn chỉnh, bạn cần bật cả Backend và Frontend chạy song song ở 2 cửa sổ Terminal khác nhau.
+### Cách 1: Sử dụng Docker Compose (Khuyên dùng - 1 Lệnh duy nhất)
+```powershell
+docker compose up -d
+```
+- **Giao diện Frontend**: `http://localhost:5173` (Tự động hot-reload khi sửa code)
+- **Backend API**: `http://localhost:8080/api`
 
-### 1. Khởi chạy Backend (Spring Boot)
+*Tắt hệ thống container:*
+```powershell
+docker compose down
+```
 
-Mặc định dự án đang cấu hình chạy ở profile `dev` sử dụng database **H2 in-memory** (tự động tạo DB, không cần cài PostgreSQL).
+---
 
-Mở terminal tại thư mục gốc của dự án:
+### Cách 2: Khởi chạy Thủ công (Local Terminal)
 
-**Windows:**
-```bash
+#### 1. Khởi chạy Backend (Spring Boot)
+```powershell
+# Windows
 ./mvnw.cmd spring-boot:run
-```
-*(Nếu PowerShell báo lỗi không tìm thấy file, có thể chạy trực tiếp bằng java)*:
-```bash
-java "-Dmaven.multiModuleProjectDirectory=." -classpath ".mvn\wrapper\maven-wrapper.jar" org.apache.maven.wrapper.MavenWrapperMain spring-boot:run
-```
 
-**macOS/Linux:**
-```bash
+# macOS / Linux
 ./mvnw spring-boot:run
 ```
 
-Backend sẽ chạy ở cổng `http://localhost:8080`.
-- H2 Console: `http://localhost:8080/h2-console` (JDBC URL: `jdbc:h2:mem:jlpt_tutor_dev`, Username: `sa`)
-
-### 2. Khởi chạy Frontend (React + Vite)
-
-Mở một cửa sổ terminal mới và trỏ vào thư mục `frontend/`:
-
-```bash
+#### 2. Khởi chạy Frontend (React + Vite)
+Mở cửa sổ Terminal mới:
+```powershell
 cd frontend
 npm install
 npm run dev
 ```
 
-Frontend sẽ chạy ở cổng `http://localhost:5173`. 
-> Lúc này bạn có thể mở trình duyệt, truy cập `http://localhost:5173`, tiến hành **Sign Up** một tài khoản mới và trải nghiệm chat với AI Tutor!
+---
+
+## 🐳 Triển Khai Production (Deployment)
+
+### 1. Triển khai bằng Docker Compose (VPS / Server riêng)
+```powershell
+docker compose -f docker-compose.prod.yml up -d --build
+```
+Hệ thống sẽ tự động đóng gói Nginx tối ưu cho Frontend (Port 80) và Spring Boot cho Backend (Port 8080).
+
+### 2. Triển khai Tách biệt (Vercel + Render)
+- **Frontend**: Deploy thư mục `frontend/` lên **Vercel**. Cấu hình biến `VITE_API_URL`.
+- **Backend**: Deploy thư mục gốc lên **Render** sử dụng file `Dockerfile` có sẵn.
 
 ---
 
-## 📝 Cách Test API thủ công (Postman / REST Client)
+## 📡 Danh Sách APIs Chính
 
-Dự án có sẵn file **`api-tests.http`** ở thư mục gốc. Hệ thống đã được bảo mật bằng **Spring Security + JWT**.
-Để gọi API `/api/ai/chat`, bạn phải làm theo luồng sau:
-
-1. **Đăng ký / Đăng nhập** gọi tới `/api/auth/login` hoặc `/api/auth/register`.
-2. Copy chuỗi `token` được trả về từ response.
-3. Gắn token vào Header khi gọi các API khác:
-```http
-Authorization: Bearer <nhập_token_vào_đây>
-```
-
-Ví dụ CURL request cho Chat AI:
-```bash
-curl -X POST http://localhost:8080/api/ai/chat \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <TOKEN_CỦA_BẠN>" \
-  -d '{
-    "useCase": "GRAMMAR_EXPLAIN",
-    "params": {
-      "user_message": "Giải thích ngữ pháp 〜てもいいですか"
-    }
-  }'
-```
+| Phương thức | Đường dẫn | Mô tả |
+| --- | --- | --- |
+| `GET` | `/api/lessons?level=N5` | Lấy danh sách bài học kèm % hoàn thành |
+| `GET` | `/api/lessons/{id}/exercises` | Sinh bài tập tương tác (Flashcard & Quiz) |
+| `POST` | `/api/lessons/{id}/complete` | Nộp bài học, ghi nhận `quiz_session` và cộng XP/Streak |
+| `GET` | `/api/vocabulary?level=N5` | Tìm kiếm từ vựng phân trang |
+| `GET` | `/api/kanji?level=N5` | Tìm kiếm chữ Hán Kanji |
+| `GET` | `/api/grammar?level=N5` | Danh sách mẫu ngữ pháp |
+| `POST` | `/api/progress/mark` | Đánh giá trạng thái từ vựng (`MASTERED`/`LEARNING`) |
+| `POST` | `/api/ai/chat` | Gửi tin nhắn cho Gia sư AI Sensei |
+| `GET` | `/api/users/me` | Lấy thông tin & thống kê học viên hiện tại |
 
 ---
 
-## 📚 Tài liệu tham khảo quan trọng (Dành cho Developer)
+## 🔒 Kiểm Tra Bảo Mật & An Toàn Code
 
-Khi tham gia phát triển dự án, bạn BẮT BUỘC phải tuân thủ các quy tắc trong các file sau:
+- **Không chứa dữ liệu nhạy cảm (No Hardcoded Secrets)**: Toàn bộ API Key, Mật khẩu Database và Secret JWT được quản lý qua biến môi trường `.env`.
+- **Quản lý Git sạch sẽ (.gitignore)**: File `.env`, `node_modules/`, `target/`, `dist/`, logs và các file làm việc trung gian của AI được ẩn hoàn toàn khỏi Git repository.
 
-1. **[CLAUDE.md](./CLAUDE.md) & [SKILL.md](./ai-prompts/SKILL.md)**: Quy tắc về hành vi code, luôn ưu tiên code đơn giản, rõ ràng, thiết kế hướng mục tiêu, không over-engineering.
-2. **[AGENT.md](./AGENT.md)**: Chứa TOÀN BỘ quy tắc về Prompt Strategy, cấu trúc JSON trả về của AI, và thiết kế của các lớp giao tiếp với Gemini.
-3. **[DESIGN.md](./frontend/DESIGN.md)**: Triết lý thiết kế UI/UX của Frontend. Sử dụng giao diện Postman Dark Workbench (Màu nền Canvas `#1B1B1B`, điểm nhấn Cam `#FF6C37` và dùng font Monospace cho dữ liệu). Không sử dụng Glassmorphism hay gradient sặc sỡ.
+---
+
+## 📄 Giấy Phép (License)
+
+Dự án được phân phối dưới giấy phép **MIT License**. Phát triển phục vụ cộng đồng học tiếng Nhật JLPT.
