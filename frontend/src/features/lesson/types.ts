@@ -25,7 +25,7 @@ export interface ExerciseResult {
   correctAnswer?: string;
   explanation?: string;
   entityType?: string;
-  entityId?: string;
+  entityId?: number | string;
 }
 
 export interface LessonState {
