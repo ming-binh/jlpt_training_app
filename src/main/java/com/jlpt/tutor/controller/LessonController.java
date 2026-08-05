@@ -4,6 +4,7 @@ import com.jlpt.tutor.dto.ExerciseDto;
 import com.jlpt.tutor.dto.LessonDto;
 import com.jlpt.tutor.entity.*;
 import com.jlpt.tutor.repository.*;
+import com.jlpt.tutor.service.SpacedRepetitionService;
 import com.jlpt.tutor.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ public class LessonController {
     private final QuizSessionRepository quizSessionRepository;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final SpacedRepetitionService spacedRepetitionService;
 
     private String getUserId(Authentication authentication) {
         if (authentication == null) return null;
@@ -318,8 +320,7 @@ public class LessonController {
                                     .build());
 
                     progress.setStatus(status);
-                    progress.setReviewCount(progress.getReviewCount() + 1);
-                    progress.setLastReviewDate(LocalDateTime.now());
+                    spacedRepetitionService.applyReview(progress, Boolean.TRUE.equals(result.getCorrect()));
                     if (status == UserProgress.ProgressStatus.MASTERED) {
                         progress.setXp(progress.getXp() + 10);
                     }
