@@ -30,9 +30,6 @@ public class Kanji {
     @Column(length = 500)
     private String onReadings; // comma-separated: "サン, セン"
 
-    @Column(name = "meanings_vi", length = 500)
-    private String meaningsVi;
-
     private String jlptLevel; // N5, N4, N3, N2, N1 (null if unknown)
 
     private Integer grade; // school grade (1-8)
@@ -40,9 +37,6 @@ public class Kanji {
     private Integer strokeCount;
 
     public String getDisplayMeaning() {
-        if (meaningsVi != null && !meaningsVi.isBlank()) {
-            return meaningsVi;
-        }
         return meanings != null ? meanings : "";
     }
 }

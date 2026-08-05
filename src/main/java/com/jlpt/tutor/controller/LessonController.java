@@ -197,7 +197,7 @@ public class LessonController {
             if (item.getEntityType() == UserProgress.EntityType.VOCABULARY) {
                 vocabularyRepository.findById(item.getEntityId()).ifPresent(v -> {
                     String meaningStr = v.getDisplayMeaning();
-                    String readingStr = v.getReading() != null ? v.getReading() : "";
+                    String readingStr = v.getDisplayReading();
 
                     exercises.add(ExerciseDto.builder()
                         .id(UUID.randomUUID().toString())

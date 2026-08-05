@@ -26,9 +26,6 @@ public class Vocabulary {
     @Column(nullable = false)
     private String meaning;
 
-    @Column(name = "meaning_vi")
-    private String meaningVi;
-
     private String romaji;
 
     @Column(nullable = false, length = 2)
@@ -37,9 +34,13 @@ public class Vocabulary {
     private String partOfSpeech;
 
     public String getDisplayMeaning() {
-        if (meaningVi != null && !meaningVi.isBlank()) {
-            return meaningVi;
-        }
         return meaning != null ? meaning : "";
+    }
+
+    public String getDisplayReading() {
+        if (reading != null && !reading.isBlank() && !"EMPTY".equalsIgnoreCase(reading.trim())) {
+            return reading;
+        }
+        return word != null ? word : "";
     }
 }

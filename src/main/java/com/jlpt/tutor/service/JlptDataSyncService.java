@@ -38,10 +38,22 @@ public class JlptDataSyncService {
         // 1. Seed grammar from local JSON files
         seedGrammar();
 
-        // 2. Seed Vietnamese vocabulary from local JSON files (Primary source)
+        // 2. Sync vocabulary: load full 3,093 items from API if empty, then overlay Vietnamese meanings
+        if (vocabularyRepository.count() == 0) {
+            log.info("Vocabulary table is empty. Syncing full dataset from external API for N5, N4, N3...");
+            for (String level : List.of("N5", "N4", "N3")) {
+                vocabApiClient.syncVocabulary(level);
+            }
+        }
         seedLocalVocab();
 
-        // 3. Seed Vietnamese kanji from local JSON files (Primary source)
+        // 3. Sync kanji: load full dataset from API if empty, then overlay Vietnamese meanings
+        if (kanjiRepository.count() == 0) {
+            log.info("Kanji table is empty. Syncing full dataset from external API for N5, N4, N3...");
+            for (String level : List.of("N5", "N4", "N3")) {
+                kanjiApiClient.syncKanji(level);
+            }
+        }
         seedLocalKanji();
 
         log.info("=== JLPT Data Sync: Complete ===");
@@ -55,13 +67,28 @@ public class JlptDataSyncService {
     public Map<String, Object> forceSyncAll() {
         log.info("=== Force Syncing All JLPT Data N5-N3 from Live APIs ===");
         
-        // Seed Grammar
         seedGrammar();
+
+        int vocabCount = 0;
+        if (vocabularyRepository.count() == 0) {
+            for (String level : List.of("N5", "N4", "N3")) {
+                vocabCount += vocabApiClient.syncVocabulary(level);
+            }
+        }
         seedLocalVocab();
+
+        int kanjiCount = 0;
+        if (kanjiRepository.count() == 0) {
+            for (String level : List.of("N5", "N4", "N3")) {
+                kanjiCount += kanjiApiClient.syncKanji(level);
+            }
+        }
         seedLocalKanji();
 
         return Map.of(
             "status", "success",
+            "newVocabSynced", vocabCount,
+            "newKanjiSynced", kanjiCount,
             "totalVocabulary", vocabularyRepository.count(),
             "totalKanji", kanjiRepository.count(),
             "totalGrammar", grammarPointRepository.count()
@@ -113,13 +140,9 @@ public class JlptDataSyncService {
                 InputStream is = resource.getInputStream();
                 List<Vocabulary> vocabList = objectMapper.readValue(is, new TypeReference<>() {});
                 for (Vocabulary v : vocabList) {
-                    if (v.getMeaningVi() == null || v.getMeaningVi().isBlank()) {
-                        v.setMeaningVi(v.getMeaning());
-                    }
                     vocabularyRepository.findFirstByWord(v.getWord())
                         .ifPresentOrElse(existing -> {
                             existing.setMeaning(v.getMeaning());
-                            existing.setMeaningVi(v.getMeaning());
                             existing.setReading(v.getReading());
                             existing.setRomaji(v.getRomaji());
                             vocabularyRepository.save(existing);
@@ -142,13 +165,9 @@ public class JlptDataSyncService {
                 InputStream is = resource.getInputStream();
                 List<Kanji> kanjiList = objectMapper.readValue(is, new TypeReference<>() {});
                 for (Kanji k : kanjiList) {
-                    if (k.getMeaningsVi() == null || k.getMeaningsVi().isBlank()) {
-                        k.setMeaningsVi(k.getMeanings());
-                    }
                     kanjiRepository.findByCharacter(k.getCharacter())
                         .ifPresentOrElse(existing -> {
                             existing.setMeanings(k.getMeanings());
-                            existing.setMeaningsVi(k.getMeanings());
                             existing.setKunReadings(k.getKunReadings());
                             existing.setOnReadings(k.getOnReadings());
                             kanjiRepository.save(existing);
