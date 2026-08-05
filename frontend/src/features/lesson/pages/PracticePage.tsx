@@ -5,7 +5,7 @@ import { AppHeader } from '@/components/common/app-header';
 import type { JlptLevel, ContentType } from '@/services/lesson.service';
 import { cn } from '@/lib/utils';
 
-const LEVELS: JlptLevel[] = ['N5', 'N4', 'N3', 'N2', 'N1'];
+const LEVELS: JlptLevel[] = ['N5', 'N4', 'N3'];
 const TYPES: { type: ContentType | 'MIXED'; jp: string; label: string; desc: string }[] = [
   { type: 'MIXED', jp: '総合', label: 'Tổng hợp', desc: 'Trộn ngẫu nhiên các loại' },
   { type: 'VOCABULARY', jp: '単語', label: 'Từ vựng', desc: 'Chọn nghĩa đúng của từ' },

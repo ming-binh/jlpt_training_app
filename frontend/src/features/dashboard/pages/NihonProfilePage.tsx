@@ -4,8 +4,10 @@ import {
   BookOpen,
   Brain,
   CalendarClock,
+  Check,
   Flame,
   Mail,
+  PenLine,
   ShieldCheck,
   Sparkles,
   Target,
@@ -13,6 +15,19 @@ import {
 } from "lucide-react";
 import { AppHeader } from "@/components/common/app-header";
 import { userService, type DashboardStats, type UserProfile } from "@/services/user.service";
+import { progressService, type ProgressSummary } from "@/services/lesson.service";
+
+const MASTERED_META = [
+  { key: 'masteredVocab' as const, label: 'Từ vựng', kanji: '語', icon: BookOpen, to: '/tu-vung' },
+  { key: 'masteredKanji' as const, label: 'Kanji', kanji: '漢', icon: PenLine, to: '/kanji' },
+  { key: 'masteredGrammar' as const, label: 'Ngữ pháp', kanji: '文', icon: Brain, to: '/ngu-phap' },
+];
+
+const PROGRESS_DEFAULT: ProgressSummary = {
+  streak: 0, xp: 0, xpToNextLevel: 500,
+  masteredVocab: 0, masteredKanji: 0, masteredGrammar: 0,
+  todayGoalComplete: false, jlptLevel: 'N5',
+};
 
 const WEEK_DAYS = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
 
@@ -26,6 +41,8 @@ export function NihonProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [progressSummary, setProgressSummary] = useState<ProgressSummary>(PROGRESS_DEFAULT);
+  const [todayDone, setTodayDone] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -37,6 +54,10 @@ export function NihonProfilePage() {
       if (statsRes) setStats(statsRes);
       setLoading(false);
     });
+    progressService.getSummary().then(setProgressSummary).catch(() => setProgressSummary(PROGRESS_DEFAULT));
+    progressService.getStreakCalendar()
+      .then(days => setTodayDone(days[days.length - 1]?.studied ?? false))
+      .catch(() => setTodayDone(false));
   }, []);
 
   // Compute dynamic user values
@@ -181,6 +202,69 @@ export function NihonProfilePage() {
               value={lastActiveText}
               hint="Tự động cập nhật khi bạn học"
             />
+          </section>
+
+          {/* Progress Tracking Section - Tiến độ học tập */}
+          <section className="surface-card mt-6 p-5 sm:p-6 border border-border/80">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Bảng theo dõi</p>
+                <h2 className="mt-1 text-lg font-semibold">Tiến độ học tập</h2>
+              </div>
+            </div>
+
+            {/* Nhiệm vụ hôm nay */}
+            <div className="flex flex-wrap items-center gap-4 rounded-xl bg-secondary/60 border border-border/50 p-4 mb-4">
+              <span
+                className={
+                  todayDone
+                    ? "grid size-10 shrink-0 place-items-center rounded-full border border-accent bg-accent/15 text-accent"
+                    : "grid size-10 shrink-0 place-items-center rounded-full border border-border"
+                }
+              >
+                {todayDone && <Check className="size-4" />}
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold">Nhiệm vụ hôm nay</p>
+                <p className="text-xs text-muted-foreground">
+                  {todayDone
+                    ? 'Bạn đã hoàn thành lượt học hôm nay.'
+                    : 'Hoàn thành 1 lượt luyện tập hoặc ôn tập để giữ tiến độ.'}
+                </p>
+              </div>
+              {!todayDone && (
+                <Link
+                  to="/practice"
+                  className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-accent px-4 py-2 text-xs font-semibold text-accent-foreground transition-transform hover:-translate-y-0.5"
+                >
+                  Luyện tập ngay <ArrowRight className="size-3" />
+                </Link>
+              )}
+            </div>
+
+            {/* Đã thuộc */}
+            <div className="flex items-center gap-2 mb-3">
+              <p className="text-sm font-semibold">Đã thuộc</p>
+              <span className="ml-auto text-xs text-muted-foreground">
+                Tổng {progressSummary.masteredVocab + progressSummary.masteredKanji + progressSummary.masteredGrammar} mục
+              </span>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {MASTERED_META.map((m) => (
+                <Link
+                  key={m.key}
+                  to={m.to}
+                  className="surface-card group relative overflow-hidden p-4 transition-transform hover:-translate-y-1 border border-border/50"
+                >
+                  <span className="jp pointer-events-none absolute -right-1 -top-4 text-6xl text-secondary/60 transition-colors group-hover:text-primary/40">
+                    {m.kanji}
+                  </span>
+                  <m.icon className="relative size-4 text-accent" />
+                  <p className="relative mt-3 text-2xl font-semibold">{progressSummary[m.key]}</p>
+                  <p className="relative text-xs text-muted-foreground">{m.label}</p>
+                </Link>
+              ))}
+            </div>
           </section>
 
           {/* Weak Sections List */}

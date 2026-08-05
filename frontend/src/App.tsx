@@ -18,7 +18,6 @@ import { ResetPasswordPage } from './features/auth/pages/ResetPasswordPage';
 import { AuthCallbackPage } from './features/auth/pages/AuthCallbackPage';
 
 // Learning & Dashboard Feature Pages
-import { ProgressPage } from './features/dashboard/pages/ProgressPage';
 import { LessonPage } from './features/lesson/pages/LessonPage';
 import { ReviewPage } from './features/lesson/pages/ReviewPage';
 import { PracticePage } from './features/lesson/pages/PracticePage';
@@ -60,7 +59,8 @@ const App: React.FC = () => {
         <Route path="/quiz" element={<PracticePage />} />
         <Route path="/practice/session" element={<QuizSessionPage mode="practice" />} />
 
-        <Route path="/progress" element={<ProgressPage />} />
+        {/* /progress redirects to /profile where progress is embedded */}
+        <Route path="/progress" element={<Navigate to="/profile" replace />} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
