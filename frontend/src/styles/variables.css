@@ -1,43 +1,43 @@
 :root {
   /* ═══════════════════════════════════════════════════
-     Sakura Night Theme
-     Canvas: deep space navy · Accent: violet purple
+     Indigo Nhật Theme (matches styles.css's Tailwind theme)
+     Canvas: deep indigo navy · Accent: gold
      ═══════════════════════════════════════════════════ */
 
-  /* Primary — Violet Purple */
-  --color-primary: #8B5CF6;
-  --color-on-primary: #FFFFFF;
-  --color-primary-hover: #9D6FF8;
-  --color-primary-pressed: #7A4DE0;
-  --color-primary-subtle: #1A1535;
+  /* Primary — Indigo */
+  --color-primary: oklch(0.56 0.14 266);
+  --color-on-primary: oklch(0.97 0.02 85);
+  --color-primary-hover: oklch(0.62 0.14 266);
+  --color-primary-pressed: oklch(0.48 0.14 266);
+  --color-primary-subtle: oklch(0.28 0.05 268);
 
-  /* Accent — Sakura Pink (highlights, method-post equivalent) */
-  --color-accent: #EC4899;
-  --color-accent-subtle: #2A1228;
+  /* Accent — Gold (matches app accent) */
+  --color-accent: oklch(0.78 0.13 78);
+  --color-accent-subtle: oklch(0.78 0.13 78 / 0.12);
 
   /* Text */
-  --color-ink: #E8E9F0;
-  --color-ink-muted: #9396B5;
-  --color-ink-subdued: #5A5D7A;
+  --color-ink: oklch(0.93 0.03 85);
+  --color-ink-muted: oklch(0.74 0.03 85);
+  --color-ink-subdued: oklch(0.55 0.03 85);
 
-  /* Surfaces — deep navy stack */
-  --color-canvas: #0C0D14;
-  --color-surface-1: #141520;
-  --color-surface-2: #1C1E2E;
-  --color-surface-3: #252742;
+  /* Surfaces — deep indigo stack */
+  --color-canvas: oklch(0.15 0.04 268);
+  --color-surface-1: oklch(0.235 0.048 268);
+  --color-surface-2: oklch(0.27 0.05 268);
+  --color-surface-3: oklch(0.3 0.055 268);
 
   /* Borders */
-  --color-border: #252742;
-  --color-border-strong: #383B5C;
+  --color-border: oklch(0.34 0.05 268);
+  --color-border-strong: oklch(0.4 0.06 268);
 
   /* Semantic / Method equivalents */
   --color-method-get: #34D399;    /* emerald green — safe reads */
   --color-method-post: #FBBF24;   /* amber — writes */
   --color-method-delete: #F87171; /* red — destructive */
 
-  --color-success: #34D399;
-  --color-warning: #FBBF24;
-  --color-danger: #F87171;
+  --color-success: oklch(0.7 0.13 165);
+  --color-warning: oklch(0.78 0.13 78);
+  --color-danger: oklch(0.62 0.2 22);
 
   /* ── JLPT Level Colors ──────────────────────────── */
   --color-n5: #34D399;        /* emerald  — beginner */
@@ -87,11 +87,11 @@
   --radius-lg: 12px;
   --radius-pill: 9999px;
 
-  /* Shadows — violet-tinted */
+  /* Shadows — indigo-tinted */
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5);
   --shadow-elevated: 0 6px 20px rgba(0, 0, 0, 0.6);
   --shadow-flyout: 0 16px 48px rgba(0, 0, 0, 0.7);
-  --shadow-glow: 0 0 24px rgba(139, 92, 246, 0.2);
+  --shadow-glow: 0 0 24px rgba(99, 102, 241, 0.2);
 
   /* Motion */
   --duration-fast: 90ms;

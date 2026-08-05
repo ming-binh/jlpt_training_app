@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sword, ChevronRight } from 'lucide-react';
+import { AppHeader } from '@/components/common/app-header';
 import type { JlptLevel, ContentType } from '@/services/lesson.service';
 import { LevelBadge } from '@/components/LevelBadge';
 import './PracticePage.css';
@@ -29,7 +30,9 @@ export const PracticePage: React.FC = () => {
   };
 
   return (
-    <div className="practice-page page-container">
+    <div className="min-h-screen bg-background text-foreground">
+      <AppHeader />
+      <div className="practice-page">
       <div className="practice-header animate-fade-in">
         <div className="practice-icon"><Sword size={28} /></div>
         <h1 className="practice-title">Luyện tập</h1>
@@ -92,6 +95,7 @@ export const PracticePage: React.FC = () => {
       <button id="practice-start-btn" className="practice-start-btn animate-bounce" onClick={handleStart}>
         Bắt đầu luyện tập ⚡
       </button>
+      </div>
     </div>
   );
 };

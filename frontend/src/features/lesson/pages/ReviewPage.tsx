@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RotateCcw, CheckCircle2 } from 'lucide-react';
+import { AppHeader } from '@/components/common/app-header';
 import { quizService } from '@/services/lesson.service';
 import type { Exercise } from '@/services/lesson.service';
 import './ReviewPage.css';
@@ -22,7 +23,9 @@ export const ReviewPage: React.FC = () => {
   };
 
   return (
-    <div className="review-page page-container">
+    <div className="min-h-screen bg-background text-foreground">
+      <AppHeader />
+      <div className="review-page">
       <div className="review-header animate-fade-in">
         <div className="review-icon"><RotateCcw size={26} /></div>
         <div>
@@ -80,6 +83,7 @@ export const ReviewPage: React.FC = () => {
           </button>
         </>
       )}
+      </div>
     </div>
   );
 };

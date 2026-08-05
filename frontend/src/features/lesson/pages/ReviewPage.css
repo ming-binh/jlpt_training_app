@@ -1,4 +1,8 @@
-.review-page { max-width: 480px; padding-bottom: var(--space-10); }
+.review-page {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4) var(--space-10);
+}
 
 .review-header {
   display: flex; align-items: center; gap: var(--space-4);
@@ -34,7 +38,7 @@
   font-family: var(--font-mono);
   color: var(--color-accent);
   line-height: 1;
-  filter: drop-shadow(0 0 16px rgba(236, 72, 153, 0.3));
+  filter: drop-shadow(0 0 16px oklch(0.78 0.13 78 / 0.35));
 }
 
 .review-count-label {
@@ -97,12 +101,12 @@
 .review-start-btn {
   width: 100%; padding: var(--space-5);
   display: flex; align-items: center; justify-content: center; gap: var(--space-3);
-  background: linear-gradient(135deg, var(--color-accent), #C026D3);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
   color: white; border: none;
   border-radius: var(--radius-lg);
   font-size: 15px; font-weight: 700; cursor: pointer;
   transition: all var(--duration-base) var(--easing-standard);
-  box-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
+  box-shadow: var(--shadow-glow);
 }
 
 .review-start-btn:hover {

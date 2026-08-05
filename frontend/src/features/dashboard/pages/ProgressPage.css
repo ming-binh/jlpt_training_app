@@ -1,4 +1,8 @@
-.progress-page { max-width: 640px; padding-bottom: var(--space-10); }
+.progress-page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4) var(--space-10);
+}
 
 .progress-header {
   display: flex; align-items: center; gap: var(--space-3);

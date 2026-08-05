@@ -18,13 +18,11 @@ import { ResetPasswordPage } from './features/auth/pages/ResetPasswordPage';
 import { AuthCallbackPage } from './features/auth/pages/AuthCallbackPage';
 
 // Learning & Dashboard Feature Pages
-import { DashboardPage } from './features/dashboard/pages/DashboardPage';
 import { ProgressPage } from './features/dashboard/pages/ProgressPage';
 import { LessonPage } from './features/lesson/pages/LessonPage';
 import { ReviewPage } from './features/lesson/pages/ReviewPage';
 import { PracticePage } from './features/lesson/pages/PracticePage';
 import { QuizSessionPage } from './features/lesson/pages/QuizSessionPage';
-import { MainLayout } from './layouts/MainLayout';
 
 const App: React.FC = () => {
   return (
@@ -48,40 +46,21 @@ const App: React.FC = () => {
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
         {/* ── Dashboard & Learning Modules ────────────────── */}
-        <Route path="/dashboard" element={
-          <MainLayout>
-            <DashboardPage />
-          </MainLayout>
-        } />
+        {/* Dashboard is now the top section of "/" for logged-in users */}
+        <Route path="/dashboard" element={<Navigate to="/" replace />} />
 
         <Route path="/learn" element={<NihonLessonListPage />} />
 
         <Route path="/lesson/:id" element={<LessonPage />} />
 
-        <Route path="/review" element={
-          <MainLayout>
-            <ReviewPage />
-          </MainLayout>
-        } />
+        <Route path="/review" element={<ReviewPage />} />
         <Route path="/review/session" element={<QuizSessionPage mode="review" />} />
 
-        <Route path="/practice" element={
-          <MainLayout>
-            <PracticePage />
-          </MainLayout>
-        } />
-        <Route path="/quiz" element={
-          <MainLayout>
-            <PracticePage />
-          </MainLayout>
-        } />
+        <Route path="/practice" element={<PracticePage />} />
+        <Route path="/quiz" element={<PracticePage />} />
         <Route path="/practice/session" element={<QuizSessionPage mode="practice" />} />
 
-        <Route path="/progress" element={
-          <MainLayout>
-            <ProgressPage />
-          </MainLayout>
-        } />
+        <Route path="/progress" element={<ProgressPage />} />
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />

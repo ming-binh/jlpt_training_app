@@ -1,10 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, BookOpen, Brain, Flame, MessageCircle, Sparkles, GraduationCap, Play, PenLine } from "lucide-react";
+import { ArrowRight, BookOpen, Brain, Flame, MessageCircle, Sparkles, GraduationCap, Play, PenLine, RotateCcw, Sword, TrendingUp, ChevronRight, Zap } from "lucide-react";
 import { GRAMMAR, KANJI, VOCAB } from "@/data/jlpt";
 import { AppHeader } from "@/components/common/app-header";
 import { jlptService, type VocabularyItem } from "@/services/jlpt.service";
 import { userService, type DashboardStats } from "@/services/user.service";
+import { authService } from "@/services/auth.service";
+import { progressService, type ProgressSummary, type JlptLevel } from "@/services/lesson.service";
+import { supabase } from "@/lib/supabase";
+import { StreakBadge } from "@/components/StreakBadge";
+import { XPBar } from "@/components/XPBar";
+import { LevelBadge } from "@/components/LevelBadge";
 
 export function NihonHomePage() {
   const [counts, setCounts] = useState({
@@ -15,6 +21,35 @@ export function NihonHomePage() {
 
   const [wordOfDay, setWordOfDay] = useState<VocabularyItem | null>(null);
   const [userStats, setUserStats] = useState<DashboardStats | null>(null);
+
+  const [isLoggedIn, setIsLoggedIn] = useState(() => authService.isAuthenticated());
+  const [progressSummary, setProgressSummary] = useState<ProgressSummary | null>(null);
+  const [displayName, setDisplayName] = useState<string>("Học Viên");
+
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    progressService.getSummary().then(setProgressSummary).catch(() => null);
+
+    supabase.auth.getUser().then(({ data }) => {
+      const name = data.user?.user_metadata?.full_name ?? data.user?.email ?? "Học Viên";
+      setDisplayName(name.split(" ").pop() ?? name);
+    });
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+    });
+    return () => authListener.subscription.unsubscribe();
+  }, []);
+
+  const greeting = () => {
+    const h = new Date().getHours();
+    if (h < 12) return "Chào buổi sáng";
+    if (h < 18) return "Chào buổi chiều";
+    return "Chào buổi tối";
+  };
 
   useEffect(() => {
     // Fetch stats, word of day & user profile stats from backend API
@@ -112,9 +147,68 @@ export function NihonHomePage() {
     { label: "Ngữ pháp", value: grammarPct, count: `${userStats?.completedGrammar ?? 0}/${counts.grammar}` },
   ];
 
+  const quickActions = [
+    { to: "/learn", icon: BookOpen, label: "Tiếp tục học", desc: "Bài học tiếp theo" },
+    { to: "/review", icon: RotateCcw, label: "Ôn tập", desc: "Thẻ cần nhắc lại" },
+    { to: "/practice", icon: Sword, label: "Luyện tập", desc: "Quiz tổng hợp" },
+    { to: "/progress", icon: TrendingUp, label: "Tiến độ", desc: "Xem thống kê" },
+  ];
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <AppHeader />
+
+      {/* Dashboard section — logged-in users only */}
+      {isLoggedIn && progressSummary && (
+        <section className="border-b border-border bg-card/40">
+          <div className="mx-auto max-w-6xl px-4 py-8">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="text-xl font-semibold">
+                {greeting()}, {displayName}! 👋
+              </h2>
+              <LevelBadge level={progressSummary.jlptLevel as JlptLevel} size="md" />
+            </div>
+
+            <div className="mt-5 grid gap-4 md:grid-cols-[auto_1fr]">
+              {/* Streak + XP */}
+              <div className="surface-card flex flex-col gap-5 p-5 sm:flex-row sm:items-center md:min-w-[360px]">
+                <div className="flex items-center gap-3">
+                  <StreakBadge days={progressSummary.streak} size="lg" animated />
+                  <span className="text-sm text-muted-foreground">ngày liên tiếp</span>
+                </div>
+                <div className="h-px w-full bg-border sm:h-10 sm:w-px" />
+                <div className="flex-1">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-accent">
+                    <Zap size={14} />
+                    {progressSummary.xp} / {progressSummary.xpToNextLevel} XP
+                  </div>
+                  <XPBar current={progressSummary.xp} max={progressSummary.xpToNextLevel} showText={false} className="mt-2" />
+                </div>
+              </div>
+
+              {/* Quick actions */}
+              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+                {quickActions.map((action) => (
+                  <Link
+                    key={action.to}
+                    to={action.to}
+                    className="surface-card group flex items-center gap-3 p-4 transition-transform hover:-translate-y-0.5"
+                  >
+                    <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-accent/15 text-accent">
+                      <action.icon size={18} />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-sm font-semibold">{action.label}</span>
+                      <span className="block truncate text-xs text-muted-foreground">{action.desc}</span>
+                    </span>
+                    <ChevronRight size={16} className="shrink-0 text-muted-foreground group-hover:text-accent" />
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Hero Section */}
       <section className="relative overflow-hidden border-b border-border">

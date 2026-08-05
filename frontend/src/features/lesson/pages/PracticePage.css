@@ -1,4 +1,8 @@
-.practice-page { max-width: 480px; padding-bottom: var(--space-10); }
+.practice-page {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4) var(--space-10);
+}
 
 .practice-header {
   display: flex;

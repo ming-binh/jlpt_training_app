@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { TrendingUp, Star, Zap } from 'lucide-react';
+import { AppHeader } from '@/components/common/app-header';
 import { StreakBadge } from '@/components/StreakBadge';
 import { XPBar } from '@/components/XPBar';
 import { LevelBadge } from '@/components/LevelBadge';
@@ -13,25 +14,29 @@ const DEFAULT: ProgressSummary = {
   todayGoalComplete: true, jlptLevel: 'N5',
 };
 
-// Last 14 days mock streak calendar
-const mockCalendar = Array.from({ length: 14 }, (_, i) => ({
-  date: new Date(Date.now() - (13 - i) * 86400000).toLocaleDateString('vi-VN', { weekday: 'short', day: 'numeric' }),
-  studied: Math.random() > 0.3,
-}));
-
 export const ProgressPage: React.FC = () => {
   const [summary, setSummary] = useState<ProgressSummary>(DEFAULT);
+  const [calendar, setCalendar] = useState<{ date: string; studied: boolean }[]>([]);
 
   useEffect(() => {
     progressService.getSummary()
       .then(setSummary)
       .catch(() => setSummary(DEFAULT));
+
+    progressService.getStreakCalendar()
+      .then(days => setCalendar(days.slice(-14)))
+      .catch(() => setCalendar([]));
   }, []);
+
+  const formatDay = (isoDate: string) =>
+    new Date(isoDate).toLocaleDateString('vi-VN', { weekday: 'short', day: 'numeric' });
 
   const totalMastered = summary.masteredVocab + summary.masteredKanji + summary.masteredGrammar;
 
   return (
-    <div className="progress-page page-container">
+    <div className="min-h-screen bg-background text-foreground">
+      <AppHeader />
+      <div className="progress-page">
 
       <div className="progress-header animate-fade-in">
         <TrendingUp size={22} className="progress-header-icon" />
@@ -72,10 +77,10 @@ export const ProgressPage: React.FC = () => {
 
         {/* Calendar */}
         <div className="progress-calendar">
-          {mockCalendar.map((day, i) => (
-            <div key={i} className={`progress-cal-day ${day.studied ? 'progress-cal-day--done' : ''}`}>
+          {calendar.map((day) => (
+            <div key={day.date} className={`progress-cal-day ${day.studied ? 'progress-cal-day--done' : ''}`}>
               <div className="progress-cal-dot" />
-              <span className="progress-cal-label">{day.date}</span>
+              <span className="progress-cal-label">{formatDay(day.date)}</span>
             </div>
           ))}
         </div>
@@ -107,6 +112,7 @@ export const ProgressPage: React.FC = () => {
         </div>
       </div>
 
+      </div>
     </div>
   );
 };
