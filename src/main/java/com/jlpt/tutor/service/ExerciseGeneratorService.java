@@ -42,7 +42,11 @@ public class ExerciseGeneratorService {
             switch (item.getEntityType()) {
                 case VOCABULARY -> vocabularyRepository.findById(item.getEntityId()).ifPresent(v -> {
                     exercises.add(buildVocabFlashcard(v));
-                    exercises.add(buildVocabMultipleChoice(v, allVocabs));
+                    // Skip multiple_choice if this word's own meaning was never translated —
+                    // an English "correct answer" next to Vietnamese distractors reads as broken.
+                    if (!isEnglish(v.getDisplayMeaning())) {
+                        exercises.add(buildVocabMultipleChoice(v, allVocabs));
+                    }
                 });
                 case KANJI -> kanjiRepository.findById(item.getEntityId())
                         .ifPresent(k -> exercises.add(buildKanjiFlashcard(k)));
@@ -64,9 +68,14 @@ public class ExerciseGeneratorService {
 
     /** Random multiple_choice vocab exercises for a level — used by practice quiz. */
     public List<ExerciseDto> randomVocabExercises(String level, int limit) {
-        List<Vocabulary> pool = (level != null && !level.isBlank())
+        List<Vocabulary> rawPool = (level != null && !level.isBlank())
                 ? vocabularyRepository.findByJlptLevelIgnoreCase(level, PageRequest.of(0, 500)).getContent()
                 : vocabularyRepository.findAll();
+
+        // Only Vietnamese-translated words: an English "correct answer" reads as broken next to Vietnamese distractors.
+        List<Vocabulary> pool = rawPool.stream()
+                .filter(v -> !isEnglish(v.getDisplayMeaning()))
+                .collect(Collectors.toList());
 
         List<Vocabulary> shuffled = new ArrayList<>(pool);
         Collections.shuffle(shuffled);
@@ -171,7 +180,7 @@ public class ExerciseGeneratorService {
         List<String> distractors = allVocabs.stream()
                 .filter(other -> !other.getId().equals(v.getId()))
                 .map(Vocabulary::getDisplayMeaning)
-                .filter(m -> m != null && !m.isBlank() && !m.equalsIgnoreCase(correctAnswer))
+                .filter(m -> m != null && !m.isBlank() && !m.equalsIgnoreCase(correctAnswer) && !isEnglish(m))
                 .distinct()
                 .collect(Collectors.toList());
 
@@ -194,5 +203,17 @@ public class ExerciseGeneratorService {
 
         Collections.shuffle(options);
         return options;
+    }
+
+    /** Heuristic: true if text has no Vietnamese diacritics and looks like plain ASCII (i.e. never translated). */
+    private boolean isEnglish(String text) {
+        if (text == null || text.isBlank()) return true;
+        String trimmed = text.trim();
+        boolean hasVietnameseDiacritics = trimmed.toLowerCase()
+                .matches(".*[àáảãạăắằẳẵặâấầẩẫậđèéẻẽẹêếềểễệìíỉĩịòóỏõọôốồổỗộơớờởỡợùúủũụưứừửữựỳýỷỹỵ].*");
+        if (hasVietnameseDiacritics) {
+            return false;
+        }
+        return trimmed.matches("^[a-zA-Z0-9\\s,()/.'-–]+$");
     }
 }
