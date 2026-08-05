@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, BookOpen, Brain, Flame, MessageCircle, Sparkles, GraduationCap, Play, PenLine, RotateCcw, Sword, TrendingUp, ChevronRight, Zap } from "lucide-react";
+import { ArrowRight, BookOpen, Brain, MessageCircle, GraduationCap, Play, PenLine, RotateCcw, ListChecks, TrendingUp, Check } from "lucide-react";
 import { GRAMMAR, KANJI, VOCAB } from "@/data/jlpt";
 import { AppHeader } from "@/components/common/app-header";
 import { jlptService, type VocabularyItem } from "@/services/jlpt.service";
 import { userService, type DashboardStats } from "@/services/user.service";
 import { authService } from "@/services/auth.service";
-import { progressService, type ProgressSummary, type JlptLevel } from "@/services/lesson.service";
+import { progressService } from "@/services/lesson.service";
 import { supabase } from "@/lib/supabase";
-import { StreakBadge } from "@/components/StreakBadge";
-import { XPBar } from "@/components/XPBar";
-import { LevelBadge } from "@/components/LevelBadge";
+import { cn } from "@/lib/utils";
 
 export function NihonHomePage() {
   const [counts, setCounts] = useState({
@@ -23,13 +21,15 @@ export function NihonHomePage() {
   const [userStats, setUserStats] = useState<DashboardStats | null>(null);
 
   const [isLoggedIn, setIsLoggedIn] = useState(() => authService.isAuthenticated());
-  const [progressSummary, setProgressSummary] = useState<ProgressSummary | null>(null);
+  const [todayDone, setTodayDone] = useState(false);
   const [displayName, setDisplayName] = useState<string>("Học Viên");
 
   useEffect(() => {
     if (!isLoggedIn) return;
 
-    progressService.getSummary().then(setProgressSummary).catch(() => null);
+    progressService.getStreakCalendar()
+      .then(days => setTodayDone(days[days.length - 1]?.studied ?? false))
+      .catch(() => setTodayDone(false));
 
     supabase.auth.getUser().then(({ data }) => {
       const name = data.user?.user_metadata?.full_name ?? data.user?.email ?? "Học Viên";
@@ -128,7 +128,6 @@ export function NihonHomePage() {
     : VOCAB[0];
 
   // Dynamic calculations for user progress
-  const streakDays = userStats?.streakDays ?? 1;
   const userLevel = userStats?.jlptLevel ?? "N5";
 
   const vocabPct = userStats
@@ -150,7 +149,7 @@ export function NihonHomePage() {
   const quickActions = [
     { to: "/learn", icon: BookOpen, label: "Tiếp tục học", desc: "Bài học tiếp theo" },
     { to: "/review", icon: RotateCcw, label: "Ôn tập", desc: "Thẻ cần nhắc lại" },
-    { to: "/practice", icon: Sword, label: "Luyện tập", desc: "Quiz tổng hợp" },
+    { to: "/practice", icon: ListChecks, label: "Luyện tập", desc: "Quiz tổng hợp" },
     { to: "/progress", icon: TrendingUp, label: "Tiến độ", desc: "Xem thống kê" },
   ];
 
@@ -158,53 +157,43 @@ export function NihonHomePage() {
     <div className="min-h-screen bg-background text-foreground">
       <AppHeader />
 
-      {/* Dashboard section — logged-in users only */}
-      {isLoggedIn && progressSummary && (
+      {/* Nhiệm vụ hôm nay — logged-in users only */}
+      {isLoggedIn && (
         <section className="border-b border-border bg-card/40">
-          <div className="mx-auto max-w-6xl px-4 py-8">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 className="text-xl font-semibold">
-                {greeting()}, {displayName}! 👋
-              </h2>
-              <LevelBadge level={progressSummary.jlptLevel as JlptLevel} size="md" />
+          <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-5 lg:flex-row lg:items-center">
+            <div className="flex items-center gap-3">
+              <span
+                className={cn(
+                  "grid size-10 shrink-0 place-items-center rounded-full border",
+                  todayDone ? "border-accent bg-accent/15 text-accent" : "border-border text-muted-foreground",
+                )}
+              >
+                {todayDone && <Check className="size-4" />}
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold">{greeting()}, {displayName}</p>
+                <p className="truncate text-xs text-muted-foreground">
+                  {todayDone
+                    ? "Bạn đã hoàn thành nhiệm vụ hôm nay."
+                    : "Nhiệm vụ hôm nay: hoàn thành 1 lượt luyện tập hoặc ôn tập."}
+                </p>
+              </div>
             </div>
-
-            <div className="mt-5 grid gap-4 md:grid-cols-[auto_1fr]">
-              {/* Streak + XP */}
-              <div className="surface-card flex flex-col gap-5 p-5 sm:flex-row sm:items-center md:min-w-[360px]">
-                <div className="flex items-center gap-3">
-                  <StreakBadge days={progressSummary.streak} size="lg" animated />
-                  <span className="text-sm text-muted-foreground">ngày liên tiếp</span>
-                </div>
-                <div className="h-px w-full bg-border sm:h-10 sm:w-px" />
-                <div className="flex-1">
-                  <div className="flex items-center gap-1.5 text-xs font-semibold text-accent">
-                    <Zap size={14} />
-                    {progressSummary.xp} / {progressSummary.xpToNextLevel} XP
-                  </div>
-                  <XPBar current={progressSummary.xp} max={progressSummary.xpToNextLevel} showText={false} className="mt-2" />
-                </div>
-              </div>
-
-              {/* Quick actions */}
-              <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-                {quickActions.map((action) => (
-                  <Link
-                    key={action.to}
-                    to={action.to}
-                    className="surface-card group flex items-center gap-3 p-4 transition-transform hover:-translate-y-0.5"
-                  >
-                    <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-accent/15 text-accent">
-                      <action.icon size={18} />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-semibold">{action.label}</span>
-                      <span className="block truncate text-xs text-muted-foreground">{action.desc}</span>
-                    </span>
-                    <ChevronRight size={16} className="shrink-0 text-muted-foreground group-hover:text-accent" />
-                  </Link>
-                ))}
-              </div>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:ml-auto">
+              {quickActions.map((action) => (
+                <Link
+                  key={action.to}
+                  to={action.to}
+                  className="group flex items-center gap-3 rounded-xl border border-border bg-background/60 px-3 py-2.5 transition-colors hover:bg-secondary"
+                >
+                  <action.icon className="size-4 shrink-0 text-accent" />
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-medium">{action.label}</span>
+                    <span className="block truncate text-[11px] text-muted-foreground">{action.desc}</span>
+                  </span>
+                  <ArrowRight className="ml-auto size-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              ))}
             </div>
           </div>
         </section>
@@ -218,10 +207,7 @@ export function NihonHomePage() {
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-2 rounded-full border border-accent/40 bg-accent/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-accent backdrop-blur-sm">
-                <Flame className="size-4 animate-pulse text-amber-400" /> Chuỗi {streakDays} ngày liên tiếp
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/40 bg-primary/20 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary-foreground">
-                <Sparkles className="size-3 text-accent" /> Mục tiêu {userLevel}
+                Mục tiêu {userLevel}
               </span>
             </div>
 
