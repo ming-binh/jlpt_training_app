@@ -4,7 +4,8 @@ import com.jlpt.tutor.dto.ExerciseDto;
 import com.jlpt.tutor.dto.LessonDto;
 import com.jlpt.tutor.entity.*;
 import com.jlpt.tutor.repository.*;
-import com.jlpt.tutor.service.SpacedRepetitionService;
+import com.jlpt.tutor.service.ExerciseGeneratorService;
+import com.jlpt.tutor.service.ProgressUpdateService;
 import com.jlpt.tutor.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,14 +26,12 @@ public class LessonController {
 
     private final LessonRepository lessonRepository;
     private final LessonItemRepository lessonItemRepository;
-    private final VocabularyRepository vocabularyRepository;
-    private final KanjiRepository kanjiRepository;
-    private final GrammarPointRepository grammarPointRepository;
     private final UserProgressRepository userProgressRepository;
     private final QuizSessionRepository quizSessionRepository;
     private final UserRepository userRepository;
     private final UserService userService;
-    private final SpacedRepetitionService spacedRepetitionService;
+    private final ExerciseGeneratorService exerciseGeneratorService;
+    private final ProgressUpdateService progressUpdateService;
 
     private String getUserId(Authentication authentication) {
         if (authentication == null) return null;
@@ -192,71 +191,7 @@ public class LessonController {
         }
 
         List<LessonItem> items = lessonItemRepository.findByLessonIdOrderByOrderIndex(id);
-        List<ExerciseDto> exercises = new ArrayList<>();
-        List<Vocabulary> allVocabs = vocabularyRepository.findAll();
-
-        for (LessonItem item : items) {
-            if (item.getEntityType() == UserProgress.EntityType.VOCABULARY) {
-                vocabularyRepository.findById(item.getEntityId()).ifPresent(v -> {
-                    String meaningStr = v.getDisplayMeaning();
-                    String readingStr = v.getDisplayReading();
-
-                    exercises.add(ExerciseDto.builder()
-                        .id(UUID.randomUUID().toString())
-                        .type("flashcard")
-                        .question(v.getWord())
-                        .questionFurigana(readingStr)
-                        .questionMeaning(meaningStr)
-                        .correctAnswer(meaningStr)
-                        .explanation("Từ vựng: " + v.getWord() + " (" + readingStr + ") = " + meaningStr)
-                        .entityType("VOCABULARY")
-                        .entityId(v.getId())
-                        .build());
-
-                    exercises.add(ExerciseDto.builder()
-                        .id(UUID.randomUUID().toString())
-                        .type("multiple_choice")
-                        .question("Từ \"" + v.getWord() + "\" (" + readingStr + ") có nghĩa là gì?")
-                        .questionFurigana(readingStr)
-                        .options(generateVocabOptions(v, allVocabs))
-                        .correctAnswer(meaningStr)
-                        .explanation("Nghĩa đúng của " + v.getWord() + " là: " + meaningStr)
-                        .entityType("VOCABULARY")
-                        .entityId(v.getId())
-                        .build());
-                });
-            } else if (item.getEntityType() == UserProgress.EntityType.KANJI) {
-                kanjiRepository.findById(item.getEntityId()).ifPresent(k -> {
-                    String meaningStr = k.getDisplayMeaning();
-                    exercises.add(ExerciseDto.builder()
-                        .id(UUID.randomUUID().toString())
-                        .type("flashcard")
-                        .question(k.getCharacter())
-                        .questionFurigana("Âm On: " + (k.getOnReadings() != null ? k.getOnReadings() : "—"))
-                        .questionMeaning(meaningStr)
-                        .correctAnswer(meaningStr)
-                        .explanation("Chữ Hán: " + k.getCharacter() + " | Nghĩa: " + meaningStr + " | Âm Kun: " + (k.getKunReadings() != null ? k.getKunReadings() : "—"))
-                        .entityType("KANJI")
-                        .entityId(k.getId())
-                        .build());
-                });
-            } else if (item.getEntityType() == UserProgress.EntityType.GRAMMAR) {
-                grammarPointRepository.findById(item.getEntityId()).ifPresent(g -> {
-                    String meaningStr = g.getMeaning() != null ? g.getMeaning() : "";
-                    exercises.add(ExerciseDto.builder()
-                        .id(UUID.randomUUID().toString())
-                        .type("flashcard")
-                        .question(g.getTitle())
-                        .questionFurigana(g.getStructure() != null ? g.getStructure() : "")
-                        .questionMeaning(meaningStr)
-                        .correctAnswer(meaningStr)
-                        .explanation("Cấu trúc: " + g.getStructure() + "\n" + meaningStr)
-                        .entityType("GRAMMAR")
-                        .entityId(g.getId())
-                        .build());
-                });
-            }
-        }
+        List<ExerciseDto> exercises = exerciseGeneratorService.generateForItems(items);
 
         return ResponseEntity.ok(exercises);
     }
@@ -278,15 +213,18 @@ public class LessonController {
         }
 
         List<LessonDto.QuizResultDto> results = request.getResults() != null ? request.getResults() : Collections.emptyList();
-        int correct = (int) results.stream().filter(r -> Boolean.TRUE.equals(r.getCorrect())).count();
-        int total = results.size();
+        long totalTimeMs = request.getTotalTimeMs() != null ? request.getTotalTimeMs() : 0L;
+
+        // 1. Update UserProgress for each exercise result
+        ProgressUpdateService.ResultSummary summary = progressUpdateService.applyResults(userId, results);
+        int correct = summary.correctCount();
+        int total = summary.totalCount();
         int score = total > 0 ? Math.round((float) correct / total * 100) : 0;
         int xpEarned = score / 10 * 5; // 5 XP per 10% score
-        long totalTimeMs = request.getTotalTimeMs() != null ? request.getTotalTimeMs() : 0L;
 
         log.info("Lesson {} completed by user {} — score: {}, XP: {}", id, userId, score, xpEarned);
 
-        // 1. Save QuizSession record
+        // 2. Save QuizSession record
         QuizSession session = QuizSession.builder()
                 .userId(userId)
                 .lessonId(id)
@@ -300,37 +238,6 @@ public class LessonController {
                 .build();
         quizSessionRepository.save(session);
 
-        // 2. Update UserProgress for each exercise result
-        for (LessonDto.QuizResultDto result : results) {
-            if (result.getEntityType() != null && result.getEntityId() != null) {
-                try {
-                    UserProgress.EntityType type = UserProgress.EntityType.valueOf(result.getEntityType());
-                    UserProgress.ProgressStatus status = Boolean.TRUE.equals(result.getCorrect())
-                            ? UserProgress.ProgressStatus.MASTERED
-                            : UserProgress.ProgressStatus.LEARNING;
-
-                    UserProgress progress = userProgressRepository
-                            .findByUserIdAndEntityTypeAndEntityId(userId, type, result.getEntityId())
-                            .orElse(UserProgress.builder()
-                                    .userId(userId)
-                                    .entityType(type)
-                                    .entityId(result.getEntityId())
-                                    .reviewCount(0)
-                                    .xp(0)
-                                    .build());
-
-                    progress.setStatus(status);
-                    spacedRepetitionService.applyReview(progress, Boolean.TRUE.equals(result.getCorrect()));
-                    if (status == UserProgress.ProgressStatus.MASTERED) {
-                        progress.setXp(progress.getXp() + 10);
-                    }
-                    userProgressRepository.save(progress);
-                } catch (Exception e) {
-                    log.warn("Failed to save progress result for item {}", result.getEntityId(), e);
-                }
-            }
-        }
-
         // 3. Update User streak & last active
         userRepository.findById(userId).ifPresent(user -> {
             userService.updateStreakAndLastActive(user);
@@ -343,38 +250,5 @@ public class LessonController {
             .score(score)
             .streakUpdated(true)
             .build());
-    }
-
-    private List<ExerciseDto.OptionDto> generateVocabOptions(Vocabulary v, List<Vocabulary> allVocabs) {
-        List<ExerciseDto.OptionDto> options = new ArrayList<>();
-        String correctAnswer = v.getDisplayMeaning();
-        options.add(ExerciseDto.OptionDto.builder().id(correctAnswer).text(correctAnswer).build());
-
-        List<String> distractors = allVocabs.stream()
-                .filter(other -> !other.getId().equals(v.getId()))
-                .map(Vocabulary::getDisplayMeaning)
-                .filter(m -> m != null && !m.isBlank() && !m.equalsIgnoreCase(correctAnswer))
-                .distinct()
-                .collect(Collectors.toList());
-
-        Collections.shuffle(distractors);
-
-        for (int i = 0; i < Math.min(3, distractors.size()); i++) {
-            String wrongAnswer = distractors.get(i);
-            options.add(ExerciseDto.OptionDto.builder().id(wrongAnswer).text(wrongAnswer).build());
-        }
-
-        // Fallback distractors if less than 3
-        String[] defaultWrong = {"ăn uống", "đi lại", "học tập", "thời gian", "nghỉ ngơi"};
-        int fallbackIdx = 0;
-        while (options.size() < 4 && fallbackIdx < defaultWrong.length) {
-            String fb = defaultWrong[fallbackIdx++];
-            if (options.stream().noneMatch(o -> o.getText().equalsIgnoreCase(fb))) {
-                options.add(ExerciseDto.OptionDto.builder().id(fb).text(fb).build());
-            }
-        }
-
-        Collections.shuffle(options);
-        return options;
     }
 }
