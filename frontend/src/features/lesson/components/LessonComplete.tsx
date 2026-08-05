@@ -10,6 +10,10 @@ interface LessonCompleteProps {
   xpEarned: number;
   lessonTitle: string;
   onRetry: () => void;
+  /** Where the "back" button navigates to. Defaults to the lesson list. */
+  backPath?: string;
+  /** Label for the "back" button. Defaults to the lesson list label. */
+  backLabel?: string;
 }
 
 export const LessonComplete: React.FC<LessonCompleteProps> = ({
@@ -17,6 +21,8 @@ export const LessonComplete: React.FC<LessonCompleteProps> = ({
   xpEarned,
   lessonTitle,
   onRetry,
+  backPath = '/learn',
+  backLabel = 'Về danh sách bài học',
 }) => {
   const navigate = useNavigate();
   const correctCount = results.filter((r) => r.correct).length;
@@ -85,11 +91,11 @@ export const LessonComplete: React.FC<LessonCompleteProps> = ({
             </button>
             <button
               type="button"
-              onClick={() => navigate('/learn')}
+              onClick={() => navigate(backPath)}
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-5 py-2.5 text-sm font-bold text-foreground hover:bg-secondary cursor-pointer transition-all hover:-translate-y-0.5"
             >
               <BookOpen className="size-4" />
-              <span>Về danh sách bài học</span>
+              <span>{backLabel}</span>
             </button>
           </div>
         </div>

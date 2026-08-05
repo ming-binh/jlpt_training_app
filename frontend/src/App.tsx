@@ -10,7 +10,6 @@ import { NihonVocabPage } from './features/vocab/pages/NihonVocabPage';
 import { NihonKanjiPage } from './features/kanji/pages/NihonKanjiPage';
 import { NihonGrammarPage } from './features/grammar/pages/NihonGrammarPage';
 import { NihonChatPage } from './features/ai-chat/pages/NihonChatPage';
-import { NihonQuizPage } from './features/lesson/pages/NihonQuizPage';
 
 // Auth Feature Pages
 import { AuthPage } from './features/auth/pages/AuthPage';
@@ -23,6 +22,8 @@ import { DashboardPage } from './features/dashboard/pages/DashboardPage';
 import { ProgressPage } from './features/dashboard/pages/ProgressPage';
 import { LessonPage } from './features/lesson/pages/LessonPage';
 import { ReviewPage } from './features/lesson/pages/ReviewPage';
+import { PracticePage } from './features/lesson/pages/PracticePage';
+import { QuizSessionPage } from './features/lesson/pages/QuizSessionPage';
 import { MainLayout } from './layouts/MainLayout';
 
 const App: React.FC = () => {
@@ -37,8 +38,6 @@ const App: React.FC = () => {
         <Route path="/tu-vung" element={<NihonVocabPage />} />
         <Route path="/kanji" element={<NihonKanjiPage />} />
         <Route path="/ngu-phap" element={<NihonGrammarPage />} />
-        <Route path="/practice" element={<NihonQuizPage />} />
-        <Route path="/quiz" element={<NihonQuizPage />} />
         <Route path="/chat" element={<NihonChatPage />} />
 
         {/* ── Auth System ─────────────────────────────────── */}
@@ -64,6 +63,19 @@ const App: React.FC = () => {
             <ReviewPage />
           </MainLayout>
         } />
+        <Route path="/review/session" element={<QuizSessionPage mode="review" />} />
+
+        <Route path="/practice" element={
+          <MainLayout>
+            <PracticePage />
+          </MainLayout>
+        } />
+        <Route path="/quiz" element={
+          <MainLayout>
+            <PracticePage />
+          </MainLayout>
+        } />
+        <Route path="/practice/session" element={<QuizSessionPage mode="practice" />} />
 
         <Route path="/progress" element={
           <MainLayout>
