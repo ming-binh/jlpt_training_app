@@ -23,6 +23,14 @@ import { ReviewPage } from './features/lesson/pages/ReviewPage';
 import { PracticePage } from './features/lesson/pages/PracticePage';
 import { QuizSessionPage } from './features/lesson/pages/QuizSessionPage';
 
+// Admin Feature Pages
+import { RequireAdmin } from './features/admin/RequireAdmin';
+import { AdminLayout } from './features/admin/layout/AdminLayout';
+import { AdminDashboardPage } from './features/admin/pages/AdminDashboardPage';
+import { AdminUsersPage } from './features/admin/pages/AdminUsersPage';
+import { AdminRolesPage } from './features/admin/pages/AdminRolesPage';
+import { AdminContentPage } from './features/admin/pages/AdminContentPage';
+
 const App: React.FC = () => {
   return (
     <BrowserRouter>
@@ -61,6 +69,21 @@ const App: React.FC = () => {
 
         {/* /progress redirects to /profile where progress is embedded */}
         <Route path="/progress" element={<Navigate to="/profile" replace />} />
+
+        {/* ── Admin Control Panel ─────────────────────────── */}
+        <Route
+          path="/admin"
+          element={
+            <RequireAdmin>
+              <AdminLayout />
+            </RequireAdmin>
+          }
+        >
+          <Route index element={<AdminDashboardPage />} />
+          <Route path="users" element={<AdminUsersPage />} />
+          <Route path="roles" element={<AdminRolesPage />} />
+          <Route path="content" element={<AdminContentPage />} />
+        </Route>
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />

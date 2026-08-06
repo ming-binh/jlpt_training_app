@@ -12,6 +12,8 @@ export interface DashboardStats {
   completedGrammar: number;
 }
 
+export type Role = 'USER' | 'PREMIUM' | 'ADMIN';
+
 export interface UserProfile {
   id: string;
   email: string;
@@ -20,6 +22,7 @@ export interface UserProfile {
   streakDays?: number;
   mockScore?: number;
   weakSections?: string;
+  role?: Role;
 }
 
 export const userService = {

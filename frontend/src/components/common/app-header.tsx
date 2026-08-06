@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { BookOpen, Brain, MessageCircle, PenLine, Home, GraduationCap, Layers, User as UserIcon, LogOut, UserCheck } from "lucide-react";
+import { BookOpen, Brain, MessageCircle, PenLine, Home, GraduationCap, Layers, User as UserIcon, LogOut, UserCheck, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
-import { userService } from "@/services/user.service";
+import { userService, type Role } from "@/services/user.service";
 
 const NAV = [
   { to: "/", label: "Trang chủ", icon: Home },
@@ -20,6 +20,7 @@ export function AppHeader() {
   const navigate = useNavigate();
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
+  const [role, setRole] = useState<Role | null>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const menuRef = useRef<HTMLDivElement>(null);
@@ -33,11 +34,13 @@ export function AppHeader() {
             if (profile && profile.username) {
               setUsername(profile.username);
             }
+            setRole(profile?.role ?? null);
           })
           .catch(() => null);
       } else {
         setUserEmail(null);
         setUsername(null);
+        setRole(null);
       }
     });
 
@@ -157,6 +160,16 @@ export function AppHeader() {
                         <MessageCircle className="size-4 text-accent" />
                         <span>Phòng chat của tôi</span>
                       </Link>
+                      {role === "ADMIN" && (
+                        <Link
+                          to="/admin"
+                          onClick={() => setShowUserMenu(false)}
+                          className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-secondary cursor-pointer"
+                        >
+                          <ShieldCheck className="size-4 text-accent" />
+                          <span>Trang quản trị</span>
+                        </Link>
+                      )}
                     </div>
 
                     <div className="pt-1">
