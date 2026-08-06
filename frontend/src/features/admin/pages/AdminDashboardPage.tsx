@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Users, Crown, GraduationCap, MessageCircle } from 'lucide-react';
+import { Users, GraduationCap, MessageCircle } from 'lucide-react';
 import { adminService, type DashboardStats } from '@/services/admin.service';
 import { RoleBadge, LevelBadge, relativeTime } from '../adminUi';
 import { toast } from '@/components/ui/toast';
@@ -17,12 +17,10 @@ export function AdminDashboardPage() {
     return <div className="text-sm text-muted-foreground">Đang tải...</div>;
   }
 
-  const premiumPct = stats.totalUsers > 0 ? Math.round((stats.premiumUsers / stats.totalUsers) * 100) : 0;
   const maxLevelCount = Math.max(1, ...stats.levelDistribution.map((l) => l.count));
 
   const cards = [
     { label: 'Tổng học viên', value: stats.totalUsers, hint: `${stats.adminUsers} quản trị viên`, icon: Users },
-    { label: 'Premium', value: stats.premiumUsers, hint: `${premiumPct}% tổng số`, icon: Crown },
     { label: 'Bài học', value: stats.totalLessons, hint: 'Tất cả trình độ', icon: GraduationCap },
     { label: 'Phiên chat AI hôm nay', value: stats.aiChatSessionsToday, hint: 'Tính từ 0h', icon: MessageCircle },
   ];

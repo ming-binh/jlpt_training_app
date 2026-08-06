@@ -28,7 +28,6 @@ public class AdminDashboardService {
     public DashboardStatsDto getStats() {
         List<User> allUsers = userRepository.findAll();
 
-        long premiumUsers = allUsers.stream().filter(u -> u.getRole() == Role.PREMIUM).count();
         long adminUsers = allUsers.stream().filter(u -> u.getRole() == Role.ADMIN).count();
 
         List<DashboardStatsDto.LevelCount> levelDistribution = LEVELS.stream()
@@ -49,7 +48,6 @@ public class AdminDashboardService {
 
         return DashboardStatsDto.builder()
                 .totalUsers(allUsers.size())
-                .premiumUsers(premiumUsers)
                 .adminUsers(adminUsers)
                 .totalLessons(lessonRepository.count())
                 .aiChatSessionsToday(aiChatSessionsToday)

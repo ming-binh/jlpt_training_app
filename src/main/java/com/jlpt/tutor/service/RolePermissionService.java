@@ -24,7 +24,6 @@ public class RolePermissionService {
 
     public PermissionMatrixResponse getMatrix() {
         Map<String, Boolean> userEnabled = enabledMap(Role.USER);
-        Map<String, Boolean> premiumEnabled = enabledMap(Role.PREMIUM);
         Map<String, Boolean> adminEnabled = enabledMap(Role.ADMIN);
 
         List<PermissionRowDto> rows = PermissionCatalog.ALL.stream()
@@ -33,7 +32,6 @@ public class RolePermissionService {
                         .label(p.label())
                         .category(p.category())
                         .user(userEnabled.getOrDefault(p.key(), false))
-                        .premium(premiumEnabled.getOrDefault(p.key(), false))
                         .admin(adminEnabled.getOrDefault(p.key(), false))
                         .build())
                 .toList();

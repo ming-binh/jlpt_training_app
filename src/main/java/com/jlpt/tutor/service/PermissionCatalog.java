@@ -30,8 +30,7 @@ public final class PermissionCatalog {
 
     /** Default enabled state per role, used only for first-run seeding. */
     public static final Map<Role, Set<String>> DEFAULTS = Map.of(
-            Role.USER, Set.of("content.study", "ai.chat"),
-            Role.PREMIUM, Set.of("content.study", "ai.chat", "content.n2n1", "ai.chat.unlimited"),
+            Role.USER, Set.of("content.study", "ai.chat", "content.n2n1", "ai.chat.unlimited"),
             Role.ADMIN, Set.of(
                     "content.study", "ai.chat", "content.n2n1", "ai.chat.unlimited",
                     "admin.access", "admin.users", "admin.content", "admin.audit_log", "admin.system_config"

@@ -10,7 +10,6 @@ import { RoleEditModal } from '../components/RoleEditModal';
 const ROLE_FILTERS: { key: Role | 'ALL'; label: string }[] = [
   { key: 'ALL', label: 'Tất cả' },
   { key: 'USER', label: 'User' },
-  { key: 'PREMIUM', label: 'Premium' },
   { key: 'ADMIN', label: 'Admin' },
 ];
 

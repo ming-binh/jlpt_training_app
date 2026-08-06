@@ -14,6 +14,5 @@ public class PermissionRowDto {
     private String label;
     private String category;
     private boolean user;
-    private boolean premium;
     private boolean admin;
 }

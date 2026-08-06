@@ -4,8 +4,7 @@ import type { AdminUser } from '@/services/admin.service';
 import type { Role } from '@/services/user.service';
 
 const OPTIONS: { key: Role; label: string; desc: string }[] = [
-  { key: 'USER', label: 'USER', desc: 'Học viên tiêu chuẩn, quyền cơ bản.' },
-  { key: 'PREMIUM', label: 'PREMIUM', desc: 'Mở khoá toàn bộ nội dung & AI không giới hạn.' },
+  { key: 'USER', label: 'USER', desc: 'Học viên đã đăng nhập, toàn quyền học tập.' },
   { key: 'ADMIN', label: 'ADMIN', desc: 'Toàn quyền quản trị hệ thống.' },
 ];
 

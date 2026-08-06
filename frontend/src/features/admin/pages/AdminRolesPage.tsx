@@ -6,14 +6,12 @@ import { adminService, type PermissionMatrix, type PermissionRow } from '@/servi
 import type { Role } from '@/services/user.service';
 
 const ROLE_META: { key: Role; label: string; badgeClass: string; desc: string }[] = [
-  { key: 'USER', label: 'USER', badgeClass: 'bg-secondary text-muted-foreground', desc: 'Mặc định khi đăng ký. Học N5–N3 giới hạn, chat AI có hạn mức/ngày.' },
-  { key: 'PREMIUM', label: 'PREMIUM', badgeClass: 'bg-accent/15 text-accent', desc: 'Trả phí. Mở khoá toàn bộ nội dung và chat AI không giới hạn.' },
+  { key: 'USER', label: 'USER', badgeClass: 'bg-secondary text-muted-foreground', desc: 'Học viên đã đăng nhập. Toàn quyền học tập và chat AI.' },
   { key: 'ADMIN', label: 'ADMIN', badgeClass: 'bg-primary/15 text-primary', desc: 'Quản trị viên. Toàn quyền quản lý người dùng, nội dung và hệ thống.' },
 ];
 
-const COLUMN_META: { key: keyof Pick<PermissionRow, 'user' | 'premium' | 'admin'>; role: Role; activeClass: string; label: string }[] = [
+const COLUMN_META: { key: keyof Pick<PermissionRow, 'user' | 'admin'>; role: Role; activeClass: string; label: string }[] = [
   { key: 'user', role: 'USER', activeClass: 'border-muted-foreground bg-muted-foreground text-background', label: 'USER' },
-  { key: 'premium', role: 'PREMIUM', activeClass: 'border-accent bg-accent text-accent-foreground', label: 'PREMIUM' },
   { key: 'admin', role: 'ADMIN', activeClass: 'border-primary bg-primary text-primary-foreground', label: 'ADMIN' },
 ];
 
@@ -52,7 +50,7 @@ export function AdminRolesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2">
         {ROLE_META.map((r) => (
           <div key={r.key} className="surface-card p-4.5">
             <div className="mb-2.5 flex items-center gap-2.5">

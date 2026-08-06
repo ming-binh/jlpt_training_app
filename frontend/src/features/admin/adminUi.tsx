@@ -3,13 +3,11 @@ import type { Role } from '@/services/user.service';
 
 const ROLE_STYLE: Record<Role, string> = {
   ADMIN: 'bg-primary/15 text-primary',
-  PREMIUM: 'bg-accent/15 text-accent',
   USER: 'bg-secondary text-muted-foreground',
 };
 
 const ROLE_LABEL: Record<Role, string> = {
   ADMIN: 'ADMIN',
-  PREMIUM: 'PREMIUM',
   USER: 'USER',
 };
 

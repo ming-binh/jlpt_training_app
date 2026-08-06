@@ -21,7 +21,6 @@ export interface LevelCount {
 
 export interface DashboardStats {
   totalUsers: number;
-  premiumUsers: number;
   adminUsers: number;
   totalLessons: number;
   aiChatSessionsToday: number;
@@ -34,7 +33,6 @@ export interface PermissionRow {
   label: string;
   category: string;
   user: boolean;
-  premium: boolean;
   admin: boolean;
 }
 

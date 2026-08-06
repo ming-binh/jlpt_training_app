@@ -13,7 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 public class DashboardStatsDto {
     private long totalUsers;
-    private long premiumUsers;
     private long adminUsers;
     private long totalLessons;
     private long aiChatSessionsToday;

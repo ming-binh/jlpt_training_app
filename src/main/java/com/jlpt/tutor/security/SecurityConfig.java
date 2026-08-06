@@ -31,6 +31,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .cors(Customizer.withDefaults())
+            // CSRF disabled: API is stateless (JWT bearer auth, no cookies/session), so there's no
+            // ambient browser credential for a forged cross-site request to ride along with.
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> {
                 auth

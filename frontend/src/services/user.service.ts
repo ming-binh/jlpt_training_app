@@ -12,7 +12,7 @@ export interface DashboardStats {
   completedGrammar: number;
 }
 
-export type Role = 'USER' | 'PREMIUM' | 'ADMIN';
+export type Role = 'USER' | 'ADMIN';
 
 export interface UserProfile {
   id: string;

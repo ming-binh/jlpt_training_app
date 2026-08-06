@@ -30,8 +30,12 @@ ai:
     conversation-per-day: 10
     explanation-per-day: 50
 
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+
 jwt:
-  secret: ${JWT_SECRET:8f4e6d5c2b1a09f8e7d6c5b4a3928170f6e5d4c3b2a1908f7e6d5c4b3a210987}
+  secret: ${JWT_SECRET}
   expiration: 86400000
 
 supabase:
