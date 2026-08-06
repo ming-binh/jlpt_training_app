@@ -136,6 +136,14 @@ export function NihonHomePage() {
       icon: MessageCircle,
       count: "Chat ngay",
     },
+    {
+      to: "/practice",
+      kanji: "試",
+      title: "Câu hỏi ôn tập",
+      desc: "Trắc nghiệm từ vựng, Kanji, ngữ pháp theo cấp độ N5-N3.",
+      icon: ListChecks,
+      count: "Luyện tập ngay",
+    },
   ];
 
   const currentWord = wordOfDay

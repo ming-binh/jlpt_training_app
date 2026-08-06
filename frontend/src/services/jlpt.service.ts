@@ -85,7 +85,8 @@ export const jlptService = {
     level?: string,
     search?: string,
     page = 0,
-    size = 20
+    size = 20,
+    status?: string
   ): Promise<PageResponse<VocabularyItem>> => {
     const params: Record<string, any> = { page, size };
     if (level && level !== 'all') {
@@ -93,6 +94,9 @@ export const jlptService = {
     }
     if (search && search.trim()) {
       params.search = search.trim();
+    }
+    if (status && status !== 'all') {
+      params.status = status;
     }
     const response = await api.get<PageResponse<VocabularyItem>>('/vocabulary', { params });
     return response.data;
@@ -102,7 +106,8 @@ export const jlptService = {
     level?: string,
     search?: string,
     page = 0,
-    size = 20
+    size = 20,
+    status?: string
   ): Promise<PageResponse<KanjiItem>> => {
     const params: Record<string, any> = { page, size };
     if (level && level !== 'all') {
@@ -110,6 +115,9 @@ export const jlptService = {
     }
     if (search && search.trim()) {
       params.search = search.trim();
+    }
+    if (status && status !== 'all') {
+      params.status = status;
     }
     const response = await api.get<PageResponse<KanjiItem>>('/kanji', { params });
     return response.data;
@@ -119,7 +127,8 @@ export const jlptService = {
     level?: string,
     search?: string,
     page = 0,
-    size = 20
+    size = 20,
+    status?: string
   ): Promise<PageResponse<GrammarPointItem>> => {
     const params: Record<string, any> = { page, size };
     if (level && level !== 'all') {
@@ -127,6 +136,9 @@ export const jlptService = {
     }
     if (search && search.trim()) {
       params.search = search.trim();
+    }
+    if (status && status !== 'all') {
+      params.status = status;
     }
     const response = await api.get<PageResponse<GrammarPointItem>>('/grammar', { params });
     return response.data;
@@ -152,7 +164,7 @@ export const jlptService = {
     entityId: number,
     status: 'LEARNING' | 'MASTERED' | 'REVIEW_NEEDED' = 'MASTERED'
   ) => {
-    const res = await api.post('/progress/mark', { entityType, entityId, status, xp: 10 });
+    const res = await api.post('/progress/mark', { entityType, entityId, status });
     return res.data;
   },
 

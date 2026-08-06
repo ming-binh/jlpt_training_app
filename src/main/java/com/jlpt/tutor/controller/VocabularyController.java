@@ -1,11 +1,13 @@
 package com.jlpt.tutor.controller;
 
+import com.jlpt.tutor.entity.User;
 import com.jlpt.tutor.entity.Vocabulary;
 import com.jlpt.tutor.repository.VocabularyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -21,14 +23,19 @@ public class VocabularyController {
     public ResponseEntity<Page<Vocabulary>> getVocabulary(
             @RequestParam(required = false) String level,
             @RequestParam(required = false) String search,
+            @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "20") int size,
+            Authentication authentication) {
 
         String filterLevel = (level != null && !level.isBlank() && !"ALL".equalsIgnoreCase(level)) ? level : null;
         String filterSearch = (search != null && !search.isBlank()) ? search.trim() : null;
 
+        String userId = authentication != null && authentication.getPrincipal() instanceof User user ? user.getId() : null;
+        String filterStatus = (userId != null && status != null && !status.isBlank() && !"ALL".equalsIgnoreCase(status)) ? status.toUpperCase() : null;
+
         Page<Vocabulary> result = vocabularyRepository.searchVocabulary(
-                filterLevel, filterSearch, PageRequest.of(page, size));
+                filterLevel, filterSearch, filterStatus, userId, PageRequest.of(page, size));
 
         return ResponseEntity.ok(result);
     }

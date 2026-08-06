@@ -20,8 +20,14 @@ public interface KanjiRepository extends JpaRepository<Kanji, Long> {
            "(:search IS NULL OR :search = '' OR LOWER(k.character) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(k.meanings) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(k.onReadings) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
-           "LOWER(k.kunReadings) LIKE LOWER(CONCAT('%', :search, '%')))")
-    Page<Kanji> searchKanji(@Param("level") String level, @Param("search") String search, Pageable pageable);
+           "LOWER(k.kunReadings) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
+           "(:status IS NULL OR :status = '' OR " +
+           "  (:status = 'NEW' AND NOT EXISTS (SELECT 1 FROM UserProgress up WHERE up.userId = :userId AND up.entityType = 'KANJI' AND up.entityId = k.id)) OR " +
+           "  (:status <> 'NEW' AND EXISTS (SELECT 1 FROM UserProgress up WHERE up.userId = :userId AND up.entityType = 'KANJI' AND up.entityId = k.id AND up.status = :status))" +
+           ")")
+    Page<Kanji> searchKanji(@Param("level") String level, @Param("search") String search,
+                             @Param("status") String status, @Param("userId") String userId,
+                             Pageable pageable);
 
     @Query("SELECT COUNT(k) FROM Kanji k WHERE UPPER(k.jlptLevel) = UPPER(:jlptLevel)")
     long countByJlptLevelIgnoreCase(@Param("jlptLevel") String jlptLevel);

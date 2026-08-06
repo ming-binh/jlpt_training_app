@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight, RotateCcw, Search, Volume2, CheckCircle2, Bookmark } from "lucide-react";
 import { type Level } from "@/data/jlpt";
 import { LevelBadge, LevelFilter } from "@/components/common/level-filter";
+import { StatusFilter, type ProgressStatusFilter } from "@/components/common/status-filter";
 import { AppHeader } from "@/components/common/app-header";
 import { Pagination } from "@/components/common/pagination";
 import { toast } from "@/components/ui/toast";
@@ -10,6 +11,7 @@ import { jlptService, type VocabularyItem } from "@/services/jlpt.service";
 
 export function NihonVocabPage() {
   const [level, setLevel] = useState<Level | "all">("all");
+  const [status, setStatus] = useState<ProgressStatusFilter>("all");
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
   const pageSize = 20;
@@ -27,7 +29,7 @@ export function NihonVocabPage() {
   useEffect(() => {
     setLoading(true);
     Promise.all([
-      jlptService.getVocabulary(level, query, page, pageSize).catch(() => null),
+      jlptService.getVocabulary(level, query, page, pageSize, status).catch(() => null),
       jlptService.getUserProgressMap().catch(() => ({})),
     ]).then(([res, map]) => {
       if (res) {
@@ -42,7 +44,7 @@ export function NihonVocabPage() {
       }
       setLoading(false);
     });
-  }, [level, query, page]);
+  }, [level, status, query, page]);
 
   const list = vocabList.map((v) => ({
     id: String(v.id),
@@ -110,7 +112,10 @@ export function NihonVocabPage() {
             <h1 className="mt-1 text-3xl font-bold">Ôn tập từ vựng JLPT</h1>
           </div>
 
-          <LevelFilter value={level} onChange={(l) => { setLevel(l); setPage(0); }} />
+          <div className="flex flex-wrap items-center gap-2">
+            <LevelFilter value={level} onChange={(l) => { setLevel(l); setPage(0); }} />
+            <StatusFilter value={status} onChange={(s) => { setStatus(s); setPage(0); }} />
+          </div>
         </div>
 
         {/* Workspace grid */}
@@ -207,10 +212,16 @@ export function NihonVocabPage() {
                   <button
                     type="button"
                     onClick={() => handleMarkProgress("MASTERED")}
-                    className="flex items-center gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-2.5 text-xs font-bold text-emerald-400 transition-all hover:bg-emerald-500 hover:text-emerald-950 cursor-pointer shadow-sm"
-                    title="Đánh dấu đã thuộc từ này vào Database"
+                    disabled={currentStatus === "MASTERED"}
+                    className={cn(
+                      "flex items-center gap-1.5 rounded-xl border px-4 py-2.5 text-xs font-bold transition-all shadow-sm",
+                      currentStatus === "MASTERED"
+                        ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-400/70 cursor-not-allowed"
+                        : "border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-emerald-950 cursor-pointer"
+                    )}
+                    title={currentStatus === "MASTERED" ? "Đã thuộc từ này" : "Đánh dấu đã thuộc từ này vào Database"}
                   >
-                    <CheckCircle2 className="size-4" /> Đã thuộc (+10 XP)
+                    <CheckCircle2 className="size-4" /> {currentStatus === "MASTERED" ? "Đã thuộc" : "Đã thuộc (+10 XP)"}
                   </button>
 
                   <button

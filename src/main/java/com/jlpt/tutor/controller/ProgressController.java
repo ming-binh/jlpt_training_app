@@ -35,6 +35,8 @@ public class ProgressController {
     private final UserService userService;
     private final SpacedRepetitionService spacedRepetitionService;
 
+    private static final int MASTERY_XP = 10;
+
     @GetMapping("/summary")
     public ResponseEntity<LessonDto.ProgressSummary> getSummary(
             Authentication authentication) {
@@ -106,15 +108,14 @@ public class ProgressController {
                 userId, entityType, request.getEntityId());
 
         boolean correct = status == UserProgress.ProgressStatus.MASTERED;
+        boolean wasAlreadyMastered = existingOpt.isPresent()
+                && existingOpt.get().getStatus() == UserProgress.ProgressStatus.MASTERED;
 
         UserProgress progress;
         if (existingOpt.isPresent()) {
             progress = existingOpt.get();
             progress.setStatus(status);
             spacedRepetitionService.applyReview(progress, correct);
-            if (request.getXp() != null) {
-                progress.setXp(progress.getXp() + request.getXp());
-            }
         } else {
             progress = UserProgress.builder()
                     .userId(userId)
@@ -122,9 +123,13 @@ public class ProgressController {
                     .entityId(request.getEntityId())
                     .status(status)
                     .reviewCount(0)
-                    .xp(request.getXp() != null ? request.getXp() : 10)
+                    .xp(0)
                     .build();
             spacedRepetitionService.applyReview(progress, correct);
+        }
+
+        if (status == UserProgress.ProgressStatus.MASTERED && !wasAlreadyMastered) {
+            progress.setXp(progress.getXp() + MASTERY_XP);
         }
 
         UserProgress saved = userProgressRepository.save(progress);
@@ -184,6 +189,5 @@ public class ProgressController {
         private String entityType; // VOCABULARY, KANJI, GRAMMAR
         private Long entityId;
         private String status;     // LEARNING, MASTERED, REVIEW_NEEDED
-        private Integer xp;
     }
 }

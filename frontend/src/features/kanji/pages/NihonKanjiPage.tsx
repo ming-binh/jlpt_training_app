@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Search, CheckCircle2, Bookmark } from "lucide-react";
 import { type Level } from "@/data/jlpt";
 import { LevelBadge, LevelFilter } from "@/components/common/level-filter";
+import { StatusFilter, type ProgressStatusFilter } from "@/components/common/status-filter";
 import { AppHeader } from "@/components/common/app-header";
 import { Pagination } from "@/components/common/pagination";
 import { toast } from "@/components/ui/toast";
@@ -10,6 +11,7 @@ import { jlptService, type KanjiItem } from "@/services/jlpt.service";
 
 export function NihonKanjiPage() {
   const [level, setLevel] = useState<Level | "all">("all");
+  const [status, setStatus] = useState<ProgressStatusFilter>("all");
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
   const pageSize = 24;
@@ -24,7 +26,7 @@ export function NihonKanjiPage() {
   useEffect(() => {
     setLoading(true);
     Promise.all([
-      jlptService.getKanji(level, query, page, pageSize).catch(() => null),
+      jlptService.getKanji(level, query, page, pageSize, status).catch(() => null),
       jlptService.getUserProgressMap().catch(() => ({})),
     ]).then(([res, map]) => {
       if (res) {
@@ -40,7 +42,7 @@ export function NihonKanjiPage() {
       }
       setLoading(false);
     });
-  }, [level, query, page]);
+  }, [level, status, query, page]);
 
   const list = kanjiList.map((k) => ({
     id: String(k.id),
@@ -86,13 +88,22 @@ export function NihonKanjiPage() {
               Chạm vào một chữ để xem âm đọc, số nét và thông tin chi tiết. ({totalElements} chữ)
             </p>
           </div>
-          <LevelFilter
-            value={level}
-            onChange={(l) => {
-              setLevel(l);
-              setPage(0);
-            }}
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            <LevelFilter
+              value={level}
+              onChange={(l) => {
+                setLevel(l);
+                setPage(0);
+              }}
+            />
+            <StatusFilter
+              value={status}
+              onChange={(s) => {
+                setStatus(s);
+                setPage(0);
+              }}
+            />
+          </div>
         </header>
 
         {/* Search input */}
@@ -212,9 +223,15 @@ export function NihonKanjiPage() {
                 <button
                   type="button"
                   onClick={() => handleMarkProgress("MASTERED")}
-                  className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 py-2.5 text-xs font-bold text-emerald-400 transition-colors hover:bg-emerald-500 hover:text-emerald-950 cursor-pointer"
+                  disabled={activeStatus === "MASTERED"}
+                  className={cn(
+                    "flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border py-2.5 text-xs font-bold transition-colors",
+                    activeStatus === "MASTERED"
+                      ? "border-emerald-500/30 bg-emerald-500/5 text-emerald-400/70 cursor-not-allowed"
+                      : "border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-emerald-950 cursor-pointer"
+                  )}
                 >
-                  <CheckCircle2 className="size-4" /> Đã thuộc (+10 XP)
+                  <CheckCircle2 className="size-4" /> {activeStatus === "MASTERED" ? "Đã thuộc" : "Đã thuộc (+10 XP)"}
                 </button>
               </div>
             </aside>
