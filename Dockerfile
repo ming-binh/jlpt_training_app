@@ -19,5 +19,12 @@ COPY --from=build /app/target/tutor-0.0.1-SNAPSHOT.jar app.jar
 # Expose Spring Boot port
 EXPOSE 8080
 
-# Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run the application with memory-optimized JVM flags for Render free tier (512MB RAM)
+ENTRYPOINT ["java", \
+  "-Xmx256m", \
+  "-Xms64m", \
+  "-Xss256k", \
+  "-XX:MaxMetaspaceSize=150m", \
+  "-XX:+UseSerialGC", \
+  "-XX:TieredStopAtLevel=1", \
+  "-jar", "app.jar"]
