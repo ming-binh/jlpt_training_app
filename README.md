@@ -1,185 +1,125 @@
-# 🌸 NIHON JOURNEY — JLPT AI TUTOR (N5 ➔ N3)
+# Nihon Journey — JLPT Training Platform
 
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
-[![React](https://img.shields.io/badge/React-18-blue.svg)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
-[![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL%20%26%20Auth-emerald.svg)](https://supabase.com/)
-[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
+Nihon Journey is a full-stack web application for studying and practicing Japanese in preparation for the JLPT (N5 through N3). It is a personal project built to practice full-stack engineering end to end: a Spring Boot backend, a React frontend, a managed Postgres/Auth provider (Supabase), and an AI tutor feature backed by external LLM APIs.
 
-**Nihon Journey** là hệ thống Full-stack học & luyện thi tiếng Nhật thông minh từ cấp độ **JLPT N5 đến N3**. Ứng dụng kết hợp giữa **Lộ trình bài học cấu trúc**, kho dữ liệu từ vựng - kanji - ngữ pháp phong phú, và **Gia sư AI Sensei** tương tác 24/7.
+The project is not affiliated with the Japan Foundation or the official JLPT organization. It is a learning exercise, built and iterated on as a way to practice backend architecture, frontend UI work, authentication, and deployment — not a commercial product.
 
----
+## What it does
 
-## 🌟 Tính Năng Nổi Bật
+- Structured lessons for vocabulary, kanji, and grammar, split by level (N5, N4, N3), each paired with an auto-generated flashcard and multiple-choice quiz.
+- Standalone vocabulary, kanji, and grammar browsers with search, level filtering, and a filter for personal study status (not started, needs review, mastered).
+- Per-item progress tracking backed by a simple spaced-repetition schedule, with experience points awarded once per item the first time it is mastered.
+- An AI tutor ("Sensei") for grammar questions, translation, and conversation practice, backed by Google Gemini and Groq, with per-user rate limiting.
+- Account system backed by Supabase Auth (email/password and Google OAuth), with a lightweight onboarding step to pick a starting JLPT level.
+- A streak tracker, XP total, and a profile page summarizing progress across vocabulary, kanji, and grammar.
+- An admin panel (role-gated) for managing users, roles and permissions, and study content, with an audit log of administrative actions.
 
-### 1. 🎓 Lộ Trình Bài Học Cấu Trúc (`Lesson` & `QuizSession`)
-- Chia nhỏ dữ liệu thành các Bài học chuẩn hóa cho **N5, N4, N3**:
-  - **Bài học Từ vựng**: 15 từ / bài
-  - **Bài học Kanji**: 12 chữ / bài
-  - **Bài học Ngữ pháp**: 10 cấu trúc / bài
-- **Sinh bài tập Quiz tự động**: Kết hợp Flashcard lật thẻ và Trắc nghiệm 4 lựa chọn.
-- **Tối ưu hóa Batch Query**: Tốc độ xử lý siêu tốc, giảm từ 4.000+ câu lệnh SQL xuống chỉ **3 SQL queries** trên 1 request.
+## Tech stack
 
-### 2. 📖 Kho Từ Vựng Tiếng Nhật (3,000+ Từ)
-- Tìm kiếm tức thì, lọc theo trình độ (N5 ➔ N3), hiển thị Furigana, ví dụ thực tế và phát âm.
-- Đánh dấu tương tác **`🟢 Đã thuộc (+10 XP)`** hoặc **`🔴 Cần học lại`** lưu trực tiếp vào cơ sở dữ liệu.
+Backend: Java 17, Spring Boot 3, Spring Security, Spring Data JPA / Hibernate, PostgreSQL (hosted on Supabase), HikariCP.
 
-### 3. 漢 Kho Kanji (600+ Chữ Hán)
-- Tra cứu âm On/Kun, số nét, ý nghĩa Hán Việt và từ ghép liên quan.
+Frontend: React 18, TypeScript, Vite, Tailwind CSS, React Router.
 
-### 4. 文 Cấu Trúc Ngữ Pháp (50+ Mẫu)
-- Công thức chia động từ, giải thích sắc thái sử dụng và câu ví dụ song ngữ Nhật - Việt.
+Auth and data: Supabase for Postgres hosting and authentication (JWT-based, validated on the backend). Row Level Security is enabled on all application tables; the backend connects with a role that bypasses RLS, so authorization is enforced in the Spring Security layer rather than at the database layer.
 
-### 5. 🤖 Trợ Lý Gia Sư AI Sensei (24/7)
-- Tích hợp đa mô hình AI tiên tiến: **Google Gemini 1.5 Flash** & **Groq Llama 3.3 70B**.
-- Giải thích ngữ pháp, sửa bài viết, dịch câu và luyện hội thoại phản xạ.
+AI: Google Gemini and Groq (Llama 3.3) for the tutor chat feature, selected per use case.
 
-### 6. 🔥 Trang Cá Nhân & Thống Kê Chuỗi Ngày Học (Streak)
-- Theo dõi chuỗi ngày học liên tục (7-day streak tracker), điểm kinh nghiệm XP, cấp độ mục tiêu và phần kỹ năng cần cải thiện.
+Deployment: the backend is a self-contained Spring Boot jar (Dockerfile included) intended for a host like Render; the frontend is a static Vite build intended for Vercel. A Docker Compose setup is also included for running both services together, e.g. on a single VPS.
 
----
-
-## 🏗️ Kiến Trúc & Công Nghệ (Tech Stack)
+## Project structure
 
 ```
-                        ┌───────────────────────────────┐
-                        │   React 18 + Vite + TS        │
-                        │   (Nihon Journey UI / Tailwind)│
-                        └──────────────┬────────────────┘
-                                       │ REST API (Axios + Supabase Bearer JWT)
-                                       ▼
-                        ┌───────────────────────────────┐
-                        │   Spring Boot 3.2 (Java 17)   │
-                        │   • Spring Security + JWT     │
-                        │   • HikariCP (20 connections) │
-                        │   • JPA / Hibernate           │
-                        └──────┬─────────────────┬──────┘
-                               │                 │
-            ┌──────────────────┴──┐           ┌──┴──────────────────┐
-            ▼                     ▼           ▼                     ▼
-┌───────────────────────┐ ┌───────────────┐ ┌───────────────────┐ ┌────────────────┐
-│ Supabase PostgreSQL   │ │ Supabase Auth │ │ Google Gemini API │ │ Groq Llama 3.3 │
-│ (3,000+ Vocab/Kanji)  │ │ (JWT Session) │ │ (Sensei Tutor AI) │ │ (Fast AI Chat) │
-└───────────────────────┘ └───────────────┘ └───────────────────┘ └────────────────┘
+src/main/java/com/jlpt/tutor/   Spring Boot backend (controllers, services, repositories, entities)
+src/main/resources/             application config, seed data
+frontend/src/                   React frontend
+  components/                   shared UI components
+  features/                     one folder per feature area (auth, lesson, vocab, kanji, grammar, ai-chat, admin, dashboard)
+  services/                     API clients
+supabase/migrations/            reference SQL for Supabase-side setup (see note below)
 ```
 
-- **Backend**: Java 17, Spring Boot 3.2.0, Spring Security, Spring Data JPA, HikariCP.
-- **Frontend**: React 18, Vite 5, TypeScript, Tailwind CSS, Lucide Icons.
-- **Database & Auth**: Supabase PostgreSQL Cloud, Supabase Auth (JWT Validation).
-- **Containerization**: Docker, Docker Compose (`docker-compose.yml` & `docker-compose.prod.yml`), Nginx Alpine.
+## Running locally
 
----
+### Prerequisites
 
-## ⚙️ Cấu Hình Môi Trường (.env)
+- Java 17 and Maven (or use the included `mvnw` / `mvnw.cmd` wrapper)
+- Node.js 18+ and npm
+- A Supabase project (for Postgres and Auth), or Docker if you prefer the containerized setup
 
-### 1. File `.env` ở thư mục gốc (Backend)
-Sao chép từ `.env.example`:
-```env
-# AI Provider Keys
-GROQ_API_KEY=gsk_your_groq_key
-GROQ_MODEL=llama-3.3-70b-versatile
+### Environment variables
 
-GEMINI_API_KEY=your_gemini_key
-GEMINI_BASE_URL=https://generativelanguage.googleapis.com
-GEMINI_MODEL=gemini-1.5-flash
+Copy `.env.example` to `.env` in the project root and fill in real values:
 
-# Supabase Database Configuration
-DB_URL=jdbc:postgresql://aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres
-DB_USERNAME=postgres.your_project_ref
-DB_PASSWORD=your_db_password
-
-# Supabase Auth Configuration
-SUPABASE_URL=https://your-project-ref.supabase.co
-SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_JWT_SECRET=your_supabase_jwt_secret
-
+```
+GROQ_API_KEY=
+GEMINI_API_KEY=
+DB_URL=jdbc:postgresql://<your-supabase-pooler-host>:5432/postgres
+DB_USERNAME=
+DB_PASSWORD=
+SUPABASE_URL=
+SUPABASE_ANON_KEY=
+SUPABASE_JWT_SECRET=
+JWT_SECRET=
+CORS_ALLOWED_ORIGINS=http://localhost:5173
 SPRING_PROFILES_ACTIVE=prod
 ```
 
-### 2. File `frontend/.env.local` (Frontend)
-Sao chép từ `frontend/.env.example`:
-```env
+`JWT_SECRET` and `DB_PASSWORD` have no default value and must be set, or the backend will fail to start — this is intentional, to avoid a fallback secret ever being used in a real deployment.
+
+Copy `frontend/.env.example` to `frontend/.env.local` and fill in:
+
+```
 VITE_API_URL=http://localhost:8080/api
-VITE_SUPABASE_URL=https://your-project-ref.supabase.co
-VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+VITE_SUPABASE_URL=
+VITE_SUPABASE_ANON_KEY=
 ```
 
----
+### Option 1: Docker Compose
 
-## 🚀 Hướng Dẫn Khởi Chạy Dự Án
-
-### Cách 1: Sử dụng Docker Compose (Khuyên dùng - 1 Lệnh duy nhất)
-```powershell
+```
 docker compose up -d
 ```
-- **Giao diện Frontend**: `http://localhost:5173` (Tự động hot-reload khi sửa code)
-- **Backend API**: `http://localhost:8080/api`
 
-*Tắt hệ thống container:*
-```powershell
-docker compose down
+This starts the backend on port 8080 and the frontend dev server (with hot reload) on port 5173.
+
+### Option 2: Run each service manually
+
+Backend:
+
+```
+./mvnw.cmd spring-boot:run   # Windows
+./mvnw spring-boot:run       # macOS / Linux
 ```
 
----
+Frontend, in a separate terminal:
 
-### Cách 2: Khởi chạy Thủ công (Local Terminal)
-
-#### 1. Khởi chạy Backend (Spring Boot)
-```powershell
-# Windows
-./mvnw.cmd spring-boot:run
-
-# macOS / Linux
-./mvnw spring-boot:run
 ```
-
-#### 2. Khởi chạy Frontend (React + Vite)
-Mở cửa sổ Terminal mới:
-```powershell
 cd frontend
 npm install
 npm run dev
 ```
 
----
+## Deployment
 
-## 🐳 Triển Khai Production (Deployment)
+For a split deployment:
 
-### 1. Triển khai bằng Docker Compose (VPS / Server riêng)
-```powershell
-docker compose -f docker-compose.prod.yml up -d --build
-```
-Hệ thống sẽ tự động đóng gói Nginx tối ưu cho Frontend (Port 80) và Spring Boot cho Backend (Port 8080).
+- Frontend: deploy the `frontend/` directory to Vercel, with the environment variables listed above set in the Vercel project settings, and `VITE_API_URL` pointed at the deployed backend.
+- Backend: deploy the repository root to Render (or any host that can run a Docker image) using the included `Dockerfile`. Set `CORS_ALLOWED_ORIGINS` to the deployed frontend's origin — it defaults to `http://localhost:5173`, which only works for local development.
 
-### 2. Triển khai Tách biệt (Vercel + Render)
-- **Frontend**: Deploy thư mục `frontend/` lên **Vercel**. Cấu hình biến `VITE_API_URL`.
-- **Backend**: Deploy thư mục gốc lên **Render** sử dụng file `Dockerfile` có sẵn.
+For a single-host deployment, `docker-compose.prod.yml` builds and runs both services together behind their own containers.
 
----
+## Notes on the Supabase migrations folder
 
-## 📡 Danh Sách APIs Chính
+`supabase/migrations/` contains SQL that was written directly against the Supabase project (outside of the backend's own Hibernate-managed schema) for a couple of one-off concerns: a trigger that mirrors new `auth.users` rows into `public.users`, and a one-time script to backfill `lesson` rows from existing content tables. These predate the backend's own auto-provisioning logic (`JwtAuthenticationFilter`) and are kept here mainly as a record of what was run against the database, not as an automated migration pipeline — the backend does not apply them on startup.
 
-| Phương thức | Đường dẫn | Mô tả |
-| --- | --- | --- |
-| `GET` | `/api/lessons?level=N5` | Lấy danh sách bài học kèm % hoàn thành |
-| `GET` | `/api/lessons/{id}/exercises` | Sinh bài tập tương tác (Flashcard & Quiz) |
-| `POST` | `/api/lessons/{id}/complete` | Nộp bài học, ghi nhận `quiz_session` và cộng XP/Streak |
-| `GET` | `/api/vocabulary?level=N5` | Tìm kiếm từ vựng phân trang |
-| `GET` | `/api/kanji?level=N5` | Tìm kiếm chữ Hán Kanji |
-| `GET` | `/api/grammar?level=N5` | Danh sách mẫu ngữ pháp |
-| `POST` | `/api/progress/mark` | Đánh giá trạng thái từ vựng (`MASTERED`/`LEARNING`) |
-| `POST` | `/api/ai/chat` | Gửi tin nhắn cho Gia sư AI Sensei |
-| `GET` | `/api/users/me` | Lấy thông tin & thống kê học viên hiện tại |
+## Current limitations
 
----
+This is a personal project at a "working prototype" stage rather than a production-hardened application. Notably:
 
-## 🔒 Kiểm Tra Bảo Mật & An Toàn Code
+- There is no automated test suite yet.
+- Schema changes are applied via Hibernate's `ddl-auto: update` rather than versioned migrations, aside from the ad hoc Supabase SQL noted above.
+- The database still has a Postgres-level trigger for user provisioning that duplicates the backend's own logic; the two are believed to be consistent in practice but have not been formally reconciled.
 
-- **Không chứa dữ liệu nhạy cảm (No Hardcoded Secrets)**: Toàn bộ API Key, Mật khẩu Database và Secret JWT được quản lý qua biến môi trường `.env`.
-- **Quản lý Git sạch sẽ (.gitignore)**: File `.env`, `node_modules/`, `target/`, `dist/`, logs và các file làm việc trung gian của AI được ẩn hoàn toàn khỏi Git repository.
+## License
 
----
-
-## 📄 Giấy Phép (License)
-
-Dự án được phân phối dưới giấy phép **MIT License**. Phát triển phục vụ cộng đồng học tiếng Nhật JLPT.
+MIT — see `LICENSE`.
