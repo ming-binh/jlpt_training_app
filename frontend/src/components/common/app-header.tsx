@@ -85,7 +85,7 @@ export function AppHeader() {
           <span className="hidden leading-tight sm:block">
             <span className="block text-sm font-semibold tracking-wide">NIHON JOURNEY</span>
             <span className="block text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
-              JLPT TUTOR AI
+              JLPT TRAINING APP
             </span>
           </span>
         </Link>

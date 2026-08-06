@@ -1,15 +1,34 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, BookOpen, Brain, MessageCircle, GraduationCap, Play, PenLine, RotateCcw, ListChecks, TrendingUp, Check } from "lucide-react";
+import { ArrowRight, BookOpen, Brain, MessageCircle, GraduationCap, Play, PenLine, RotateCcw, ListChecks, TrendingUp, Check, Star, Clock } from "lucide-react";
 import { GRAMMAR, KANJI, VOCAB } from "@/data/jlpt";
 import { AppHeader } from "@/components/common/app-header";
-import { jlptService, type VocabularyItem } from "@/services/jlpt.service";
+import { jlptService } from "@/services/jlpt.service";
 import { userService, type DashboardStats } from "@/services/user.service";
 import { authService } from "@/services/auth.service";
 import { progressService } from "@/services/lesson.service";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 import { LevelPickerModal } from "../components/LevelPickerModal";
+import { HighlightCarousel, type HighlightItem } from "../components/HighlightCarousel";
+
+const TESTIMONIALS = [
+  {
+    name: "Minh Anh",
+    level: "N4 → N3",
+    quote: "Bài học chia nhỏ dễ hiểu, mình duy trì học mỗi tối 15 phút mà lên trình độ nhanh hơn hẳn hồi tự học sách giấy.",
+  },
+  {
+    name: "Quốc Bảo",
+    level: "N5 → N4",
+    quote: "Trợ lý AI Sensei giải thích ngữ pháp cực dễ hiểu, hỏi lúc nào cũng được, không ngại hỏi lại nhiều lần như hỏi giáo viên thật.",
+  },
+  {
+    name: "Thu Trang",
+    level: "Đang học N3",
+    quote: "Ôn từ vựng bằng flashcard lật thẻ mỗi ngày, nhớ lâu hơn hẳn học vẹt — quiz cuối bài giúp mình biết ngay chỗ nào còn yếu.",
+  },
+];
 
 export function NihonHomePage() {
   const [counts, setCounts] = useState({
@@ -18,7 +37,7 @@ export function NihonHomePage() {
     grammar: GRAMMAR.length,
   });
 
-  const [wordOfDay, setWordOfDay] = useState<VocabularyItem | null>(null);
+  const [highlights, setHighlights] = useState<HighlightItem[]>([]);
   const [userStats, setUserStats] = useState<DashboardStats | null>(null);
 
   const [isLoggedIn, setIsLoggedIn] = useState(() => authService.isAuthenticated());
@@ -59,9 +78,10 @@ export function NihonHomePage() {
       jlptService.getVocabStats().catch(() => null),
       jlptService.getKanjiStats().catch(() => null),
       jlptService.getGrammarStats().catch(() => null),
-      jlptService.getVocabulary("N5", "", 0, 1).catch(() => null),
+      jlptService.getVocabulary("N5", "", 0, 6).catch(() => null),
+      jlptService.getKanji("N5", "", 0, 6).catch(() => null),
       userService.getDashboardStats().catch(() => null),
-    ]).then(([vocabRes, kanjiRes, grammarRes, vocabListRes, userStatsRes]) => {
+    ]).then(([vocabRes, kanjiRes, grammarRes, vocabListRes, kanjiListRes, userStatsRes]) => {
       const vocabCount = vocabRes?.total && vocabRes.total > 0 ? vocabRes.total : VOCAB.length;
       const kanjiCount = kanjiRes?.total && kanjiRes.total > 0 ? kanjiRes.total : KANJI.length;
       const grammarCount = grammarRes?.total && grammarRes.total > 0 ? grammarRes.total : GRAMMAR.length;
@@ -72,9 +92,27 @@ export function NihonHomePage() {
         grammar: grammarCount,
       });
 
-      if (vocabListRes?.content && vocabListRes.content.length > 0) {
-        setWordOfDay(vocabListRes.content[0]);
+      const vocabHighlights: HighlightItem[] = (vocabListRes?.content || []).map((v) => ({
+        type: "vocab",
+        main: v.word,
+        reading: v.reading,
+        meaning: v.meaning,
+        level: v.jlptLevel || "N5",
+      }));
+      const kanjiHighlights: HighlightItem[] = (kanjiListRes?.content || []).map((k) => ({
+        type: "kanji",
+        main: k.character,
+        reading: [k.onReadings, k.kunReadings].filter(Boolean).join(" · "),
+        meaning: k.meanings,
+        level: k.jlptLevel || "N5",
+      }));
+      const merged: HighlightItem[] = [];
+      const maxLen = Math.max(vocabHighlights.length, kanjiHighlights.length);
+      for (let i = 0; i < maxLen; i++) {
+        if (vocabHighlights[i]) merged.push(vocabHighlights[i]);
+        if (kanjiHighlights[i]) merged.push(kanjiHighlights[i]);
       }
+      setHighlights(merged);
 
       if (userStatsRes) {
         setUserStats(userStatsRes);
@@ -145,10 +183,6 @@ export function NihonHomePage() {
       count: "Luyện tập ngay",
     },
   ];
-
-  const currentWord = wordOfDay
-    ? { word: wordOfDay.word, reading: wordOfDay.reading, meaning: wordOfDay.meaning }
-    : VOCAB[0];
 
   // Dynamic calculations for user progress
   const userLevel = userStats?.jlptLevel ?? "N5";
@@ -258,19 +292,9 @@ export function NihonHomePage() {
             </div>
           </div>
 
-          {/* Word of the day & progress widget */}
+          {/* Highlight carousel & progress widget */}
           <div className="surface-card relative p-6 md:p-8">
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                Từ của ngày
-              </p>
-              <span className="text-xs font-bold text-accent bg-accent/10 border border-accent/30 rounded-lg px-2 py-0.5">
-                {userLevel}
-              </span>
-            </div>
-            <p className="jp mt-4 text-5xl font-bold leading-none md:text-6xl">{currentWord.word}</p>
-            <p className="jp mt-3 text-lg font-medium text-accent">{currentWord.reading}</p>
-            <p className="mt-1 text-sm text-muted-foreground">{currentWord.meaning}</p>
+            <HighlightCarousel items={highlights} />
             <div className="mt-6 space-y-4 border-t border-border pt-5">
               {dynamicProgress.map((p) => (
                 <div key={p.label}>
@@ -288,6 +312,29 @@ export function NihonHomePage() {
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Stats strip */}
+      <section className="border-b border-border bg-card/40">
+        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-4 px-4 py-6 sm:grid-cols-3 lg:grid-cols-5">
+          {[
+            { icon: BookOpen, value: `${counts.vocab.toLocaleString("vi-VN")}`, label: "Từ vựng" },
+            { icon: PenLine, value: `${counts.kanji.toLocaleString("vi-VN")}`, label: "Kanji" },
+            { icon: Brain, value: `${counts.grammar.toLocaleString("vi-VN")}`, label: "Mẫu ngữ pháp" },
+            { icon: MessageCircle, value: "24/7", label: "AI Sensei đồng hành" },
+            { icon: Clock, value: "15 phút", label: "Mỗi ngày là đủ" },
+          ].map((s) => (
+            <div key={s.label} className="flex items-center gap-3">
+              <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-secondary text-accent">
+                <s.icon className="size-4" />
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-lg font-bold leading-tight">{s.value}</p>
+                <p className="truncate text-[11px] text-muted-foreground">{s.label}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -344,6 +391,37 @@ export function NihonHomePage() {
               </span>
             </Link>
           ))}
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="border-t border-border bg-card/40">
+        <div className="mx-auto max-w-6xl px-4 py-12">
+          <h2 className="text-2xl font-semibold">Học viên nói gì về Nihon Journey</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Một vài chia sẻ từ cộng đồng đang luyện thi JLPT cùng chúng tôi.
+          </p>
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {TESTIMONIALS.map((t) => (
+              <div key={t.name} className="surface-card p-6">
+                <div className="flex gap-0.5 text-accent">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star key={i} className="size-3.5 fill-current" />
+                  ))}
+                </div>
+                <p className="mt-4 text-sm leading-relaxed text-foreground">"{t.quote}"</p>
+                <div className="mt-5 flex items-center gap-3 border-t border-border pt-4">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-full bg-secondary text-sm font-bold text-accent">
+                    {t.name[0]}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold">{t.name}</p>
+                    <p className="truncate text-[11px] text-muted-foreground">{t.level}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
