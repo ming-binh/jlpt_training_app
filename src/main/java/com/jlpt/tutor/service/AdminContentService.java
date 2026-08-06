@@ -28,19 +28,19 @@ public class AdminContentService {
         String filterSearch = (search != null && !search.isBlank()) ? search.trim() : null;
 
         return switch (type) {
-            case VOCAB -> vocabularyRepository.searchVocabulary(filterLevel, filterSearch, pageable)
+            case VOCAB -> vocabularyRepository.searchVocabulary(filterLevel, filterSearch, null, null, pageable)
                     .map(v -> AdminContentItemDto.builder()
                             .id(String.valueOf(v.getId())).type("VOCAB")
                             .title(v.getWord() + (v.getReading() != null ? " (" + v.getReading() + ")" : ""))
                             .level(v.getJlptLevel())
                             .build());
-            case KANJI -> kanjiRepository.searchKanji(filterLevel, filterSearch, pageable)
+            case KANJI -> kanjiRepository.searchKanji(filterLevel, filterSearch, null, null, pageable)
                     .map(k -> AdminContentItemDto.builder()
                             .id(String.valueOf(k.getId())).type("KANJI")
                             .title(k.getCharacter() + (k.getMeanings() != null ? " — " + k.getMeanings() : ""))
                             .level(k.getJlptLevel())
                             .build());
-            case GRAMMAR -> grammarPointRepository.searchGrammar(filterLevel, filterSearch, pageable)
+            case GRAMMAR -> grammarPointRepository.searchGrammar(filterLevel, filterSearch, null, null, pageable)
                     .map(g -> AdminContentItemDto.builder()
                             .id(String.valueOf(g.getId())).type("GRAMMAR")
                             .title(g.getTitle())
