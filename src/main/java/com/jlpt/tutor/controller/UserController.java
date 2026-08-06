@@ -13,11 +13,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
+
+    private static final Set<String> ALLOWED_LEVELS = Set.of("N5", "N4", "N3");
 
     private final UserRepository userRepository;
     private final UserService userService;
@@ -62,6 +65,7 @@ public class UserController {
                 .completedVocab((int) completedVocab)
                 .completedKanji((int) completedKanji)
                 .completedGrammar((int) completedGrammar)
+                .onboarded(Boolean.TRUE.equals(user.getOnboarded()))
                 .build();
 
         return ResponseEntity.ok(stats);
@@ -80,7 +84,11 @@ public class UserController {
             user.setUsername(request.getUsername().trim());
         }
         if (request.getJlptLevel() != null && !request.getJlptLevel().isBlank()) {
-            user.setJlptLevel(request.getJlptLevel().toUpperCase().trim());
+            String level = request.getJlptLevel().toUpperCase().trim();
+            if (ALLOWED_LEVELS.contains(level)) {
+                user.setJlptLevel(level);
+                user.setOnboarded(true);
+            }
         }
 
         User updated = userRepository.save(user);
@@ -105,5 +113,6 @@ public class UserController {
         private Integer completedVocab;
         private Integer completedKanji;
         private Integer completedGrammar;
+        private boolean onboarded;
     }
 }

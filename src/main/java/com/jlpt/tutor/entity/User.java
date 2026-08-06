@@ -45,6 +45,9 @@ public class User implements UserDetails {
     @Builder.Default
     private Boolean locked = false;
 
+    @Builder.Default
+    private Boolean onboarded = false;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + (role != null ? role.name() : "USER")));

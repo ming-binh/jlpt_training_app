@@ -9,6 +9,7 @@ import { authService } from "@/services/auth.service";
 import { progressService } from "@/services/lesson.service";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
+import { LevelPickerModal } from "../components/LevelPickerModal";
 
 export function NihonHomePage() {
   const [counts, setCounts] = useState({
@@ -23,6 +24,7 @@ export function NihonHomePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => authService.isAuthenticated());
   const [todayDone, setTodayDone] = useState(false);
   const [displayName, setDisplayName] = useState<string>("Học Viên");
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
     if (!isLoggedIn) return;
@@ -76,9 +78,22 @@ export function NihonHomePage() {
 
       if (userStatsRes) {
         setUserStats(userStatsRes);
+        if (userStatsRes.onboarded === false) {
+          setShowOnboarding(true);
+        }
       }
     });
   }, []);
+
+  const handleLevelSave = (level: string) => {
+    userService
+      .updateProfile({ jlptLevel: level })
+      .then(() => {
+        setUserStats((prev) => (prev ? { ...prev, jlptLevel: level, onboarded: true } : prev));
+        setShowOnboarding(false);
+      })
+      .catch(() => setShowOnboarding(false));
+  };
 
   const features = [
     {
@@ -327,6 +342,15 @@ export function NihonHomePage() {
       <footer className="border-t border-border py-8 text-center text-xs text-muted-foreground">
         Nihon Journey · 毎日少しずつ — mỗi ngày một chút
       </footer>
+
+      {showOnboarding && (
+        <LevelPickerModal
+          mode="onboarding"
+          currentLevel={userStats?.jlptLevel ?? "N5"}
+          onClose={() => setShowOnboarding(false)}
+          onSave={handleLevelSave}
+        />
+      )}
     </div>
   );
 }

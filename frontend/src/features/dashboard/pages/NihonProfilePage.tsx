@@ -16,6 +16,8 @@ import {
 import { AppHeader } from "@/components/common/app-header";
 import { userService, type DashboardStats, type UserProfile } from "@/services/user.service";
 import { progressService, type ProgressSummary } from "@/services/lesson.service";
+import { LevelPickerModal } from "../components/LevelPickerModal";
+import { toast } from "@/components/ui/toast";
 
 const MASTERED_META = [
   { key: 'masteredVocab' as const, label: 'Từ vựng', kanji: '語', icon: BookOpen, to: '/tu-vung' },
@@ -43,6 +45,7 @@ export function NihonProfilePage() {
   const [loading, setLoading] = useState(true);
   const [progressSummary, setProgressSummary] = useState<ProgressSummary>(PROGRESS_DEFAULT);
   const [todayDone, setTodayDone] = useState(false);
+  const [showLevelEdit, setShowLevelEdit] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -59,6 +62,17 @@ export function NihonProfilePage() {
       .then(days => setTodayDone(days[days.length - 1]?.studied ?? false))
       .catch(() => setTodayDone(false));
   }, []);
+
+  const handleLevelSave = (level: string) => {
+    userService
+      .updateProfile({ jlptLevel: level })
+      .then((updated) => {
+        setProfile(updated);
+        toast.success("Đã cập nhật trình độ học.");
+        setShowLevelEdit(false);
+      })
+      .catch(() => toast.error("Không thể cập nhật trình độ."));
+  };
 
   // Compute dynamic user values
   const email = profile?.email || "hocvien@example.com";
@@ -189,6 +203,15 @@ export function NihonProfilePage() {
               label="Trình độ hiện tại"
               value={jlptLevel}
               hint={`Mục tiêu kế tiếp: ${nextLevel}`}
+              action={
+                <button
+                  type="button"
+                  onClick={() => setShowLevelEdit(true)}
+                  className="shrink-0 text-[11px] font-semibold text-accent hover:underline"
+                >
+                  Đổi trình độ
+                </button>
+              }
             />
             <StatCard
               icon={<Target className="size-4 text-accent" />}
@@ -299,6 +322,15 @@ export function NihonProfilePage() {
           </section>
         </main>
       </div>
+
+      {showLevelEdit && (
+        <LevelPickerModal
+          mode="edit"
+          currentLevel={jlptLevel}
+          onClose={() => setShowLevelEdit(false)}
+          onSave={handleLevelSave}
+        />
+      )}
     </div>
   );
 }
@@ -308,17 +340,22 @@ function StatCard({
   label,
   value,
   hint,
+  action,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
   hint: string;
+  action?: React.ReactNode;
 }) {
   return (
     <div className="surface-card p-5 border border-border/80">
-      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-        {icon}
-        <span className="truncate">{label}</span>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          {icon}
+          <span className="truncate">{label}</span>
+        </div>
+        {action}
       </div>
       <p className="mt-3 truncate text-2xl font-bold">{value}</p>
       <p className="mt-1 text-xs text-muted-foreground">{hint}</p>

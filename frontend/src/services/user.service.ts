@@ -10,6 +10,7 @@ export interface DashboardStats {
   completedVocab: number;
   completedKanji: number;
   completedGrammar: number;
+  onboarded: boolean;
 }
 
 export type Role = 'USER' | 'ADMIN';
@@ -23,6 +24,7 @@ export interface UserProfile {
   mockScore?: number;
   weakSections?: string;
   role?: Role;
+  onboarded?: boolean;
 }
 
 export const userService = {
