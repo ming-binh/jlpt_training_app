@@ -12,6 +12,7 @@ import org.springframework.util.StreamUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -60,13 +61,29 @@ public class PromptBuilder {
     private Resource ragContextTemplate;
 
     public String build(AiRequest request) {
-        String master = loadAndFill(masterSystemPrompt, request.getUserContext());
+        Map<String, String> userContext = request.getUserContext() != null ? new HashMap<>(request.getUserContext()) : new HashMap<>();
+        userContext.putIfAbsent("user_name", "Học viên");
+        userContext.putIfAbsent("jlpt_level", "N4");
+        userContext.putIfAbsent("last_mock_score", "Chưa có");
+        userContext.putIfAbsent("weak_sections", "Đang cập nhật");
+        userContext.putIfAbsent("streak_days", "1");
+
+        Map<String, String> params = request.getParams() != null ? new HashMap<>(request.getParams()) : new HashMap<>();
+        params.putIfAbsent("jlpt_level", userContext.get("jlpt_level"));
+        params.putIfAbsent("user_message", "");
+        params.putIfAbsent("grammar_point", params.get("user_message"));
+        params.putIfAbsent("scenario", "Hỏi đáp kiến thức tiếng Nhật và luyện thi JLPT");
+        params.putIfAbsent("ai_role", "Sensei (Gia sư tiếng Nhật)");
+        params.putIfAbsent("user_role", "Học viên");
+
+        String master = loadAndFill(masterSystemPrompt, userContext);
         String template = loadTemplate(request.getUseCase(), request.getUserId());
-        String filled = fillTemplate(template, request.getParams());
+        String filled = fillTemplate(template, params);
 
         String ragBlock = buildRagBlock(request.getRagContext());
         String guardrails = loadGuardrails();
-        String fewShot = request.getUseCase().needsFewShot() ? loadFewShot(request.getUseCase()) : "";
+        String fewShot = (request.getUseCase() != null && request.getUseCase().needsFewShot())
+                ? loadFewShot(request.getUseCase()) : "";
 
         if (ragBlock.isEmpty()) {
             return String.join("\n\n", master, guardrails, fewShot, filled);
@@ -88,6 +105,8 @@ public class PromptBuilder {
     }
 
     private String loadTemplate(AiUseCase useCase, String userId) {
+        if (useCase == null) useCase = AiUseCase.CONVERSATION;
+        
         // Try getting a variant first (A/B testing)
         String variant = promptVariantService.selectPromptVariant(useCase.name(), userId);
         if (variant != null) {
@@ -105,6 +124,7 @@ public class PromptBuilder {
     }
 
     private String loadFewShot(AiUseCase useCase) {
+        if (useCase == null) return "";
         return switch (useCase) {
             case GRAMMAR_EXPLAIN -> readResource(grammarExamplesPrompt);
             case WRITING_CHECK -> readResource(writingExamplesPrompt);
@@ -136,9 +156,6 @@ public class PromptBuilder {
         String result = template;
         for (Map.Entry<String, String> entry : params.entrySet()) {
             result = result.replace("{{" + entry.getKey() + "}}", sanitize(entry.getValue()));
-        }
-        if (result.contains("{{")) {
-            log.warn("Unfilled placeholders in prompt: {}", result.replaceAll("[^{]*\\{\\{([^}]+)\\}\\}[^{]*", "{{$1}}"));
         }
         return result;
     }

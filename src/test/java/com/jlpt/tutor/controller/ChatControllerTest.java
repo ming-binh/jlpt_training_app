@@ -9,7 +9,11 @@ import com.jlpt.tutor.entity.User;
 import com.jlpt.tutor.exception.RateLimitException;
 import com.jlpt.tutor.model.AiUseCase;
 import com.jlpt.tutor.security.JwtAuthenticationFilter;
-import com.jlpt.tutor.service.*;
+import com.jlpt.tutor.service.ConversationService;
+import com.jlpt.tutor.service.GeminiService;
+import com.jlpt.tutor.service.OffTopicFilter;
+import com.jlpt.tutor.service.RateLimitService;
+import com.jlpt.tutor.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -26,12 +30,14 @@ import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(ChatController.class)
-@AutoConfigureMockMvc(addFilters = false) // Bypass security filters for controller testing
+@WebMvcTest(controllers = ChatController.class)
+@AutoConfigureMockMvc(addFilters = false)
 class ChatControllerTest {
 
     @Autowired
@@ -75,7 +81,7 @@ class ChatControllerTest {
         when(offTopicFilter.isOnTopic(anyString())).thenReturn(true);
         when(geminiService.chat(any(AiRequest.class)))
                 .thenReturn(AiResponse.builder().message("Chào bạn!").build());
-        when(conversationService.createConversation(anyString()))
+        when(conversationService.createConversation(anyString(), anyString()))
                 .thenReturn(Conversation.builder().id("conv-123").userId("user-001").build());
 
         mockMvc.perform(post("/api/ai/chat")
@@ -117,16 +123,14 @@ class ChatControllerTest {
         when(offTopicFilter.isOnTopic(anyString())).thenReturn(true);
         when(geminiService.chat(any(AiRequest.class)))
                 .thenReturn(AiResponse.builder().message("Đây là giải thích...").build());
+        when(conversationService.createConversation(eq("guest"), anyString()))
+                .thenReturn(Conversation.builder().id("guest-conv").userId("guest").build());
 
         mockMvc.perform(post("/api/ai/chat")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("Đây là giải thích..."));
-
-        // No conversation persistence without userId
-        verify(conversationService, never()).createConversation(any());
-        verify(conversationService, never()).saveMessage(any(), any(), any());
     }
 
     @Test
@@ -140,7 +144,7 @@ class ChatControllerTest {
                 .thenReturn(Map.of("user_name", "Minh", "jlpt_level", "N4"));
         when(geminiService.chat(any(AiRequest.class)))
                 .thenReturn(AiResponse.builder().message("OK").build());
-        when(conversationService.createConversation("user-001"))
+        when(conversationService.createConversation(eq("user-001"), anyString()))
                 .thenReturn(Conversation.builder().id("conv-456").userId("user-001").build());
 
         mockMvc.perform(post("/api/ai/chat")
@@ -154,7 +158,6 @@ class ChatControllerTest {
 
     @Test
     void testChat_NullUseCase_Returns400() throws Exception {
-        // useCase is @NotNull — sending null should trigger validation error
         String jsonBody = "{\"params\":{\"user_message\":\"test\"}}";
 
         mockMvc.perform(post("/api/ai/chat")

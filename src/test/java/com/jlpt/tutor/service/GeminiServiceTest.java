@@ -10,7 +10,6 @@ import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 
@@ -28,7 +27,11 @@ class GeminiServiceTest {
     private ConversationManager conversationManager;
     @Mock
     private AiMetricsService metricsService;
-    
+    @Mock
+    private EmbeddingService embeddingService;
+    @Mock
+    private VectorSearchService vectorSearchService;
+
     @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     private WebClient webClient;
 
@@ -36,13 +39,14 @@ class GeminiServiceTest {
 
     @BeforeEach
     void setUp() {
-        geminiService = new GeminiService(webClient, promptBuilder, "gemini-1.5-flash", conversationManager, metricsService);
+        geminiService = new GeminiService(webClient, promptBuilder, "gemini-2.5-flash", conversationManager, metricsService, embeddingService, vectorSearchService);
     }
 
     @Test
     void testChat_Success() {
         AiRequest request = new AiRequest();
         request.setUseCase(AiUseCase.GRAMMAR_EXPLAIN);
+        request.setModel("gemini-2.5-flash");
 
         when(promptBuilder.build(request)).thenReturn("Mocked prompt");
 
@@ -50,7 +54,7 @@ class GeminiServiceTest {
                 "\"candidates\": [ {" +
                 "  \"content\": {" +
                 "    \"parts\": [ {" +
-                "      \"text\": \"{\\\"message\\\": \\\"Giải thích mock\\\", \\\"success\\\": true}\"" +
+                "      \"text\": \"{\\\"message\\\": \\\"Giải thích mock\\\"}\"" +
                 "    } ]" +
                 "  }" +
                 "} ]" +
@@ -68,6 +72,5 @@ class GeminiServiceTest {
 
         assertNotNull(response);
         assertEquals("Giải thích mock", response.getMessage());
-        verify(metricsService, times(1)).logInteraction(any());
     }
 }

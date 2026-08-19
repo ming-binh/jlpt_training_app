@@ -33,7 +33,7 @@ ai:
 rag:
   enabled: ${RAG_ENABLED:false}
   top-k: ${RAG_TOP_K:3}
-  embedding-model: ${GEMINI_EMBEDDING_MODEL:text-embedding-004}
+  embedding-model: ${JINA_EMBEDDING_MODEL:jina-embeddings-v3}
 
 app:
   cors:

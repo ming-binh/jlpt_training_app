@@ -185,7 +185,7 @@ export function NihonChatPage() {
 
     try {
       const res = await chatService.sendMessage({
-        useCase: AiUseCase.GRAMMAR_EXPLAIN,
+        useCase: AiUseCase.CONVERSATION,
         conversationId: conversationId || undefined,
         model: selectedModel,
         params: {
@@ -194,7 +194,6 @@ export function NihonChatPage() {
         },
         userContext: {
           user_name: userName,
-          jlpt_level: "N4",
         },
       });
 
@@ -205,6 +204,19 @@ export function NihonChatPage() {
       }
 
       let text = res.message || "Xin lỗi, Sensei chưa hiểu rõ câu hỏi. Bạn có thể hỏi lại không?";
+
+      // If message is a JSON string with nested fields, parse it cleanly
+      if (typeof text === "string" && text.trim().startsWith("{")) {
+        try {
+          const parsed = JSON.parse(text.trim());
+          if (parsed.message) {
+            text = parsed.message;
+          }
+          if (parsed.quiz && !(res as any).quiz) {
+            (res as any).quiz = parsed.quiz;
+          }
+        } catch (_) {}
+      }
 
       if ((res as any).quiz) {
         const quiz = (res as any).quiz;

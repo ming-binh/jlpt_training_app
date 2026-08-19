@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
@@ -31,6 +32,7 @@ class UserServiceTest {
                 .jlptLevel("N4")
                 .mockScore(80)
                 .streakDays(5)
+                .lastActiveAt(LocalDateTime.now())
                 .build();
         when(userRepository.findById("user-001")).thenReturn(Optional.of(user));
 
@@ -55,6 +57,7 @@ class UserServiceTest {
     void testBuildUserContext_NullFields() {
         User user = User.builder()
                 .id("user-002")
+                .lastActiveAt(LocalDateTime.now())
                 .build();
         when(userRepository.findById("user-002")).thenReturn(Optional.of(user));
 
@@ -62,8 +65,8 @@ class UserServiceTest {
 
         assertEquals("Bạn", context.get("user_name"));
         assertEquals("N5", context.get("jlpt_level"));
-        assertEquals("N/A", context.get("last_mock_score"));
-        assertEquals("0", context.get("streak_days"));
+        assertEquals("Chưa làm bài test", context.get("last_mock_score"));
+        assertEquals("1", context.get("streak_days"));
     }
 
     @Test

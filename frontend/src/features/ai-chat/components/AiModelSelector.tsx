@@ -4,9 +4,7 @@ import {
   Check,
   Zap,
   Sparkles,
-  Cpu,
   Bot,
-  Gauge,
   Info,
 } from "lucide-react";
 
@@ -23,54 +21,34 @@ export interface AiModelOption {
 
 export const AI_MODELS: AiModelOption[] = [
   {
-    id: "llama-3.3-70b-versatile",
-    name: "Llama 3.3 (70B) Versatile",
-    shortName: "Llama 3.3 70B",
+    id: "openai/gpt-oss-120b",
+    name: "GPT OSS (120B)",
+    shortName: "GPT OSS 120B",
     provider: "Groq",
-    badge: "⚡ Khuyên dùng",
-    description: "Phản hồi cực nhanh, thông minh & giải thích tiếng Nhật chuẩn xác",
-    icon: Zap,
-    accentColor: "text-amber-400 bg-amber-400/10 border-amber-400/30",
-  },
-  {
-    id: "gemini-1.5-flash",
-    name: "Gemini 1.5 Flash",
-    shortName: "Gemini Flash",
-    provider: "Google AI",
-    badge: "✨ Đa năng",
-    description: "Xử lý ngữ cảnh mượt mà, câu trả lời tự nhiên chuẩn văn phong",
-    icon: Sparkles,
-    accentColor: "text-sky-400 bg-sky-400/10 border-sky-400/30",
-  },
-  {
-    id: "gemini-1.5-pro",
-    name: "Gemini 1.5 Pro",
-    shortName: "Gemini Pro",
-    provider: "Google AI",
-    badge: "🧠 Chuyên sâu JLPT",
-    description: "Khả năng phân tích sâu cấu trúc ngữ pháp phức tạp N2 - N1",
-    icon: Cpu,
-    accentColor: "text-indigo-400 bg-indigo-400/10 border-indigo-400/30",
-  },
-  {
-    id: "deepseek-r1-distill-llama-70b",
-    name: "DeepSeek R1 (70B)",
-    shortName: "DeepSeek R1",
-    provider: "Groq",
-    badge: "🎯 Suy luận logic",
-    description: "Tư duy từng bước, giải thích chi tiết nguồn gốc từ và mẫu câu",
+    badge: "⚡ Siêu tốc",
+    description: "Tốc độ phản hồi cực nhanh (1-2s), giải thích chi tiết mẫu câu và ngữ cảnh",
     icon: Bot,
     accentColor: "text-emerald-400 bg-emerald-400/10 border-emerald-400/30",
   },
   {
-    id: "llama-3.1-8b-instant",
-    name: "Llama 3.1 (8B) Instant",
-    shortName: "Llama 3.1 8B",
+    id: "gemini-2.5-flash",
+    name: "Gemini 2.5 Flash",
+    shortName: "Gemini 2.5 Flash",
+    provider: "Google AI",
+    badge: "🧠 Phân tích sâu",
+    description: "Khả năng phân tích sâu cấu trúc ngữ pháp phức tạp và đặt ví dụ tự nhiên",
+    icon: Zap,
+    accentColor: "text-amber-400 bg-amber-400/10 border-amber-400/30",
+  },
+  {
+    id: "qwen/qwen3.6-27b",
+    name: "Qwen 3.6 (27B)",
+    shortName: "Qwen 3.6 27B",
     provider: "Groq",
-    badge: "🚀 Siêu tốc độ",
-    description: "Tốc độ phản hồi tức thì, ngắn gọn và tiết kiệm thời gian",
-    icon: Gauge,
-    accentColor: "text-rose-400 bg-rose-400/10 border-rose-400/30",
+    badge: "✨ Chuyên Kanji",
+    description: "Khả năng xử lý chữ Hán Kanji và thành ngữ tiếng Nhật xuất sắc",
+    icon: Sparkles,
+    accentColor: "text-violet-400 bg-violet-400/10 border-violet-400/30",
   },
 ];
 
@@ -172,11 +150,11 @@ export function AiModelSelector({
         />
       </button>
 
-      {/* Popover Dropdown (Opens upwards above the input container) */}
+      {/* Popover Dropdown (Aligned to right edge of trigger, expanding leftwards) */}
       {isOpen && (
         <div
           role="listbox"
-          className="absolute bottom-full mb-2.5 right-0 sm:right-auto sm:left-0 z-50 w-[300px] sm:w-[360px] rounded-2xl border border-border bg-card/95 p-2 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-2 duration-150"
+          className="absolute bottom-full mb-3 right-0 z-50 w-[300px] sm:w-[350px] rounded-2xl border border-border/80 bg-card/95 p-2 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-bottom-2 duration-150"
         >
           {/* Header */}
           <div className="flex items-center justify-between px-2.5 py-1.5 border-b border-border/50 mb-1.5">
@@ -190,7 +168,7 @@ export function AiModelSelector({
           </div>
 
           {/* Model Options List */}
-          <div className="space-y-1 max-h-[320px] overflow-y-auto pr-0.5">
+          <div className="space-y-1.5 max-h-[320px] overflow-y-auto pr-0.5">
             {AI_MODELS.map((model) => {
               const isSelected = model.id === currentModel.id;
               const ModelIcon = model.icon;
@@ -202,7 +180,7 @@ export function AiModelSelector({
                   onClick={() => handleSelect(model)}
                   role="option"
                   aria-selected={isSelected}
-                  className={`w-full flex items-start gap-3 rounded-xl p-2.5 text-left transition-all cursor-pointer ${
+                  className={`w-full flex items-start gap-2.5 rounded-xl p-2.5 text-left transition-all cursor-pointer ${
                     isSelected
                       ? "bg-accent/15 border border-accent/40 shadow-xs"
                       : "hover:bg-secondary/70 border border-transparent"
@@ -215,23 +193,21 @@ export function AiModelSelector({
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-1.5 mb-0.5">
-                      <div className="flex items-center gap-1.5 truncate">
-                        <span className="text-xs font-bold text-foreground truncate">
-                          {model.name}
-                        </span>
-                      </div>
-                      <span className="shrink-0 text-[10px] font-semibold text-accent bg-accent/10 px-1.5 py-0.5 rounded">
+                    <div className="flex items-center justify-between gap-1.5 mb-1">
+                      <span className="text-xs font-bold text-foreground truncate">
+                        {model.name}
+                      </span>
+                      <span className="shrink-0 text-[10px] font-semibold text-accent bg-accent/10 px-1.5 py-0.5 rounded border border-accent/20">
                         {model.badge}
                       </span>
                     </div>
 
-                    <p className="text-[11px] text-muted-foreground leading-tight line-clamp-2">
+                    <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">
                       {model.description}
                     </p>
 
                     <div className="mt-1 flex items-center gap-2 text-[10px] text-muted-foreground/80">
-                      <span className="uppercase tracking-wider font-semibold font-mono text-[9px]">
+                      <span className="uppercase tracking-wider font-semibold font-mono text-[9px] px-1.5 py-0.5 rounded bg-secondary">
                         {model.provider}
                       </span>
                     </div>
@@ -250,7 +226,7 @@ export function AiModelSelector({
           {/* Bottom Hint */}
           <div className="mt-1.5 pt-1.5 border-t border-border/40 px-2 flex items-center gap-1.5 text-[10px] text-muted-foreground">
             <Info className="size-3 shrink-0 text-accent/80" />
-            <span>Mô hình sẽ tự động lưu và áp dụng cho các lượt hỏi tiếp theo.</span>
+            <span>Tự động lưu cho các lượt hỏi tiếp theo.</span>
           </div>
         </div>
       )}

@@ -11,15 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Batch service that generates embeddings for all JLPT content entries
  * and stores them in the database for RAG vector search.
  *
- * Uses batchEmbedContents (100 texts per API call) for maximum efficiency.
- * Only processes entries where embedding IS NULL (incremental indexing).
+ * Uses batchEmbedContents (100 texts per API call) for high throughput.
  */
 @Slf4j
 @Service
@@ -32,36 +30,44 @@ public class RagIndexingService {
     private final EmbeddingService embeddingService;
     private final JdbcTemplate jdbcTemplate;
 
-    /** Number of texts sent per batchEmbedContents call (API max is 100). */
-    private static final int BATCH_SIZE = 100;
+    /** Number of texts sent per Jina AI API call (Jina supports up to 2048). */
+    private static final int BATCH_SIZE = 500;
 
-    /** Delay between batch API calls — Google free tier has a per-minute rolling quota.
-     *  With 65s between calls, we stay safely under the limit. */
-    private static final long BATCH_DELAY_MS = 65_000; // 65 seconds between batches
+    /** Delay between batch API calls in ms (500ms is fast and safe for Jina). */
+    private static final long BATCH_DELAY_MS = 500;
 
     /**
-     * Index all content types. Skips entries that already have embeddings.
+     * Index all content types.
+     * @param force If true, re-indexes even already embedded rows.
      */
-    public IndexingResult indexAll() {
-        log.info("RAG indexing: starting full index");
-        IndexingResult grammar = indexGrammar();
-        IndexingResult vocab = indexVocabulary();
-        IndexingResult kanji = indexKanji();
+    public IndexingResult indexAll(boolean force) {
+        log.info("RAG indexing: starting full index (force={})", force);
+        IndexingResult grammar = indexGrammar(force);
+        IndexingResult vocab = indexVocabulary(force);
+        IndexingResult kanji = indexKanji(force);
         IndexingResult total = grammar.merge(vocab).merge(kanji);
         log.info("RAG indexing: complete — indexed={}, skipped={}, failed={}",
                 total.indexed(), total.skipped(), total.failed());
         return total;
     }
 
+    public IndexingResult indexAll() {
+        return indexAll(false);
+    }
+
     public IndexingResult indexGrammar() {
-        log.info("RAG indexing: grammar_point");
-        List<GrammarPoint> unindexed = fetchUnindexedGrammar();
-        if (unindexed.isEmpty()) {
-            log.info("Grammar: nothing to index (all done)");
+        return indexGrammar(false);
+    }
+
+    public IndexingResult indexGrammar(boolean force) {
+        log.info("RAG indexing: grammar_point (force={})", force);
+        List<GrammarPoint> items = fetchGrammar(force);
+        if (items.isEmpty()) {
+            log.info("Grammar: nothing to index");
             return new IndexingResult(0, 0, 0);
         }
         IndexingResult result = indexInBatches(
-                unindexed.stream().map(g -> new IdAndText(g.getId(), buildGrammarText(g))).toList(),
+                items.stream().map(g -> new IdAndText(g.getId(), buildGrammarText(g))).toList(),
                 "grammar_point"
         );
         log.info("Grammar indexed={}, failed={}", result.indexed(), result.failed());
@@ -69,14 +75,18 @@ public class RagIndexingService {
     }
 
     public IndexingResult indexVocabulary() {
-        log.info("RAG indexing: vocabulary");
-        List<Vocabulary> unindexed = fetchUnindexedVocab();
-        if (unindexed.isEmpty()) {
-            log.info("Vocabulary: nothing to index (all done)");
+        return indexVocabulary(false);
+    }
+
+    public IndexingResult indexVocabulary(boolean force) {
+        log.info("RAG indexing: vocabulary (force={})", force);
+        List<Vocabulary> items = fetchVocab(force);
+        if (items.isEmpty()) {
+            log.info("Vocabulary: nothing to index");
             return new IndexingResult(0, 0, 0);
         }
         IndexingResult result = indexInBatches(
-                unindexed.stream().map(v -> new IdAndText(v.getId(), buildVocabText(v))).toList(),
+                items.stream().map(v -> new IdAndText(v.getId(), buildVocabText(v))).toList(),
                 "vocabulary"
         );
         log.info("Vocabulary indexed={}, failed={}", result.indexed(), result.failed());
@@ -84,14 +94,18 @@ public class RagIndexingService {
     }
 
     public IndexingResult indexKanji() {
-        log.info("RAG indexing: kanji");
-        List<Kanji> unindexed = fetchUnindexedKanji();
-        if (unindexed.isEmpty()) {
-            log.info("Kanji: nothing to index (all done)");
+        return indexKanji(false);
+    }
+
+    public IndexingResult indexKanji(boolean force) {
+        log.info("RAG indexing: kanji (force={})", force);
+        List<Kanji> items = fetchKanji(force);
+        if (items.isEmpty()) {
+            log.info("Kanji: nothing to index");
             return new IndexingResult(0, 0, 0);
         }
         IndexingResult result = indexInBatches(
-                unindexed.stream().map(k -> new IdAndText(k.getId(), buildKanjiText(k))).toList(),
+                items.stream().map(k -> new IdAndText(k.getId(), buildKanjiText(k))).toList(),
                 "kanji"
         );
         log.info("Kanji indexed={}, failed={}", result.indexed(), result.failed());
@@ -100,7 +114,6 @@ public class RagIndexingService {
 
     /**
      * Processes items in batches of BATCH_SIZE, calling batchEmbedContents once per batch.
-     * Significantly reduces API call count (e.g. 3093 vocab = 31 batch calls, not 3093 calls).
      */
     private IndexingResult indexInBatches(List<IdAndText> items, String tableName) {
         int indexed = 0, failed = 0;
@@ -128,7 +141,6 @@ public class RagIndexingService {
                 }
             }
 
-            // Pause between batches to respect rate limits
             if (batchNum < totalBatches - 1) {
                 batchSleep();
             }
@@ -179,51 +191,51 @@ public class RagIndexingService {
 
     // ---- DB helpers ----
 
-    private List<GrammarPoint> fetchUnindexedGrammar() {
-        return jdbcTemplate.query(
-                "SELECT * FROM grammar_point WHERE embedding IS NULL ORDER BY id",
-                (rs, rowNum) -> {
-                    GrammarPoint g = new GrammarPoint();
-                    g.setId(rs.getLong("id"));
-                    g.setTitle(rs.getString("title"));
-                    g.setStructure(rs.getString("structure"));
-                    g.setMeaning(rs.getString("meaning"));
-                    g.setExamples(rs.getString("examples"));
-                    g.setRelatedGrammar(rs.getString("related_grammar"));
-                    g.setJlptLevel(rs.getString("jlpt_level"));
-                    return g;
-                });
+    private List<GrammarPoint> fetchGrammar(boolean force) {
+        String sql = force ? "SELECT * FROM grammar_point ORDER BY id"
+                           : "SELECT * FROM grammar_point WHERE embedding IS NULL ORDER BY id";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            GrammarPoint g = new GrammarPoint();
+            g.setId(rs.getLong("id"));
+            g.setTitle(rs.getString("title"));
+            g.setStructure(rs.getString("structure"));
+            g.setMeaning(rs.getString("meaning"));
+            g.setExamples(rs.getString("examples"));
+            g.setRelatedGrammar(rs.getString("related_grammar"));
+            g.setJlptLevel(rs.getString("jlpt_level"));
+            return g;
+        });
     }
 
-    private List<Vocabulary> fetchUnindexedVocab() {
-        return jdbcTemplate.query(
-                "SELECT * FROM vocabulary WHERE embedding IS NULL ORDER BY id",
-                (rs, rowNum) -> {
-                    Vocabulary v = new Vocabulary();
-                    v.setId(rs.getLong("id"));
-                    v.setWord(rs.getString("word"));
-                    v.setReading(rs.getString("reading"));
-                    v.setMeaning(rs.getString("meaning"));
-                    v.setRomaji(rs.getString("romaji"));
-                    v.setPartOfSpeech(rs.getString("part_of_speech"));
-                    v.setJlptLevel(rs.getString("jlpt_level"));
-                    return v;
-                });
+    private List<Vocabulary> fetchVocab(boolean force) {
+        String sql = force ? "SELECT * FROM vocabulary ORDER BY id"
+                           : "SELECT * FROM vocabulary WHERE embedding IS NULL ORDER BY id";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            Vocabulary v = new Vocabulary();
+            v.setId(rs.getLong("id"));
+            v.setWord(rs.getString("word"));
+            v.setReading(rs.getString("reading"));
+            v.setMeaning(rs.getString("meaning"));
+            v.setRomaji(rs.getString("romaji"));
+            v.setPartOfSpeech(rs.getString("part_of_speech"));
+            v.setJlptLevel(rs.getString("jlpt_level"));
+            return v;
+        });
     }
 
-    private List<Kanji> fetchUnindexedKanji() {
-        return jdbcTemplate.query(
-                "SELECT * FROM kanji WHERE embedding IS NULL ORDER BY id",
-                (rs, rowNum) -> {
-                    Kanji k = new Kanji();
-                    k.setId(rs.getLong("id"));
-                    k.setCharacter(rs.getString("character"));
-                    k.setMeanings(rs.getString("meanings"));
-                    k.setOnReadings(rs.getString("on_readings"));
-                    k.setKunReadings(rs.getString("kun_readings"));
-                    k.setJlptLevel(rs.getString("jlpt_level"));
-                    return k;
-                });
+    private List<Kanji> fetchKanji(boolean force) {
+        String sql = force ? "SELECT * FROM kanji ORDER BY id"
+                           : "SELECT * FROM kanji WHERE embedding IS NULL ORDER BY id";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            Kanji k = new Kanji();
+            k.setId(rs.getLong("id"));
+            k.setCharacter(rs.getString("character"));
+            k.setMeanings(rs.getString("meanings"));
+            k.setOnReadings(rs.getString("on_readings"));
+            k.setKunReadings(rs.getString("kun_readings"));
+            k.setJlptLevel(rs.getString("jlpt_level"));
+            return k;
+        });
     }
 
     private void updateEmbedding(String tableName, Long id, float[] vector) {
@@ -251,11 +263,7 @@ public class RagIndexingService {
         }
     }
 
-    // ---- Inner types ----
-
     private record IdAndText(Long id, String text) {}
-
-    // ---- Result types ----
 
     public record IndexingResult(int indexed, int skipped, int failed) {
         public IndexingResult merge(IndexingResult other) {

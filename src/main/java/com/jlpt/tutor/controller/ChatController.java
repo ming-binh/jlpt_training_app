@@ -193,8 +193,11 @@ public class ChatController {
             return request.getConversationId();
         }
         Conversation conversation = conversationService.createConversation(effectiveUserId, userMessage);
-        request.setConversationId(conversation.getId());
-        return conversation.getId();
+        if (conversation != null) {
+            request.setConversationId(conversation.getId());
+            return conversation.getId();
+        }
+        return null;
     }
 
     /** Extract the user's actual message from the request, using params if available. */

@@ -39,13 +39,14 @@ public class RagAdminController {
 
     /**
      * POST /api/admin/rag/index
-     * Triggers full incremental indexing across all content types.
-     * Only indexes entries where embedding IS NULL.
+     * Triggers indexing across all content types.
+     * @param force If true, re-indexes even already embedded rows.
      */
     @PostMapping("/index")
-    public ResponseEntity<Map<String, Object>> indexAll() {
-        log.info("Admin triggered: RAG full index");
-        IndexingResult result = ragIndexingService.indexAll();
+    public ResponseEntity<Map<String, Object>> indexAll(
+            @RequestParam(defaultValue = "false") boolean force) {
+        log.info("Admin triggered: RAG full index (force={})", force);
+        IndexingResult result = ragIndexingService.indexAll(force);
         return ResponseEntity.ok(toResultMap(result));
     }
 
@@ -53,9 +54,10 @@ public class RagAdminController {
      * POST /api/admin/rag/index/grammar
      */
     @PostMapping("/index/grammar")
-    public ResponseEntity<Map<String, Object>> indexGrammar() {
-        log.info("Admin triggered: RAG grammar index");
-        IndexingResult result = ragIndexingService.indexGrammar();
+    public ResponseEntity<Map<String, Object>> indexGrammar(
+            @RequestParam(defaultValue = "false") boolean force) {
+        log.info("Admin triggered: RAG grammar index (force={})", force);
+        IndexingResult result = ragIndexingService.indexGrammar(force);
         return ResponseEntity.ok(toResultMap(result));
     }
 
@@ -63,9 +65,10 @@ public class RagAdminController {
      * POST /api/admin/rag/index/vocabulary
      */
     @PostMapping("/index/vocabulary")
-    public ResponseEntity<Map<String, Object>> indexVocabulary() {
-        log.info("Admin triggered: RAG vocabulary index");
-        IndexingResult result = ragIndexingService.indexVocabulary();
+    public ResponseEntity<Map<String, Object>> indexVocabulary(
+            @RequestParam(defaultValue = "false") boolean force) {
+        log.info("Admin triggered: RAG vocabulary index (force={})", force);
+        IndexingResult result = ragIndexingService.indexVocabulary(force);
         return ResponseEntity.ok(toResultMap(result));
     }
 
@@ -73,9 +76,10 @@ public class RagAdminController {
      * POST /api/admin/rag/index/kanji
      */
     @PostMapping("/index/kanji")
-    public ResponseEntity<Map<String, Object>> indexKanji() {
-        log.info("Admin triggered: RAG kanji index");
-        IndexingResult result = ragIndexingService.indexKanji();
+    public ResponseEntity<Map<String, Object>> indexKanji(
+            @RequestParam(defaultValue = "false") boolean force) {
+        log.info("Admin triggered: RAG kanji index (force={})", force);
+        IndexingResult result = ragIndexingService.indexKanji(force);
         return ResponseEntity.ok(toResultMap(result));
     }
 

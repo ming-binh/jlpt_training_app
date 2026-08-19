@@ -5,8 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,59 +18,56 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Generates text embeddings via Gemini gemini-embedding-001 API.
+ * Generates text embeddings via Jina AI API (jina-embeddings-v3).
  *
- * Supports both single embed() and batch embedBatch() (up to 100 texts/request).
- * Results are cached in-memory to avoid redundant API calls.
- * Retries with exponential backoff on 429 rate-limit errors.
+ * Supports batch embedding (up to 500 texts per request) with 768 output dimensions.
+ * Uses task 'retrieval.passage' for documents and 'retrieval.query' for search queries.
  */
 @Slf4j
 @Service
 public class EmbeddingService {
 
-    private static final String EMBEDDING_BASE_URL = "https://generativelanguage.googleapis.com";
-    private static final Duration TIMEOUT = Duration.ofSeconds(180);
-    private static final int MAX_BATCH_SIZE = 100;
+    private static final String JINA_API_URL = "https://api.jina.ai/v1/embeddings";
+    private static final Duration TIMEOUT = Duration.ofSeconds(45);
 
     private final String apiKey;
     private final String model;
-    private final WebClient embeddingClient;
+    private final HttpClient httpClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // Simple in-memory cache: text -> embedding vector
+    // In-memory cache: text -> embedding vector
     private final ConcurrentHashMap<String, float[]> cache = new ConcurrentHashMap<>();
 
     public EmbeddingService(
-            @Value("${GEMINI_API_KEY}") String apiKey,
-            @Value("${rag.embedding-model:gemini-embedding-001}") String model) {
-        this.apiKey = apiKey;
-        this.model = model;
-        this.embeddingClient = WebClient.builder()
-                .baseUrl(EMBEDDING_BASE_URL)
-                .defaultHeader("Content-Type", "application/json")
+            @Value("${JINA_API_KEY:${GEMINI_API_KEY}}") String apiKey,
+            @Value("${rag.embedding-model:jina-embeddings-v3}") String model) {
+        this.apiKey = apiKey.strip();
+        this.model = model.strip();
+        this.httpClient = HttpClient.newBuilder()
+                .connectTimeout(TIMEOUT)
                 .build();
+        log.info("EmbeddingService initialized with model: {}", this.model);
     }
 
     /**
-     * Returns a 768-dim embedding vector for a single text.
-     * Retries with exponential backoff on 429. Returns null on failure.
+     * Returns a 768-dim embedding vector for a single query text (task=retrieval.query).
      */
     public float[] embed(String text) {
         if (text == null || text.isBlank()) return null;
-        List<float[]> results = embedBatch(List.of(text.strip()));
-        return results.isEmpty() ? null : results.get(0);
+        List<float[]> results = embedBatch(List.of(text.strip()), "retrieval.query");
+        return (results != null && !results.isEmpty()) ? results.get(0) : null;
     }
 
     /**
-     * Returns 768-dim embedding vectors for a batch of texts (up to 100).
-     * Uses batchEmbedContents API — 1 HTTP request for up to 100 texts.
-     * Retries with exponential backoff on 429. Returns empty list on total failure.
-     * Individual null entries in the returned list indicate per-item failures.
+     * Returns 768-dim embedding vectors for a batch of passage texts (task=retrieval.passage).
      */
     public List<float[]> embedBatch(List<String> texts) {
+        return embedBatch(texts, "retrieval.passage");
+    }
+
+    public List<float[]> embedBatch(List<String> texts, String task) {
         if (texts == null || texts.isEmpty()) return Collections.emptyList();
 
-        // Check cache first — only call API for uncached texts
         List<String> stripped = texts.stream().map(String::strip).toList();
         List<float[]> result = new ArrayList<>(Collections.nCopies(stripped.size(), null));
 
@@ -83,95 +83,75 @@ public class EmbeddingService {
 
         if (uncachedIndices.isEmpty()) return result;
 
-        // Build batch request for uncached texts only
-        List<Map<String, Object>> requests = new ArrayList<>();
-        for (int idx : uncachedIndices) {
-            requests.add(Map.of(
-                    "model", "models/" + model,
-                    "content", Map.of("parts", new Object[]{Map.of("text", stripped.get(idx))}),
-                    "outputDimensionality", 768
-            ));
-        }
+        List<String> uncachedTexts = uncachedIndices.stream().map(stripped::get).toList();
 
-        long backoffMs = 10000; // start at 10s, doubles: 10→20→40→80→160
-        for (int attempt = 1; attempt <= 6; attempt++) {
-            try {
-                String uri = "/v1beta/models/" + model + ":batchEmbedContents";
-                Map<String, Object> body = Map.of("requests", requests);
+        try {
+            Map<String, Object> body = Map.of(
+                    "model", model,
+                    "task", task,
+                    "dimensions", 768,
+                    "input", uncachedTexts
+            );
 
-                String rawResponse = embeddingClient.post()
-                        .uri(uri)
-                        .header("x-goog-api-key", apiKey)
-                        .bodyValue(body)
-                        .retrieve()
-                        .bodyToMono(String.class)
-                        .block(TIMEOUT);
+            String jsonBody = objectMapper.writeValueAsString(body);
 
-                List<float[]> vectors = parseBatchEmbedding(rawResponse);
-                if (vectors.size() != uncachedIndices.size()) {
-                    log.warn("EmbeddingService: batch response size mismatch ({} vs {})",
-                            vectors.size(), uncachedIndices.size());
-                }
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(JINA_API_URL))
+                    .header("Authorization", "Bearer " + apiKey)
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                    .timeout(TIMEOUT)
+                    .build();
 
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                List<float[]> vectors = parseJinaEmbedding(response.body());
                 for (int i = 0; i < uncachedIndices.size() && i < vectors.size(); i++) {
                     float[] v = vectors.get(i);
                     int originalIdx = uncachedIndices.get(i);
                     result.set(originalIdx, v);
                     if (v != null) cache.put(stripped.get(originalIdx), v);
                 }
-
                 return result;
-
-            } catch (Exception e) {
-                String msg = e.getMessage() != null ? e.getMessage() : "";
-                boolean isRateLimit = msg.contains("429") || msg.contains("Too Many Requests");
-
-                if (isRateLimit && attempt < 6) {
-                    log.warn("EmbeddingService: 429 rate-limit on batch (attempt {}/6), backing off {}ms",
-                            attempt, backoffMs);
-                    try { Thread.sleep(backoffMs); } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                        return result;
-                    }
-                    backoffMs = Math.min(backoffMs * 2, 180_000); // cap at 3 min
-                } else {
-                    log.warn("EmbeddingService: batch embed failed (size={}, attempt {}): {}",
-                            uncachedIndices.size(), attempt, msg);
-                    return result; // partial result — nulls for uncached items
-                }
             }
+
+            log.error("EmbeddingService: Jina AI error status {}: {}", response.statusCode(), response.body());
+            return result;
+
+        } catch (Exception e) {
+            log.error("EmbeddingService: request to Jina AI failed: {}", e.getMessage());
+            return result;
         }
-        return result;
     }
 
-    private List<float[]> parseBatchEmbedding(String rawResponse) {
+    private List<float[]> parseJinaEmbedding(String rawResponse) {
         List<float[]> results = new ArrayList<>();
         try {
             JsonNode root = objectMapper.readTree(rawResponse);
-            JsonNode embeddings = root.path("embeddings");
-            if (!embeddings.isArray()) {
-                log.warn("EmbeddingService: unexpected batch response — no embeddings array");
+            JsonNode data = root.path("data");
+            if (!data.isArray()) {
+                log.warn("EmbeddingService: unexpected response — no data array");
                 return results;
             }
-            for (JsonNode embedding : embeddings) {
-                JsonNode values = embedding.path("values");
-                if (!values.isArray() || values.isEmpty()) {
+            for (JsonNode item : data) {
+                JsonNode embedding = item.path("embedding");
+                if (!embedding.isArray() || embedding.isEmpty()) {
                     results.add(null);
                     continue;
                 }
-                float[] vector = new float[values.size()];
-                for (int i = 0; i < values.size(); i++) {
-                    vector[i] = (float) values.get(i).asDouble();
+                float[] vector = new float[embedding.size()];
+                for (int i = 0; i < embedding.size(); i++) {
+                    vector[i] = (float) embedding.get(i).asDouble();
                 }
                 results.add(vector);
             }
         } catch (Exception e) {
-            log.warn("EmbeddingService: failed to parse batch embedding response: {}", e.getMessage());
+            log.warn("EmbeddingService: failed to parse Jina response: {}", e.getMessage());
         }
         return results;
     }
 
-    /** Clears the in-memory cache (useful for testing or memory pressure). */
     public void clearCache() {
         cache.clear();
     }

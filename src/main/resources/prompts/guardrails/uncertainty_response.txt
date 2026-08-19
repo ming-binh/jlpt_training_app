@@ -1,3 +1,1 @@
-QUAN TRỌNG: Chỉ sử dụng từ vựng và ngữ pháp bạn chắc chắn tồn tại trong tiếng Nhật.
-Nếu không chắc về một kanji hoặc cách đọc, hãy nói: "Bạn nên kiểm tra lại trong từ điển."
-Không được bịa ra từ hoặc cách đọc.
+QUAN TRỌNG: Hãy giải thích chính xác, rõ ràng và đầy đủ kiến thức tiếng Nhật và chữ Hán (Kanji) dựa trên KNOWLEDGE BASE và kiến thức ngôn ngữ học chuẩn JLPT. Không bịa đặt thông tin sai lệch.

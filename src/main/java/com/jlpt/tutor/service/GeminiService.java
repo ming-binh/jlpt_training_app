@@ -1,11 +1,9 @@
 package com.jlpt.tutor.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jlpt.tutor.dto.*;
-import com.jlpt.tutor.exception.AiResponseException;
 import com.jlpt.tutor.model.AiUseCase;
 import com.jlpt.tutor.model.Message;
 import com.jlpt.tutor.model.RagDocument;
@@ -14,6 +12,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
+
+import io.netty.resolver.DefaultAddressResolverGroup;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import reactor.netty.http.client.HttpClient;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -37,7 +39,7 @@ public class GeminiService {
     @Value("${GROQ_API_KEY:}")
     private String groqApiKey;
 
-    @Value("${GROQ_MODEL:llama-3.3-70b-versatile}")
+    @Value("${GROQ_MODEL:openai/gpt-oss-120b}")
     private String groqModel;
 
     @Value("${rag.enabled:false}")
@@ -51,7 +53,7 @@ public class GeminiService {
 
     public GeminiService(WebClient webClient,
                          PromptBuilder promptBuilder,
-                         @Value("${GEMINI_MODEL:gemini-1.5-flash}") String model,
+                         @Value("${GEMINI_MODEL:gemini-2.5-flash}") String model,
                          ConversationManager conversationManager,
                          AiMetricsService metricsService,
                          EmbeddingService embeddingService,
@@ -76,23 +78,38 @@ public class GeminiService {
         }
 
         String reqModel = request.getModel();
+        AiResponse response = null;
+
         if (reqModel != null && !reqModel.isBlank()) {
             String trimmedModel = reqModel.trim();
             if (trimmedModel.toLowerCase().startsWith("gemini")) {
-                return chatWithGemini(request, useCase, start, trimmedModel);
+                response = chatWithGemini(request, useCase, start, trimmedModel);
+                if (isErrorFallback(response)) {
+                    log.warn("Gemini model {} failed, falling back to Groq openai/gpt-oss-120b", trimmedModel);
+                    response = chatWithGroq(request, useCase, start, "openai/gpt-oss-120b");
+                }
             } else {
-                return chatWithGroq(request, useCase, start, trimmedModel);
+                response = chatWithGroq(request, useCase, start, trimmedModel);
+                if (isErrorFallback(response)) {
+                    log.warn("Groq model {} failed, falling back to Gemini gemini-2.5-flash", trimmedModel);
+                    response = chatWithGemini(request, useCase, start, "gemini-2.5-flash");
+                }
+            }
+        } else {
+            response = chatWithGemini(request, useCase, start, this.model);
+            if (isErrorFallback(response)) {
+                log.warn("Gemini default model {} failed, falling back to Groq openai/gpt-oss-120b", this.model);
+                response = chatWithGroq(request, useCase, start, "openai/gpt-oss-120b");
             }
         }
 
-        String cleanApiKey = getCleanGroqApiKey();
-        // If Groq API key is present and valid, use Groq default
-        if (cleanApiKey.startsWith("gsk_")) {
-            return chatWithGroq(request, useCase, start, getCleanGroqModel());
-        }
+        return (response != null) ? response : AiResponse.fallback("Xin lỗi, Sensei chưa xử lý được câu hỏi. Bạn vui lòng thử lại nhé!");
+    }
 
-        // Fallback to Gemini default
-        return chatWithGemini(request, useCase, start, this.model);
+    private boolean isErrorFallback(AiResponse response) {
+        if (response == null || response.getMessage() == null) return true;
+        String msg = response.getMessage();
+        return msg.contains("Lỗi kết nối") || msg.contains("Không nhận được phản hồi");
     }
 
     /**
@@ -106,18 +123,17 @@ public class GeminiService {
         String userMessage = extractUserMessage(request);
         if (userMessage.isBlank()) return;
 
-        String jlptLevel = request.getUserContext() != null
-                ? request.getUserContext().get("jlpt_level")
-                : null;
+        // Search across all JLPT levels (N5-N1) so questions about any kanji, vocab, or grammar find matching DB records
+        String jlptLevel = null;
 
         try {
             float[] queryVector = embeddingService.embed(userMessage);
             if (queryVector == null) return;
 
-            List<RagDocument> docs = vectorSearchService.search(queryVector, jlptLevel, ragTopK);
-            if (!docs.isEmpty()) {
+            List<RagDocument> docs = vectorSearchService.search(queryVector, userMessage, jlptLevel, ragTopK);
+            if (docs != null && !docs.isEmpty()) {
                 request.setRagContext(docs);
-                log.debug("RAG context: {} documents retrieved for useCase={}", docs.size(), useCase);
+                log.info("RAG enrichment: {} knowledge docs attached for query='{}'", docs.size(), userMessage);
             }
         } catch (Exception e) {
             log.warn("RAG enrichment failed (non-fatal): {}", e.getMessage());
@@ -130,7 +146,7 @@ public class GeminiService {
     }
 
     private String getCleanGroqModel() {
-        if (groqModel == null || groqModel.isBlank()) return "llama-3.3-70b-versatile";
+        if (groqModel == null || groqModel.isBlank()) return "openai/gpt-oss-120b";
         return groqModel.replaceAll("^[\"']|[\"']$", "").trim();
     }
 
@@ -139,25 +155,38 @@ public class GeminiService {
         String cleanModel = (targetModel != null && !targetModel.isBlank()) ? targetModel.trim() : getCleanGroqModel();
         String cleanApiKey = getCleanGroqApiKey();
         log.info("Calling Groq AI API with model {}...", cleanModel);
-        WebClient groqClient = WebClient.builder().build();
+        HttpClient httpClient = HttpClient.create()
+                .resolver(DefaultAddressResolverGroup.INSTANCE)
+                .responseTimeout(Duration.ofSeconds(30));
+        WebClient groqClient = WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .build();
 
         List<Map<String, String>> messages = new ArrayList<>();
         String prompt = promptBuilder.build(request);
         messages.add(Map.of("role", "system", "content", prompt + "\n\nCRITICAL: You MUST output your response strictly as a valid JSON object."));
 
-        if (useCase == AiUseCase.CONVERSATION && request.getHistory() != null && !request.getHistory().isEmpty()) {
-            String userMessage = extractUserMessage(request);
+        String userMessage = extractUserMessage(request);
+        if (request.getHistory() != null && !request.getHistory().isEmpty()) {
             List<Message> context = conversationManager.buildContext(request.getHistory(), userMessage);
-            for (Message msg : context) {
+            for (int i = 0; i < context.size(); i++) {
+                Message msg = context.get(i);
                 String role = "model".equals(msg.getRole()) || "assistant".equals(msg.getRole()) ? "assistant" : "user";
-                messages.add(Map.of("role", role, "content", msg.getContent()));
+                String content = msg.getContent();
+                if (i == context.size() - 1 && "user".equals(role)) {
+                    content += "\n(Respond strictly in JSON format)";
+                }
+                messages.add(Map.of("role", role, "content", content));
             }
+        } else {
+            messages.add(Map.of("role", "user", "content", userMessage + "\n(Respond strictly in JSON format)"));
         }
 
         Map<String, Object> body = new HashMap<>();
         body.put("model", cleanModel);
         body.put("messages", messages);
         body.put("temperature", getTemperature(useCase));
+        body.put("max_tokens", 2048);
         body.put("response_format", Map.of("type", "json_object"));
 
         for (int attempt = 0; attempt <= MAX_RETRIES; attempt++) {
@@ -267,40 +296,40 @@ public class GeminiService {
     // ---- Helpers ----
 
     private GeminiRequestDto buildRequest(AiRequest request, AiUseCase useCase) {
+        String systemPrompt = promptBuilder.build(request);
+        Content systemInstruction = Content.builder()
+                .parts(List.of(Part.text(systemPrompt)))
+                .build();
+
+        String userMessage = extractUserMessage(request);
         List<Content> contents;
 
-        if (useCase == AiUseCase.CONVERSATION && request.getHistory() != null && !request.getHistory().isEmpty()) {
-            contents = buildConversationContents(request);
+        if (request.getHistory() != null && !request.getHistory().isEmpty()) {
+            List<Message> context = conversationManager.buildContext(request.getHistory(), userMessage);
+            contents = new ArrayList<>();
+            for (Message msg : context) {
+                String role = mapRole(msg.getRole());
+                contents.add(Content.builder()
+                        .role(role)
+                        .parts(List.of(Part.text(msg.getContent())))
+                        .build());
+            }
         } else {
-            String prompt = promptBuilder.build(request);
             contents = List.of(Content.builder()
                     .role("user")
-                    .parts(List.of(Part.text(prompt)))
+                    .parts(List.of(Part.text(userMessage)))
                     .build());
         }
 
         return GeminiRequestDto.builder()
+                .systemInstruction(systemInstruction)
                 .contents(contents)
                 .generationConfig(GenerationConfig.builder()
                         .responseMimeType("application/json")
                         .temperature(getTemperature(useCase))
-                        .maxOutputTokens(2048)
+                        .maxOutputTokens(8192)
                         .build())
                 .build();
-    }
-
-    private List<Content> buildConversationContents(AiRequest request) {
-        String userMessage = extractUserMessage(request);
-        List<Message> context = conversationManager.buildContext(request.getHistory(), userMessage);
-        List<Content> contents = new ArrayList<>();
-        for (Message msg : context) {
-            String role = mapRole(msg.getRole());
-            contents.add(Content.builder()
-                    .role(role)
-                    .parts(List.of(Part.text(msg.getContent())))
-                    .build());
-        }
-        return contents;
     }
 
     private String mapRole(String role) {
@@ -320,28 +349,26 @@ public class GeminiService {
             return null;
         }
         try {
-            String cleaned = textContent.replaceAll("<thinking>[\\s\\S]*?</thinking>", "").trim();
-            AiResponse response = objectMapper.readValue(cleaned, AiResponse.class);
-            if (response.getMessage() == null || response.getMessage().isBlank()) {
-                throw new AiResponseException("Empty message from AI");
+            String cleaned = textContent
+                    .replaceAll("(?s)<thinking>.*?</thinking>", "")
+                    .replaceAll("(?s)<think>.*?</think>", "")
+                    .trim();
+            if (cleaned.startsWith("```json")) {
+                cleaned = cleaned.substring(7);
+            } else if (cleaned.startsWith("```")) {
+                cleaned = cleaned.substring(3);
             }
-            return response;
-        } catch (AiResponseException e) {
-            log.error("Validation error: {}", e.getMessage());
-            return null;
-        } catch (JsonProcessingException e) {
-            log.error("Failed to parse AI response as JSON: {}", e.getMessage());
-            try {
-                String cleaned = textContent.replaceAll("<thinking>[\\s\\S]*?</thinking>", "").trim();
-                return objectMapper.readValue(
-                        "{\"message\":\"" + escapeJson(cleaned) + "\"}",
-                        AiResponse.class);
-            } catch (Exception ex) {
-                return null;
+            if (cleaned.endsWith("```")) {
+                cleaned = cleaned.substring(0, cleaned.length() - 3);
             }
+            cleaned = cleaned.trim();
+
+            return objectMapper.readValue(cleaned, AiResponse.class);
         } catch (Exception e) {
-            log.error("Unexpected error parsing AI response: {}", e.getMessage());
-            return null;
+            log.warn("Failed to parse JSON into AiResponse, creating direct message wrapper. Raw: {}", textContent);
+            return AiResponse.builder()
+                    .message(textContent)
+                    .build();
         }
     }
 
@@ -371,6 +398,7 @@ public class GeminiService {
     }
 
     private float getTemperature(AiUseCase useCase) {
+        if (useCase == null) return 0.5f;
         return switch (useCase) {
             case GRAMMAR_EXPLAIN -> 0.3f;
             case WRITING_CHECK -> 0.2f;
@@ -384,18 +412,9 @@ public class GeminiService {
         if (request.getParams() != null && request.getParams().containsKey("user_message")) {
             return request.getParams().get("user_message");
         }
-        if (request.getParams() != null) {
+        if (request.getParams() != null && !request.getParams().isEmpty()) {
             return String.join(" ", request.getParams().values());
         }
         return "";
-    }
-
-    private String escapeJson(String s) {
-        if (s == null) return "";
-        return s.replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t");
     }
 }
