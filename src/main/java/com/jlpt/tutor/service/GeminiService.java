@@ -8,6 +8,7 @@ import com.jlpt.tutor.dto.*;
 import com.jlpt.tutor.exception.AiResponseException;
 import com.jlpt.tutor.model.AiUseCase;
 import com.jlpt.tutor.model.Message;
+import com.jlpt.tutor.model.RagDocument;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -30,12 +31,20 @@ public class GeminiService {
     private final String model;
     private final ConversationManager conversationManager;
     private final AiMetricsService metricsService;
+    private final EmbeddingService embeddingService;
+    private final VectorSearchService vectorSearchService;
 
     @Value("${GROQ_API_KEY:}")
     private String groqApiKey;
 
     @Value("${GROQ_MODEL:llama-3.3-70b-versatile}")
     private String groqModel;
+
+    @Value("${rag.enabled:false}")
+    private boolean ragEnabled;
+
+    @Value("${rag.top-k:3}")
+    private int ragTopK;
 
     private static final int MAX_RETRIES = 2;
     private static final Duration RETRY_DELAY = Duration.ofMillis(500);
@@ -44,27 +53,75 @@ public class GeminiService {
                          PromptBuilder promptBuilder,
                          @Value("${GEMINI_MODEL:gemini-1.5-flash}") String model,
                          ConversationManager conversationManager,
-                         AiMetricsService metricsService) {
+                         AiMetricsService metricsService,
+                         EmbeddingService embeddingService,
+                         VectorSearchService vectorSearchService) {
         this.webClient = webClient;
         this.promptBuilder = promptBuilder;
         this.objectMapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         this.model = model;
         this.conversationManager = conversationManager;
         this.metricsService = metricsService;
+        this.embeddingService = embeddingService;
+        this.vectorSearchService = vectorSearchService;
     }
 
     public AiResponse chat(AiRequest request) {
         long start = System.currentTimeMillis();
         AiUseCase useCase = request.getUseCase() != null ? request.getUseCase() : AiUseCase.CONVERSATION;
 
-        String cleanApiKey = getCleanGroqApiKey();
-        // If Groq API key is present and valid, use Groq
-        if (cleanApiKey.startsWith("gsk_")) {
-            return chatWithGroq(request, useCase, start);
+        // RAG enrichment: retrieve relevant knowledge before building the prompt
+        if (ragEnabled) {
+            enrichWithRagContext(request, useCase);
         }
 
-        // Fallback to Gemini
-        return chatWithGemini(request, useCase, start);
+        String reqModel = request.getModel();
+        if (reqModel != null && !reqModel.isBlank()) {
+            String trimmedModel = reqModel.trim();
+            if (trimmedModel.toLowerCase().startsWith("gemini")) {
+                return chatWithGemini(request, useCase, start, trimmedModel);
+            } else {
+                return chatWithGroq(request, useCase, start, trimmedModel);
+            }
+        }
+
+        String cleanApiKey = getCleanGroqApiKey();
+        // If Groq API key is present and valid, use Groq default
+        if (cleanApiKey.startsWith("gsk_")) {
+            return chatWithGroq(request, useCase, start, getCleanGroqModel());
+        }
+
+        // Fallback to Gemini default
+        return chatWithGemini(request, useCase, start, this.model);
+    }
+
+    /**
+     * Embeds the user's message and retrieves top-K relevant JLPT knowledge documents.
+     * Sets ragContext on the request so PromptBuilder can inject it into the prompt.
+     * Failures are non-fatal — if embedding or search fails, ragContext remains null.
+     */
+    private void enrichWithRagContext(AiRequest request, AiUseCase useCase) {
+        if (useCase == AiUseCase.WRITING_CHECK || useCase == AiUseCase.MOCK_ANALYSIS) return;
+
+        String userMessage = extractUserMessage(request);
+        if (userMessage.isBlank()) return;
+
+        String jlptLevel = request.getUserContext() != null
+                ? request.getUserContext().get("jlpt_level")
+                : null;
+
+        try {
+            float[] queryVector = embeddingService.embed(userMessage);
+            if (queryVector == null) return;
+
+            List<RagDocument> docs = vectorSearchService.search(queryVector, jlptLevel, ragTopK);
+            if (!docs.isEmpty()) {
+                request.setRagContext(docs);
+                log.debug("RAG context: {} documents retrieved for useCase={}", docs.size(), useCase);
+            }
+        } catch (Exception e) {
+            log.warn("RAG enrichment failed (non-fatal): {}", e.getMessage());
+        }
     }
 
     private String getCleanGroqApiKey() {
@@ -78,8 +135,8 @@ public class GeminiService {
     }
 
     // ---- Groq AI Engine ----
-    private AiResponse chatWithGroq(AiRequest request, AiUseCase useCase, long start) {
-        String cleanModel = getCleanGroqModel();
+    private AiResponse chatWithGroq(AiRequest request, AiUseCase useCase, long start, String targetModel) {
+        String cleanModel = (targetModel != null && !targetModel.isBlank()) ? targetModel.trim() : getCleanGroqModel();
         String cleanApiKey = getCleanGroqApiKey();
         log.info("Calling Groq AI API with model {}...", cleanModel);
         WebClient groqClient = WebClient.builder().build();
@@ -134,11 +191,13 @@ public class GeminiService {
     }
 
     // ---- Gemini AI Engine ----
-    private AiResponse chatWithGemini(AiRequest request, AiUseCase useCase, long start) {
+    private AiResponse chatWithGemini(AiRequest request, AiUseCase useCase, long start, String targetModel) {
+        String effectiveModel = (targetModel != null && !targetModel.isBlank()) ? targetModel.trim() : this.model;
+        log.info("Calling Gemini AI API with model {}...", effectiveModel);
         for (int attempt = 0; attempt <= MAX_RETRIES; attempt++) {
             try {
                 GeminiRequestDto geminiRequest = buildRequest(request, useCase);
-                String uri = "/v1beta/models/" + model + ":generateContent";
+                String uri = "/v1beta/models/" + effectiveModel + ":generateContent";
 
                 String rawResponse = webClient.post()
                         .uri(uri)
@@ -189,7 +248,8 @@ public class GeminiService {
     public Flux<String> chatStream(AiRequest request) {
         AiUseCase useCase = request.getUseCase() != null ? request.getUseCase() : AiUseCase.CONVERSATION;
         GeminiRequestDto geminiRequest = buildRequest(request, useCase);
-        String uri = "/v1beta/models/" + model + ":streamGenerateContent";
+        String effectiveModel = (request.getModel() != null && !request.getModel().isBlank()) ? request.getModel().trim() : this.model;
+        String uri = "/v1beta/models/" + effectiveModel + ":streamGenerateContent";
 
         return webClient.post()
                 .uri(uri)

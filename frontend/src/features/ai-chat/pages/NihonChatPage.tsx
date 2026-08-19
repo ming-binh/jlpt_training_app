@@ -19,6 +19,10 @@ import remarkGfm from "remark-gfm";
 import { AppHeader } from "@/components/common/app-header";
 import { chatService, AiUseCase, type ConversationItem } from "@/services/chat.service";
 import { supabase } from "@/lib/supabase";
+import {
+  AiModelSelector,
+  getSavedAiModel,
+} from "@/features/ai-chat/components/AiModelSelector";
 
 interface MessageItem {
   id: string;
@@ -41,6 +45,7 @@ export function NihonChatPage() {
   const [messages, setMessages] = useState<MessageItem[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<string>(() => getSavedAiModel());
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [editingConvId, setEditingConvId] = useState<string | null>(null);
@@ -182,6 +187,7 @@ export function NihonChatPage() {
       const res = await chatService.sendMessage({
         useCase: AiUseCase.GRAMMAR_EXPLAIN,
         conversationId: conversationId || undefined,
+        model: selectedModel,
         params: {
           user_message: query,
           grammar_point: query,
@@ -487,18 +493,27 @@ export function NihonChatPage() {
                 e.preventDefault();
                 handleSend();
               }}
-              className="surface-card flex items-center gap-2 p-2 focus-within:ring-2 focus-within:ring-ring border border-border/50 shadow-lg"
+              className="surface-card relative flex items-center gap-2 p-1.5 sm:p-2 rounded-2xl focus-within:ring-2 focus-within:ring-ring border border-border/50 shadow-lg"
             >
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Nhập câu hỏi cho Sensei AI…"
-                className="flex-1 bg-transparent px-4 py-2.5 text-sm outline-none placeholder:text-muted-foreground"
+                className="flex-1 bg-transparent px-3 py-2 text-sm outline-none placeholder:text-muted-foreground min-w-0"
               />
+
+              {/* Model Selection Dropdown (similar to ChatGPT / Gemini model picker) */}
+              <AiModelSelector
+                selectedModelId={selectedModel}
+                onSelectModel={(model) => setSelectedModel(model.id)}
+                disabled={loading}
+              />
+
               <button
                 type="submit"
                 disabled={!input.trim() || loading}
-                className="grid size-10 place-items-center rounded-xl bg-accent text-accent-foreground transition-transform hover:scale-105 disabled:opacity-40 cursor-pointer shrink-0"
+                className="grid size-9 sm:size-10 place-items-center rounded-xl bg-accent text-accent-foreground transition-transform hover:scale-105 disabled:opacity-40 cursor-pointer shrink-0"
+                title="Gửi tin nhắn"
               >
                 <Send className="size-4" />
               </button>

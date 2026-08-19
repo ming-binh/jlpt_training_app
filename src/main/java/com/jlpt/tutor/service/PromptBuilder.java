@@ -2,6 +2,7 @@ package com.jlpt.tutor.service;
 
 import com.jlpt.tutor.dto.AiRequest;
 import com.jlpt.tutor.model.AiUseCase;
+import com.jlpt.tutor.model.RagDocument;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +12,9 @@ import org.springframework.util.StreamUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -53,15 +56,31 @@ public class PromptBuilder {
     @Value("classpath:prompts/guardrails/uncertainty_response.txt")
     private Resource uncertaintyResponse;
 
+    @Value("classpath:prompts/rag_context_block.txt")
+    private Resource ragContextTemplate;
+
     public String build(AiRequest request) {
         String master = loadAndFill(masterSystemPrompt, request.getUserContext());
         String template = loadTemplate(request.getUseCase(), request.getUserId());
         String filled = fillTemplate(template, request.getParams());
 
+        String ragBlock = buildRagBlock(request.getRagContext());
         String guardrails = loadGuardrails();
         String fewShot = request.getUseCase().needsFewShot() ? loadFewShot(request.getUseCase()) : "";
 
-        return String.join("\n\n", master, guardrails, fewShot, filled);
+        if (ragBlock.isEmpty()) {
+            return String.join("\n\n", master, guardrails, fewShot, filled);
+        }
+        return String.join("\n\n", master, ragBlock, guardrails, fewShot, filled);
+    }
+
+    private String buildRagBlock(List<RagDocument> ragContext) {
+        if (ragContext == null || ragContext.isEmpty()) return "";
+        String entries = ragContext.stream()
+                .map(RagDocument::toPromptLine)
+                .collect(Collectors.joining("\n"));
+        String template = readResource(ragContextTemplate);
+        return template.replace("{{rag_entries}}", entries);
     }
 
     private String loadAndFill(Resource resource, Map<String, String> params) {

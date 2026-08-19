@@ -13,6 +13,7 @@ export type AiUseCase = (typeof AiUseCase)[keyof typeof AiUseCase];
 export interface ChatRequest {
   useCase: AiUseCase;
   conversationId?: string;
+  model?: string;
   params: {
     user_message: string;
     [key: string]: any;

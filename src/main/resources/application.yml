@@ -30,6 +30,11 @@ ai:
     conversation-per-day: 10
     explanation-per-day: 50
 
+rag:
+  enabled: ${RAG_ENABLED:false}
+  top-k: ${RAG_TOP_K:3}
+  embedding-model: ${GEMINI_EMBEDDING_MODEL:text-embedding-004}
+
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}

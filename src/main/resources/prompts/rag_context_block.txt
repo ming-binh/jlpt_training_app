@@ -1,0 +1,6 @@
+[KNOWLEDGE BASE - Tài liệu tham khảo chính xác từ hệ thống]
+Dưới đây là các mục liên quan được tra cứu từ cơ sở dữ liệu JLPT. Ưu tiên sử dụng thông tin này khi trả lời. Không bịa thêm chi tiết ngoài phạm vi bên dưới.
+
+{{rag_entries}}
+
+[/KNOWLEDGE BASE]

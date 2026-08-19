@@ -86,3 +86,36 @@ X-User-Id: user-001
     "user_message": "thời tiết hôm nay thế nào?"
   }
 }
+
+###
+# ==============================================================================
+# RAG ADMIN ENDPOINTS (Requires ADMIN JWT Token)
+# ==============================================================================
+
+### 6. Đăng nhập lấy Token (hoặc lấy token từ localStorage trên frontend)
+# @name loginAdmin
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "your_password"
+}
+
+###
+@authToken = {{loginAdmin.response.body.token}}
+
+### 7. Kiểm tra trạng thái RAG Indexing (Trước khi Index)
+GET http://localhost:8080/api/admin/rag/status
+Authorization: Bearer {{authToken}}
+
+###
+### 8. Kích hoạt Full Indexing (Vectorize toàn bộ Grammar, Vocab, Kanji)
+POST http://localhost:8080/api/admin/rag/index
+Authorization: Bearer {{authToken}}
+
+###
+### 9. Kiểm tra lại trạng thái RAG Indexing (Sau khi Index)
+GET http://localhost:8080/api/admin/rag/status
+Authorization: Bearer {{authToken}}
+
