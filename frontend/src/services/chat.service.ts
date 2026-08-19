@@ -38,7 +38,8 @@ export interface ConversationItem {
 }
 
 export interface MessageHistoryItem {
-  role: 'user' | 'model' | 'assistant';
+  id?: string;
+  role: 'user' | 'model' | 'assistant' | 'system';
   content: string;
   createdAt?: string;
 }

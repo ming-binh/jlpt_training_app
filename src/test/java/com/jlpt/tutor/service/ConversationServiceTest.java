@@ -115,4 +115,28 @@ class ConversationServiceTest {
 
         assertEquals(2, result.size());
     }
+
+    @Test
+    void testDeleteConversation_Success() {
+        Conversation conv = Conversation.builder().id("conv-123").userId("user-001").build();
+        when(conversationRepository.findById("conv-123")).thenReturn(Optional.of(conv));
+
+        boolean deleted = conversationService.deleteConversation("conv-123", "user-001");
+
+        assertTrue(deleted);
+        verify(chatMessageRepository).deleteByConversationId("conv-123");
+        verify(conversationRepository).deleteConversationById("conv-123");
+    }
+
+    @Test
+    void testUpdateTitle_Success() {
+        Conversation conv = Conversation.builder().id("conv-123").userId("user-001").title("Old Title").build();
+        when(conversationRepository.findById("conv-123")).thenReturn(Optional.of(conv));
+
+        boolean updated = conversationService.updateTitle("conv-123", "New Title", "user-001");
+
+        assertTrue(updated);
+        assertEquals("New Title", conv.getTitle());
+        verify(conversationRepository).save(conv);
+    }
 }

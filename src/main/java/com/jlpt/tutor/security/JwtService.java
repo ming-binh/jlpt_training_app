@@ -48,10 +48,11 @@ public class JwtService {
     }
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        return claimsResolver.apply(extractAllClaims(token));
+        Claims claims = extractAllClaims(token);
+        if (claims == null) return null;
+        return claimsResolver.apply(claims);
     }
 
-    /** Returns true if the token was issued by Supabase Auth. */
     /** Returns true if the token was issued by Supabase Auth. */
     public boolean isSupabaseToken(String token) {
         try {
@@ -98,13 +99,21 @@ public class JwtService {
     // ── Private helpers ───────────────────────────────────────────────────────
 
     private Claims extractAllClaims(String token) {
+        if (token == null || token.isBlank()) {
+            return null;
+        }
+        String cleanToken = token.trim();
+        if (cleanToken.startsWith("Bearer ")) {
+            cleanToken = cleanToken.substring(7).trim();
+        }
+
         // 1. Try Supabase secret if configured (HS256)
         if (supabaseJwtSecret != null && !supabaseJwtSecret.isBlank()) {
             try {
                 return Jwts.parserBuilder()
                         .setSigningKey(getSupabaseKey())
                         .build()
-                        .parseClaimsJws(token)
+                        .parseClaimsJws(cleanToken)
                         .getBody();
             } catch (Exception ignored) {
             }
@@ -115,19 +124,26 @@ public class JwtService {
                 return Jwts.parserBuilder()
                         .setSigningKey(getLegacyKey())
                         .build()
-                        .parseClaimsJws(token)
+                        .parseClaimsJws(cleanToken)
                         .getBody();
             } catch (Exception ignored) {
             }
         }
         // 3. Fallback for ES256 tokens signed by Supabase Auth (parse unverified payload)
-        return parseUnverifiedClaims(token);
+        return parseUnverifiedClaims(cleanToken);
     }
 
     @SuppressWarnings("unchecked")
     private Claims parseUnverifiedClaims(String token) {
         try {
-            String[] parts = token.split("\\.");
+            if (token == null) {
+                throw new IllegalArgumentException("Invalid JWT token format");
+            }
+            String cleanToken = token.trim();
+            if (cleanToken.startsWith("Bearer ")) {
+                cleanToken = cleanToken.substring(7).trim();
+            }
+            String[] parts = cleanToken.split("\\.");
             if (parts.length < 2) {
                 throw new IllegalArgumentException("Invalid JWT token format");
             }
@@ -138,6 +154,9 @@ public class JwtService {
             Map<String, Object> map = mapper.readValue(payloadJson, Map.class);
 
             Claims claims = Jwts.claims(map);
+            if (map.containsKey("sub") && map.get("sub") != null) {
+                claims.setSubject(String.valueOf(map.get("sub")));
+            }
             if (map.containsKey("exp") && map.get("exp") instanceof Number) {
                 long expSeconds = ((Number) map.get("exp")).longValue();
                 claims.setExpiration(new Date(expSeconds * 1000));

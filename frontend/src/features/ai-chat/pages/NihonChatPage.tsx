@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Send,
@@ -53,11 +53,12 @@ export function NihonChatPage() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const loadMessagesForConversation = (convId: string) => {
-    chatService.getMessages(convId).then((history) => {
-      if (history) {
+  const loadMessagesForConversation = useCallback(async (convId: string) => {
+    try {
+      const history = await chatService.getMessages(convId);
+      if (history && Array.isArray(history)) {
         const loadedMsgs: MessageItem[] = history.map((m, idx) => ({
-          id: String(idx),
+          id: m.id || String(idx),
           sender: m.role === "user" ? "user" : "ai",
           text: m.content,
           timestamp: m.createdAt
@@ -65,30 +66,39 @@ export function NihonChatPage() {
             : "",
         }));
         setMessages(loadedMsgs);
+      } else {
+        setMessages([]);
       }
-    });
+    } catch (err) {
+      console.error("Failed to load messages for conversation:", err);
+    }
+  }, []);
+
+  const refreshConversationList = async () => {
+    try {
+      const convs = await chatService.getConversations();
+      setConversations(convs || []);
+    } catch (err) {
+      console.warn("Could not refresh conversation list:", err);
+    }
   };
 
-  const fetchConversations = (selectConvId?: string) => {
-    chatService
-      .getConversations()
-      .then((convs) => {
-        setConversations(convs || []);
-        if (convs && convs.length > 0) {
-          const targetId = selectConvId || conversationId || convs[0].id;
-          const exists = convs.some((c) => c.id === targetId);
-          const finalId = exists ? targetId : convs[0].id;
-          setConversationId(finalId);
-          loadMessagesForConversation(finalId);
-        } else {
-          setConversationId(null);
-          setMessages([]);
-        }
-      })
-      .catch((err) => {
-        console.warn("Could not load conversations from server:", err);
-      });
-  };
+  const initialFetchConversations = useCallback(async () => {
+    try {
+      const convs = await chatService.getConversations();
+      setConversations(convs || []);
+      if (convs && convs.length > 0) {
+        const firstId = convs[0].id;
+        setConversationId(firstId);
+        await loadMessagesForConversation(firstId);
+      } else {
+        setConversationId(null);
+        setMessages([]);
+      }
+    } catch (err) {
+      console.warn("Could not load conversations from server:", err);
+    }
+  }, [loadMessagesForConversation]);
 
   // Require user authentication for AI Chat
   useEffect(() => {
@@ -99,10 +109,10 @@ export function NihonChatPage() {
         const name = data.user.user_metadata?.name || data.user.email?.split("@")[0] || "Học Viên";
         setUserName(name);
         setCheckingAuth(false);
-        fetchConversations();
+        initialFetchConversations();
       }
     });
-  }, [navigate]);
+  }, [navigate, initialFetchConversations]);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -116,6 +126,7 @@ export function NihonChatPage() {
 
   const handleSelectConversation = (convId: string) => {
     if (editingConvId) return; // Ignore selection during inline edit
+    if (conversationId === convId) return;
     setConversationId(convId);
     loadMessagesForConversation(convId);
     setIsMobileSidebarOpen(false);
@@ -157,14 +168,16 @@ export function NihonChatPage() {
 
       if (conversationId === convId) {
         if (updatedConvs.length > 0) {
-          setConversationId(updatedConvs[0].id);
-          loadMessagesForConversation(updatedConvs[0].id);
+          const nextConvId = updatedConvs[0].id;
+          setConversationId(nextConvId);
+          await loadMessagesForConversation(nextConvId);
         } else {
           startNewChat();
         }
       }
     } catch (err) {
       console.error("Failed to delete conversation:", err);
+      alert("Không thể xóa cuộc trò chuyện. Vui lòng thử lại sau.");
     }
   };
 
@@ -197,9 +210,7 @@ export function NihonChatPage() {
         },
       });
 
-      let currentConvId = conversationId;
       if (res.conversationId) {
-        currentConvId = res.conversationId;
         setConversationId(res.conversationId);
       }
 
@@ -235,10 +246,8 @@ export function NihonChatPage() {
       };
       setMessages((prev) => [...prev, aiMsg]);
 
-      // Refresh sidebar conversation list to keep title & order updated
-      if (currentConvId) {
-        fetchConversations(currentConvId);
-      }
+      // Refresh sidebar list titles and ordering smoothly without clearing current messages
+      await refreshConversationList();
     } catch (err) {
       const aiMsg: MessageItem = {
         id: String(Date.now() + 1),
@@ -281,7 +290,7 @@ export function NihonChatPage() {
             />
             <button
               type="submit"
-              className="p-1 text-emerald-400 hover:text-emerald-300"
+              className="p-1 text-emerald-400 hover:text-emerald-300 cursor-pointer"
               title="Lưu"
             >
               <Check className="size-3" />
@@ -289,7 +298,7 @@ export function NihonChatPage() {
             <button
               type="button"
               onClick={() => setEditingConvId(null)}
-              className="p-1 text-rose-400 hover:text-rose-300"
+              className="p-1 text-rose-400 hover:text-rose-300 cursor-pointer"
               title="Hủy"
             >
               <X className="size-3" />
@@ -305,7 +314,7 @@ export function NihonChatPage() {
               <button
                 type="button"
                 onClick={(e) => handleStartRename(conv, e)}
-                className="p-1 text-muted-foreground hover:text-accent rounded transition-colors"
+                className="p-1 text-muted-foreground hover:text-accent rounded transition-colors cursor-pointer"
                 title="Đổi tên"
               >
                 <Edit2 className="size-3" />
@@ -313,7 +322,7 @@ export function NihonChatPage() {
               <button
                 type="button"
                 onClick={(e) => handleDeleteConversation(conv.id, e)}
-                className="p-1 text-muted-foreground hover:text-rose-400 rounded transition-colors"
+                className="p-1 text-muted-foreground hover:text-rose-400 rounded transition-colors cursor-pointer"
                 title="Xóa"
               >
                 <Trash2 className="size-3" />
@@ -344,7 +353,7 @@ export function NihonChatPage() {
       <AppHeader />
 
       <main className="flex-1 mx-auto w-full max-w-[1700px] px-4 md:px-6 py-4 flex gap-5 overflow-hidden relative">
-        {/* Desktop Sidebar (Pinned/Sticky full-height inside flex view) */}
+        {/* Desktop Sidebar */}
         <aside className="hidden md:flex md:w-72 lg:w-80 shrink-0 flex-col h-full surface-card p-4 rounded-2xl gap-3 overflow-hidden">
           <button
             type="button"
@@ -380,7 +389,7 @@ export function NihonChatPage() {
                 <button
                   type="button"
                   onClick={() => setIsMobileSidebarOpen(false)}
-                  className="p-1 rounded-lg hover:bg-secondary text-muted-foreground"
+                  className="p-1 rounded-lg hover:bg-secondary text-muted-foreground cursor-pointer"
                 >
                   <X className="size-5" />
                 </button>
