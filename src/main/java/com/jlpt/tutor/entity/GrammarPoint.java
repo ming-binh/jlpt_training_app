@@ -21,9 +21,10 @@ public class GrammarPoint {
     @Column(nullable = false)
     private String title; // e.g. "〜てもいいですか"
 
+    @Column(columnDefinition = "TEXT")
     private String structure; // e.g. "Verb て-form + もいいですか"
 
-    @Column(length = 500)
+    @Column(columnDefinition = "TEXT")
     private String meaning; // Vietnamese meaning
 
     @Column(nullable = false, length = 2)
@@ -32,6 +33,6 @@ public class GrammarPoint {
     @Column(columnDefinition = "TEXT")
     private String examples; // JSON string of example sentences
 
-    @Column(length = 500)
+    @Column(columnDefinition = "TEXT")
     private String relatedGrammar; // comma-separated related grammar points
 }

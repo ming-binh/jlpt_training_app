@@ -15,6 +15,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import org.springframework.jdbc.core.JdbcTemplate;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,10 +34,20 @@ public class JlptDataSyncService {
     private final VocabularyRepository vocabularyRepository;
     private final KanjiRepository kanjiRepository;
     private final ObjectMapper objectMapper;
+    private final JdbcTemplate jdbcTemplate;
 
     @EventListener(ApplicationReadyEvent.class)
     public void syncOnStartup() {
         log.info("=== JLPT Data Sync: Starting ===");
+
+        // 0. Ensure column types are TEXT in PostgreSQL
+        try {
+            jdbcTemplate.execute("ALTER TABLE grammar_point ALTER COLUMN structure TYPE TEXT");
+            jdbcTemplate.execute("ALTER TABLE grammar_point ALTER COLUMN meaning TYPE TEXT");
+            jdbcTemplate.execute("ALTER TABLE grammar_point ALTER COLUMN related_grammar TYPE TEXT");
+        } catch (Exception e) {
+            log.debug("Column alter note: {}", e.getMessage());
+        }
 
         // 1. Seed grammar from local JSON files
         seedGrammar();
