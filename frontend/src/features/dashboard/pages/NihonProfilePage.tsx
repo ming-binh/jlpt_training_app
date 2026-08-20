@@ -12,11 +12,15 @@ import {
   Sparkles,
   Target,
   ArrowRight,
+  Edit2,
+  X,
+  User as UserIcon,
 } from "lucide-react";
 import { AppHeader } from "@/components/common/app-header";
 import { userService, type DashboardStats, type UserProfile } from "@/services/user.service";
 import { progressService, type ProgressSummary } from "@/services/lesson.service";
 import { LevelPickerModal } from "../components/LevelPickerModal";
+import { supabase } from "@/lib/supabase";
 import { toast } from "@/components/ui/toast";
 
 const MASTERED_META = [
@@ -46,6 +50,8 @@ export function NihonProfilePage() {
   const [progressSummary, setProgressSummary] = useState<ProgressSummary>(PROGRESS_DEFAULT);
   const [todayDone, setTodayDone] = useState(false);
   const [showLevelEdit, setShowLevelEdit] = useState(false);
+  const [showNameEdit, setShowNameEdit] = useState(false);
+  const [nameInput, setNameInput] = useState("");
 
   useEffect(() => {
     setLoading(true);
@@ -53,8 +59,16 @@ export function NihonProfilePage() {
       userService.getCurrentUser().catch(() => null),
       userService.getDashboardStats().catch(() => null),
     ]).then(([profileRes, statsRes]) => {
-      if (profileRes) setProfile(profileRes);
-      if (statsRes) setStats(statsRes);
+      if (profileRes) {
+        setProfile(profileRes);
+        setNameInput(profileRes.displayName || profileRes.username || "");
+      }
+      if (statsRes) {
+        setStats(statsRes);
+        if (!profileRes) {
+          setNameInput(statsRes.username || "");
+        }
+      }
       setLoading(false);
     });
     progressService.getSummary().then(setProgressSummary).catch(() => setProgressSummary(PROGRESS_DEFAULT));
@@ -74,21 +88,41 @@ export function NihonProfilePage() {
       .catch(() => toast.error("Không thể cập nhật trình độ."));
   };
 
+  const handleNameSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanName = nameInput.trim();
+    if (!cleanName) {
+      toast.error("Vui lòng nhập tên.");
+      return;
+    }
+
+    try {
+      const updated = await userService.updateProfile({ username: cleanName });
+      setProfile(updated);
+      // Sync to Supabase auth user_metadata as well
+      await supabase.auth.updateUser({
+        data: { name: cleanName, full_name: cleanName },
+      });
+      toast.success("Đã cập nhật tên thành công!");
+      setShowNameEdit(false);
+    } catch (err) {
+      toast.error("Không thể cập nhật tên. Vui lòng thử lại!");
+    }
+  };
+
   // Compute dynamic user values
   const email = profile?.email || "hocvien@example.com";
-  const username = profile?.username || stats?.username || email.split("@")[0];
-  const initial = (username[0] || email[0] || "U").toUpperCase();
+  const displayName = profile?.displayName || profile?.username || stats?.username || email.split("@")[0];
+  const initial = (displayName[0] || email[0] || "U").toUpperCase();
   const jlptLevel = profile?.jlptLevel || stats?.jlptLevel || "N5";
   const streakDays = stats?.streakDays ?? profile?.streakDays ?? 1;
   const mockScore = stats?.mockScore ?? profile?.mockScore ?? null;
   const nextLevel = NEXT_LEVEL_MAP[jlptLevel] || "N4";
 
   // Compute 7-day week activity streak states dynamically
-  // Get current day of week (Monday=0 ... Sunday=6)
   const now = new Date();
   const dayOfWeekIndex = (now.getDay() + 6) % 7; // Convert Sunday=0 -> 6, Monday=1 -> 0
   const weekTracker = WEEK_DAYS.map((label, idx) => {
-    // If day is within the active streak range ending today
     const isActive = idx <= dayOfWeekIndex && idx >= Math.max(0, dayOfWeekIndex - (streakDays - 1));
     return { label, done: isActive };
   });
@@ -128,9 +162,23 @@ export function NihonProfilePage() {
               </div>
 
               <div className="min-w-0">
-                <h1 className="truncate text-2xl font-bold sm:text-3xl">
-                  {loading ? "Đang tải..." : username}
-                </h1>
+                <div className="flex items-center gap-3">
+                  <h1 className="truncate text-2xl font-bold sm:text-3xl">
+                    {loading ? "Đang tải..." : displayName}
+                  </h1>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setNameInput(displayName);
+                      setShowNameEdit(true);
+                    }}
+                    className="p-1.5 rounded-lg border border-border bg-secondary/80 text-muted-foreground hover:text-accent hover:border-accent/50 transition-colors cursor-pointer"
+                    title="Đổi tên hiển thị"
+                  >
+                    <Edit2 className="size-3.5" />
+                  </button>
+                </div>
+
                 <p className="mt-1 flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
                   <Mail className="size-4 shrink-0 text-accent" />
                   <span className="truncate">{email}</span>
@@ -148,6 +196,63 @@ export function NihonProfilePage() {
               </div>
             </div>
           </section>
+
+          {/* Name Edit Modal */}
+          {showNameEdit && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-150">
+              <div className="surface-card w-full max-w-md p-6 rounded-2xl border border-border shadow-2xl space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-bold flex items-center gap-2">
+                    <UserIcon className="size-5 text-accent" /> Đổi Tên Hiển Thị
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setShowNameEdit(false)}
+                    className="p-1 rounded-lg hover:bg-secondary text-muted-foreground"
+                  >
+                    <X className="size-5" />
+                  </button>
+                </div>
+
+                <p className="text-xs text-muted-foreground">
+                  Tên này sẽ được Sensei AI dùng để xưng hô trong phòng chat và hiển thị trên toàn hệ thống.
+                </p>
+
+                <form onSubmit={handleNameSave} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-muted-foreground mb-1.5">
+                      Tên của bạn
+                    </label>
+                    <input
+                      type="text"
+                      autoFocus
+                      value={nameInput}
+                      onChange={(e) => setNameInput(e.target.value)}
+                      placeholder="Ví dụ: Bình Minh, Minh-san, ..."
+                      className="w-full bg-background border border-border rounded-xl px-3.5 py-2.5 text-sm text-foreground outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+                      maxLength={50}
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-2.5 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowNameEdit(false)}
+                      className="px-4 py-2 text-xs font-semibold rounded-xl border border-border hover:bg-secondary text-muted-foreground transition-colors cursor-pointer"
+                    >
+                      Hủy
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-5 py-2 text-xs font-semibold rounded-xl bg-accent text-accent-foreground shadow-md hover:bg-accent/90 transition-transform active:scale-95 cursor-pointer"
+                    >
+                      Lưu thay đổi
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
 
           {/* Streak Card — Main Highlight */}
           <section className="surface-card mt-6 overflow-hidden border border-border/80">
@@ -178,209 +283,141 @@ export function NihonProfilePage() {
                         <span
                           className={
                             d.done
-                              ? "grid aspect-square w-full max-w-11 place-items-center rounded-xl bg-accent text-accent-foreground shadow-md transition-all"
-                              : "grid aspect-square w-full max-w-11 place-items-center rounded-xl border border-dashed border-border/80 text-muted-foreground/60"
+                              ? "grid size-8 place-items-center rounded-xl bg-accent text-xs font-bold text-accent-foreground shadow-[var(--shadow-glow)]"
+                              : "grid size-8 place-items-center rounded-xl border border-border/60 bg-secondary/40 text-xs text-muted-foreground"
                           }
                         >
-                          <Flame className={d.done ? "size-4 text-amber-300 fill-amber-300" : "size-4 opacity-40"} />
+                          {d.done ? <Check className="size-4 stroke-[3]" /> : d.label}
                         </span>
-                        <span className="text-[11px] font-medium text-muted-foreground">{d.label}</span>
+                        <span className="text-[10px] font-medium text-muted-foreground">
+                          {d.label}
+                        </span>
                       </div>
                     ))}
                   </div>
-                  <p className="mt-4 text-xs text-muted-foreground">
-                    Học thêm hôm nay để giữ chuỗi — chỉ cần 1 bộ thẻ flashcard là đủ.
+
+                  <p className="mt-4 text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+                    <Sparkles className="size-3.5 text-accent" />
+                    {todayDone
+                      ? "Bạn đã hoàn thành mục tiêu học hôm nay. Tuyệt vời!"
+                      : "Học thêm 1 bài hôm nay để duy trì chuỗi liên tục!"}
                   </p>
                 </div>
               </div>
             </div>
           </section>
 
-          {/* 3 Metric Stat Cards Grid */}
+          {/* Mastered Skills Grid */}
           <section className="mt-6 grid gap-4 sm:grid-cols-3">
-            <StatCard
-              icon={<Sparkles className="size-4 text-accent" />}
-              label="Trình độ hiện tại"
-              value={jlptLevel}
-              hint={`Mục tiêu kế tiếp: ${nextLevel}`}
-              action={
-                <button
-                  type="button"
-                  onClick={() => setShowLevelEdit(true)}
-                  className="shrink-0 text-[11px] font-semibold text-accent hover:underline"
+            {MASTERED_META.map((item) => {
+              const count = progressSummary[item.key] || 0;
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.key}
+                  to={item.to}
+                  className="surface-card group p-5 transition-all hover:border-accent/60 hover:shadow-lg"
                 >
-                  Đổi trình độ
-                </button>
-              }
-            />
-            <StatCard
-              icon={<Target className="size-4 text-accent" />}
-              label="Điểm thi thử"
-              value={mockScore === null ? "—" : `${mockScore}/180`}
-              hint={mockScore === null ? "Chưa có bài thi thử" : "Hoàn thành gần nhất"}
-            />
-            <StatCard
-              icon={<CalendarClock className="size-4 text-accent" />}
-              label="Hoạt động gần nhất"
-              value={lastActiveText}
-              hint="Tự động cập nhật khi bạn học"
-            />
+                  <div className="flex items-center justify-between">
+                    <span className="jp grid size-12 place-items-center rounded-xl bg-secondary text-lg font-bold text-accent group-hover:scale-105 transition-transform">
+                      {item.kanji}
+                    </span>
+                    <Icon className="size-5 text-muted-foreground group-hover:text-accent transition-colors" />
+                  </div>
+                  <p className="mt-4 text-3xl font-bold text-foreground">
+                    {loading ? "..." : count}
+                  </p>
+                  <p className="mt-1 text-xs font-semibold text-muted-foreground flex items-center justify-between">
+                    <span>Đã thành thạo {item.label.toLowerCase()}</span>
+                    <ArrowRight className="size-3.5 text-accent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </p>
+                </Link>
+              );
+            })}
           </section>
 
-          {/* Progress Tracking Section - Tiến độ học tập */}
-          <section className="surface-card mt-6 p-5 sm:p-6 border border-border/80">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Bảng theo dõi</p>
-                <h2 className="mt-1 text-lg font-semibold">Tiến độ học tập</h2>
+          {/* JLPT Target Level & Roadmap */}
+          <section className="surface-card mt-6 p-5 sm:p-7">
+            <div className="flex items-center justify-between border-b border-border/60 pb-4">
+              <div className="flex items-center gap-3">
+                <span className="grid size-10 place-items-center rounded-xl bg-secondary text-accent">
+                  <Target className="size-5" />
+                </span>
+                <div>
+                  <h2 className="text-base font-bold">Mục tiêu cấp độ JLPT</h2>
+                  <p className="text-xs text-muted-foreground">
+                    Lộ trình học tập được tối ưu cho cấp độ {jlptLevel}
+                  </p>
+                </div>
               </div>
+              <button
+                type="button"
+                onClick={() => setShowLevelEdit(true)}
+                className="rounded-xl border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:border-accent/60 hover:bg-secondary hover:text-foreground cursor-pointer"
+              >
+                Đổi trình độ
+              </button>
             </div>
 
-            {/* Nhiệm vụ hôm nay */}
-            <div className="flex flex-wrap items-center gap-4 rounded-xl bg-secondary/60 border border-border/50 p-4 mb-4">
-              <span
-                className={
-                  todayDone
-                    ? "grid size-10 shrink-0 place-items-center rounded-full border border-accent bg-accent/15 text-accent"
-                    : "grid size-10 shrink-0 place-items-center rounded-full border border-border"
-                }
-              >
-                {todayDone && <Check className="size-4" />}
-              </span>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold">Nhiệm vụ hôm nay</p>
-                <p className="text-xs text-muted-foreground">
-                  {todayDone
-                    ? 'Bạn đã hoàn thành lượt học hôm nay.'
-                    : 'Hoàn thành 1 lượt luyện tập hoặc ôn tập để giữ tiến độ.'}
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-xl bg-secondary/50 p-4">
+                <p className="text-xs text-muted-foreground">Cấp độ hiện tại</p>
+                <div className="mt-1 flex items-baseline gap-2">
+                  <span className="text-2xl font-bold text-accent">{jlptLevel}</span>
+                  <span className="text-xs text-muted-foreground">
+                    (Đang hoàn thành {Math.min(100, Math.round(((progressSummary.masteredVocab + progressSummary.masteredKanji + progressSummary.masteredGrammar) / 100) * 100))}% kiến thức)
+                  </span>
+                </div>
+                <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-secondary">
+                  <div
+                    className="h-full bg-accent transition-all duration-500"
+                    style={{
+                      width: `${Math.min(100, Math.max(10, ((progressSummary.masteredVocab + progressSummary.masteredKanji + progressSummary.masteredGrammar) / 100) * 100))}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div className="rounded-xl bg-secondary/50 p-4">
+                <p className="text-xs text-muted-foreground">Điểm thi thử JLPT gần nhất</p>
+                <p className="mt-1 text-2xl font-bold text-foreground">
+                  {mockScore ? `${mockScore} / 180` : "Chưa có bài thi"}
+                </p>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Mục tiêu tiếp theo: <strong className="text-foreground font-semibold">{nextLevel}</strong>
                 </p>
               </div>
-              {!todayDone && (
-                <Link
-                  to="/practice"
-                  className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-accent px-4 py-2 text-xs font-semibold text-accent-foreground transition-transform hover:-translate-y-0.5"
-                >
-                  Luyện tập ngay <ArrowRight className="size-3" />
-                </Link>
-              )}
             </div>
 
-            {/* Đã thuộc */}
-            <div className="flex items-center gap-2 mb-3">
-              <p className="text-sm font-semibold">Đã thuộc</p>
-              <span className="ml-auto text-xs text-muted-foreground">
-                Tổng {progressSummary.masteredVocab + progressSummary.masteredKanji + progressSummary.masteredGrammar} mục
-              </span>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-3">
-              {MASTERED_META.map((m) => (
-                <Link
-                  key={m.key}
-                  to={m.to}
-                  className="surface-card group relative overflow-hidden p-4 transition-transform hover:-translate-y-1 border border-border/50"
-                >
-                  <span className="jp pointer-events-none absolute -right-1 -top-4 text-6xl text-secondary/60 transition-colors group-hover:text-primary/40">
-                    {m.kanji}
-                  </span>
-                  <m.icon className="relative size-4 text-accent" />
-                  <p className="relative mt-3 text-2xl font-semibold">{progressSummary[m.key]}</p>
-                  <p className="relative text-xs text-muted-foreground">{m.label}</p>
-                </Link>
-              ))}
-            </div>
-          </section>
-
-          {/* Weak Sections List */}
-          <section className="surface-card mt-6 p-5 sm:p-6">
-            <h2 className="text-lg font-semibold">Phần cần cải thiện</h2>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Dựa trên các câu bạn thường trả lời sai khi ôn luyện.
-            </p>
-            <ul className="mt-4 space-y-2.5">
-              {weakSectionsList.map((section) => (
-                <li
-                  key={section}
-                  className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-xl bg-secondary/60 px-4 py-3 border border-border/50"
-                >
-                  <span className="min-w-0 truncate text-sm font-medium">{section}</span>
-                  <Link
-                    to="/tu-vung"
-                    className="shrink-0 rounded-full bg-accent/10 border border-accent/30 px-3 py-1 text-[11px] font-semibold text-accent transition-colors hover:bg-accent hover:text-accent-foreground"
+            {/* Weak sections review */}
+            <div className="mt-5 border-t border-border/40 pt-4">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Phần cần củng cố thêm
+              </p>
+              <div className="mt-2.5 flex flex-wrap gap-2">
+                {weakSectionsList.map((tag) => (
+                  <span
+                    key={tag}
+                    className="rounded-lg border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-xs font-medium text-amber-400"
                   >
-                    Cần ôn <ArrowRight className="inline size-3" />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          {/* Quick Study Shortcuts */}
-          <section className="mt-6 grid gap-3 sm:grid-cols-3">
-            <ShortcutLink to="/tu-vung" icon={<BookOpen className="size-4" />} label="Ôn từ vựng" />
-            <ShortcutLink to="/kanji" icon={<span className="jp font-bold text-xs">漢</span>} label="Ôn kanji" />
-            <ShortcutLink to="/ngu-phap" icon={<Brain className="size-4" />} label="Ngữ pháp" />
+                    ⚠ {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
           </section>
         </main>
       </div>
 
+      {/* Level Picker Modal */}
       {showLevelEdit && (
         <LevelPickerModal
           mode="edit"
           currentLevel={jlptLevel}
-          onClose={() => setShowLevelEdit(false)}
           onSave={handleLevelSave}
+          onClose={() => setShowLevelEdit(false)}
         />
       )}
     </div>
-  );
-}
-
-function StatCard({
-  icon,
-  label,
-  value,
-  hint,
-  action,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: string;
-  hint: string;
-  action?: React.ReactNode;
-}) {
-  return (
-    <div className="surface-card p-5 border border-border/80">
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          {icon}
-          <span className="truncate">{label}</span>
-        </div>
-        {action}
-      </div>
-      <p className="mt-3 truncate text-2xl font-bold">{value}</p>
-      <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
-    </div>
-  );
-}
-
-function ShortcutLink({
-  to,
-  icon,
-  label,
-}: {
-  to: string;
-  icon: React.ReactNode;
-  label: string;
-}) {
-  return (
-    <Link
-      to={to}
-      className="surface-card flex items-center gap-3 p-4 text-sm font-semibold transition-transform hover:-translate-y-0.5 border border-border/80"
-    >
-      <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-secondary text-accent">
-        {icon}
-      </span>
-      <span className="min-w-0 truncate">{label}</span>
-    </Link>
   );
 }

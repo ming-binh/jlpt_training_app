@@ -29,10 +29,22 @@ export function AppHeader() {
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) {
         setUserEmail(data.user.email || "Học Viên");
-        userService.getCurrentUser()
+        const oauthName =
+          data.user.user_metadata?.full_name ||
+          data.user.user_metadata?.name ||
+          data.user.user_metadata?.user_name;
+        if (oauthName) {
+          setUsername(oauthName);
+        }
+
+        userService
+          .getCurrentUser()
           .then((profile) => {
-            if (profile && profile.username) {
-              setUsername(profile.username);
+            if (profile) {
+              const name = profile.displayName || profile.username;
+              if (name) {
+                setUsername(name);
+              }
             }
             setRole(profile?.role ?? null);
           })
@@ -46,6 +58,10 @@ export function AppHeader() {
 
     const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUserEmail(session?.user?.email || null);
+      if (session?.user) {
+        const oauthName = session.user.user_metadata?.full_name || session.user.user_metadata?.name;
+        if (oauthName) setUsername(oauthName);
+      }
     });
 
     return () => {
@@ -72,7 +88,7 @@ export function AppHeader() {
     navigate("/login");
   };
 
-  const initial = (username?.[0] || userEmail?.[0] || "M").toUpperCase();
+  const initial = (username?.[0] || userEmail?.[0] || "H").toUpperCase();
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/70 bg-background/85 backdrop-blur-xl">

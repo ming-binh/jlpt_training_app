@@ -22,6 +22,15 @@ public class AdminContentService {
     private final KanjiRepository kanjiRepository;
     private final GrammarPointRepository grammarPointRepository;
     private final AuditLogService auditLogService;
+    private final JlptDataSyncService jlptDataSyncService;
+
+    public java.util.Map<String, Object> syncGrammar() {
+        return jlptDataSyncService.syncGrammar();
+    }
+
+    public java.util.Map<String, Object> syncAll() {
+        return jlptDataSyncService.forceSyncAll();
+    }
 
     public Page<AdminContentItemDto> list(ContentType type, String level, String search, Pageable pageable) {
         String filterLevel = (level != null && !level.isBlank() && !"ALL".equalsIgnoreCase(level)) ? level : null;

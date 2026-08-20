@@ -166,8 +166,8 @@ export function NihonGrammarPage() {
                           </span>
                         )}
                       </span>
-                      <span className="mt-1 block text-sm text-muted-foreground">
-                        {g.meaning} · <span className="italic">{g.romaji}</span>
+                      <span className="mt-1 block text-sm text-muted-foreground line-clamp-1">
+                        {g.meaning}
                       </span>
                     </span>
                     <LevelBadge level={g.level} />
@@ -180,17 +180,36 @@ export function NihonGrammarPage() {
                   </button>
 
                   {open && (
-                    <div className="border-t border-border bg-secondary/50 p-6 space-y-4">
-                      {g.note && (
-                        <p className="text-xs text-muted-foreground italic">{g.note}</p>
+                    <div className="border-t border-border bg-secondary/30 p-6 space-y-4">
+                      {g.romaji && (
+                        <div className="rounded-xl bg-card p-4 border border-border/80 shadow-xs">
+                          <p className="text-[11px] font-bold uppercase tracking-wider text-accent mb-1.5 flex items-center gap-1.5">
+                            <span className="inline-block size-1.5 rounded-full bg-accent" />
+                            Cấu trúc kết hợp:
+                          </p>
+                          <p className="jp text-sm font-medium whitespace-pre-line text-foreground/90 leading-relaxed">{g.romaji}</p>
+                        </div>
                       )}
+
+                      <div className="rounded-xl bg-card p-4 border border-border/80 shadow-xs">
+                        <p className="text-[11px] font-bold uppercase tracking-wider text-accent mb-1.5 flex items-center gap-1.5">
+                          <span className="inline-block size-1.5 rounded-full bg-accent" />
+                          Ý nghĩa & Cách dùng:
+                        </p>
+                        <p className="text-sm text-foreground/90 whitespace-pre-line leading-relaxed">{g.meaning}</p>
+                      </div>
+
+                      {g.note && (
+                        <p className="text-xs text-muted-foreground italic px-1">{g.note}</p>
+                      )}
+
                       {g.examples && g.examples.length > 0 ? (
-                        <div className="space-y-3">
-                          <p className="text-xs font-semibold uppercase tracking-wider text-accent">Ví dụ:</p>
+                        <div className="space-y-3 pt-2">
+                          <p className="text-xs font-semibold uppercase tracking-wider text-accent">Câu ví dụ:</p>
                           {g.examples.map((ex: any, idx: number) => (
-                            <div key={idx} className="rounded-lg bg-card p-3 border border-border">
-                              <p className="jp font-medium">{ex.ja || ex.jp}</p>
-                              <p className="mt-1 text-xs text-muted-foreground">{ex.vi}</p>
+                            <div key={idx} className="rounded-xl bg-card p-3.5 border border-border/70">
+                              <p className="jp text-[15px] font-medium leading-relaxed">{ex.ja || ex.jp}</p>
+                              {ex.vi && <p className="mt-1.5 text-xs text-muted-foreground">{ex.vi}</p>}
                             </div>
                           ))}
                         </div>

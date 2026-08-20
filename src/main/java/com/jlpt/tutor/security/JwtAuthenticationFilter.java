@@ -3,7 +3,6 @@ package com.jlpt.tutor.security;
 import com.jlpt.tutor.entity.Role;
 import com.jlpt.tutor.entity.User;
 import com.jlpt.tutor.repository.UserRepository;
-import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,11 +28,10 @@ import java.io.IOException;
  * A. Supabase tokens (prod):
  *    - sub = Supabase UUID (e.g. "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
  *    - email extracted from "email" claim
- *    - If user doesn't exist in our DB yet → auto-create (provision) on first login
+ *    - If user doesn't exist in our DB yet → auto-create (provision) on first login with name from Google/Supabase
  *
  * B. Legacy backend tokens (dev):
  *    - sub = user email
- *    - Behaves exactly as before
  */
 @Slf4j
 @Component
@@ -90,28 +88,55 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Auto-provision: create user in our DB if not yet present
+        String extractedName = extractNameFromToken(jwt, email);
+
+        // Auto-provision or update user in our DB
         User user = userRepository.findByEmail(email)
-                .orElseGet(() -> provisionSupabaseUser(supabaseId, email, jwt));
+                .map(existingUser -> {
+                    // If existing user's username is blank or email prefix, and Google OAuth provides real name, update it
+                    if (extractedName != null && !extractedName.isBlank() && !extractedName.equals(email.split("@")[0])) {
+                        if (existingUser.getUsername() == null || existingUser.getUsername().isBlank() || existingUser.getUsername().equals(email.split("@")[0])) {
+                            existingUser.setUsername(extractedName);
+                            userRepository.save(existingUser);
+                            log.info("Auto-synced username '{}' for existing user email={}", extractedName, email);
+                        }
+                    }
+                    return existingUser;
+                })
+                .orElseGet(() -> provisionSupabaseUser(supabaseId, email, extractedName));
 
         setAuthentication(user, request);
     }
 
-    private User provisionSupabaseUser(String supabaseId, String email, String jwt) {
-        // Try to get display name from Supabase token (user_metadata.name or email prefix)
-        String displayName = jwtService.extractClaim(jwt, claims -> {
+    private String extractNameFromToken(String jwt, String email) {
+        // Try to get full name or display name from Supabase metadata (e.g. Google OAuth)
+        String extractedName = jwtService.extractClaim(jwt, claims -> {
             @SuppressWarnings("unchecked")
-            java.util.Map<String, Object> meta = (java.util.Map<String, Object>)
-                    claims.get("user_metadata");
-            if (meta != null && meta.get("name") != null) {
-                return meta.get("name").toString();
+            java.util.Map<String, Object> meta = (java.util.Map<String, Object>) claims.get("user_metadata");
+            if (meta != null) {
+                if (meta.get("full_name") != null && !meta.get("full_name").toString().isBlank()) {
+                    return meta.get("full_name").toString().trim();
+                }
+                if (meta.get("name") != null && !meta.get("name").toString().isBlank()) {
+                    return meta.get("name").toString().trim();
+                }
+                if (meta.get("user_name") != null && !meta.get("user_name").toString().isBlank()) {
+                    return meta.get("user_name").toString().trim();
+                }
+            }
+            if (claims.get("name") != null && !claims.get("name").toString().isBlank()) {
+                return claims.get("name").toString().trim();
             }
             return null;
         });
-        if (displayName == null) {
-            displayName = email.split("@")[0]; // fallback: email prefix
-        }
 
+        if (extractedName != null && !extractedName.isBlank()) {
+            return extractedName;
+        }
+        return email.split("@")[0]; // fallback to email prefix
+    }
+
+    private User provisionSupabaseUser(String supabaseId, String email, String displayName) {
         User newUser = User.builder()
                 .id(supabaseId)
                 .email(email)
@@ -122,7 +147,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 .streakDays(0)
                 .build();
 
-        log.info("Auto-provisioning Supabase user: email={}, id={}", email, supabaseId);
+        log.info("Auto-provisioning Supabase user: email={}, username={}, id={}", email, displayName, supabaseId);
         return userRepository.save(newUser);
     }
 

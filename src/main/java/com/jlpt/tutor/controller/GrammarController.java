@@ -53,6 +53,8 @@ public class GrammarController {
                 "N5", grammarPointRepository.countByJlptLevelIgnoreCase("N5"),
                 "N4", grammarPointRepository.countByJlptLevelIgnoreCase("N4"),
                 "N3", grammarPointRepository.countByJlptLevelIgnoreCase("N3"),
+                "N2", grammarPointRepository.countByJlptLevelIgnoreCase("N2"),
+                "N1", grammarPointRepository.countByJlptLevelIgnoreCase("N1"),
                 "total", grammarPointRepository.count()
         ));
     }

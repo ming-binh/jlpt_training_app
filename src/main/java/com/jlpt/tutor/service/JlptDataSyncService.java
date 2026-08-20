@@ -16,6 +16,8 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -95,13 +97,18 @@ public class JlptDataSyncService {
         );
     }
 
-    private void seedGrammar() {
-        if (grammarPointRepository.count() > 0) {
-            log.info("Grammar table already has {} entries. Skipping seed.", grammarPointRepository.count());
-            return;
-        }
+    public Map<String, Object> syncGrammar() {
+        int newlyAdded = seedGrammar();
+        return Map.of(
+            "status", "success",
+            "newGrammarSynced", newlyAdded,
+            "totalGrammar", grammarPointRepository.count()
+        );
+    }
 
-        for (String level : List.of("n5", "n4", "n3")) {
+    private int seedGrammar() {
+        int newlyAdded = 0;
+        for (String level : List.of("n5", "n4", "n3", "n2", "n1")) {
             String filename = "data/grammar_" + level + ".json";
             try {
                 ClassPathResource resource = new ClassPathResource(filename);
@@ -110,24 +117,70 @@ public class JlptDataSyncService {
                 InputStream is = resource.getInputStream();
                 List<Map<String, String>> entries = objectMapper.readValue(is, new TypeReference<>() {});
 
-                List<GrammarPoint> points = entries.stream()
-                        .map(e -> GrammarPoint.builder()
-                                .title(e.getOrDefault("title", ""))
+                String upperLevel = level.toUpperCase();
+                List<GrammarPoint> existingList = grammarPointRepository.findByJlptLevelIgnoreCase(upperLevel);
+                Map<String, GrammarPoint> existingMap = new HashMap<>();
+                for (GrammarPoint gp : existingList) {
+                    if (gp.getTitle() != null) {
+                        existingMap.put(normalizeGrammarTitle(gp.getTitle()), gp);
+                    }
+                }
+
+                List<GrammarPoint> toSave = new ArrayList<>();
+                for (Map<String, String> e : entries) {
+                    String title = e.getOrDefault("title", "").trim();
+                    if (title.isBlank()) continue;
+
+                    String normTitle = normalizeGrammarTitle(title);
+                    GrammarPoint existing = existingMap.get(normTitle);
+
+                    if (existing != null) {
+                        boolean modified = false;
+                        if ((existing.getStructure() == null || existing.getStructure().isBlank()) && e.containsKey("structure")) {
+                            existing.setStructure(e.get("structure"));
+                            modified = true;
+                        }
+                        if ((existing.getMeaning() == null || existing.getMeaning().isBlank()) && e.containsKey("meaning")) {
+                            existing.setMeaning(e.get("meaning"));
+                            modified = true;
+                        }
+                        if ((existing.getExamples() == null || existing.getExamples().isBlank() || "[]".equals(existing.getExamples())) && e.containsKey("examples")) {
+                            existing.setExamples(e.get("examples"));
+                            modified = true;
+                        }
+                        if (modified) {
+                            toSave.add(existing);
+                        }
+                    } else {
+                        GrammarPoint newGp = GrammarPoint.builder()
+                                .title(title)
                                 .structure(e.getOrDefault("structure", ""))
                                 .meaning(e.getOrDefault("meaning", ""))
-                                .jlptLevel(level.toUpperCase())
-                                .examples(e.getOrDefault("examples", ""))
+                                .jlptLevel(upperLevel)
+                                .examples(e.getOrDefault("examples", "[]"))
                                 .relatedGrammar(e.getOrDefault("relatedGrammar", ""))
-                                .build())
-                        .toList();
+                                .build();
+                        toSave.add(newGp);
+                        existingMap.put(normTitle, newGp);
+                        newlyAdded++;
+                    }
+                }
 
-                grammarPointRepository.saveAll(points);
-                log.info("Seeded {} grammar points from {}", points.size(), filename);
+                if (!toSave.isEmpty()) {
+                    grammarPointRepository.saveAll(toSave);
+                    log.info("Level {}: Saved {} grammar points (new/updated) from {}", upperLevel, toSave.size(), filename);
+                }
 
             } catch (Exception e) {
                 log.error("Failed to seed grammar from {}: {}", filename, e.getMessage());
             }
         }
+        return newlyAdded;
+    }
+
+    private String normalizeGrammarTitle(String title) {
+        if (title == null) return "";
+        return title.replace("～", "〜").replace("~", "〜").replaceAll("\\s+", "").toLowerCase();
     }
 
     private void seedLocalVocab() {

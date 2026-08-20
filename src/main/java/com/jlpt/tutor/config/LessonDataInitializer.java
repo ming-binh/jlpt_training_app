@@ -23,22 +23,23 @@ public class LessonDataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        if (lessonRepository.count() > 0) {
-            log.info("Lessons already initialized (count: {}). Skipping seeding.", lessonRepository.count());
-            return;
+        String[] levels = {"N5", "N4", "N3", "N2", "N1"};
+
+        if (lessonRepository.count() == 0) {
+            log.info("Initializing Lessons and LessonItems from database content...");
+            for (String level : levels) {
+                seedVocabLessons(level);
+                seedKanjiLessons(level);
+                seedGrammarLessons(level);
+            }
+            log.info("Successfully seeded {} lessons and {} lesson items!",
+                    lessonRepository.count(), lessonItemRepository.count());
+        } else {
+            // Incremental sync for new grammar items if any
+            for (String level : levels) {
+                syncGrammarLessons(level);
+            }
         }
-
-        log.info("Initializing Lessons and LessonItems from database content...");
-        String[] levels = {"N5", "N4", "N3"};
-
-        for (String level : levels) {
-            seedVocabLessons(level);
-            seedKanjiLessons(level);
-            seedGrammarLessons(level);
-        }
-
-        log.info("Successfully seeded {} lessons and {} lesson items!",
-                lessonRepository.count(), lessonItemRepository.count());
     }
 
     private void seedVocabLessons(String level) {
@@ -159,5 +160,60 @@ public class LessonDataInitializer implements CommandLineRunner {
                 lessonItemRepository.save(item);
             }
         }
+    }
+
+    public void syncGrammarLessons(String level) {
+        List<GrammarPoint> grammarList = grammarPointRepository
+                .findByJlptLevelIgnoreCase(level, Pageable.unpaged())
+                .getContent();
+
+        if (grammarList.isEmpty()) return;
+
+        List<LessonItem> existingItems = lessonItemRepository.findByEntityType(UserProgress.EntityType.GRAMMAR);
+        java.util.Set<Long> assignedIds = existingItems.stream()
+                .map(LessonItem::getEntityId)
+                .collect(java.util.stream.Collectors.toSet());
+
+        List<GrammarPoint> unassigned = grammarList.stream()
+                .filter(g -> !assignedIds.contains(g.getId()))
+                .toList();
+
+        if (unassigned.isEmpty()) return;
+
+        long existingLessonCount = lessonRepository.countByJlptLevelAndContentType(level, Lesson.ContentType.GRAMMAR);
+
+        int chunkSize = 10;
+        int newLessonsCount = (int) Math.ceil((double) unassigned.size() / chunkSize);
+
+        for (int i = 0; i < newLessonsCount; i++) {
+            int start = i * chunkSize;
+            int end = Math.min(start + chunkSize, unassigned.size());
+            List<GrammarPoint> chunk = unassigned.subList(start, end);
+
+            int lessonIndex = (int) existingLessonCount + i + 1;
+            Lesson lesson = Lesson.builder()
+                    .title(String.format("%s Ngữ Pháp - Bài %d", level, lessonIndex))
+                    .description(String.format("Cấu trúc ngữ pháp JLPT %s - Phần %d", level, lessonIndex))
+                    .jlptLevel(level)
+                    .contentType(Lesson.ContentType.GRAMMAR)
+                    .orderIndex(lessonIndex)
+                    .itemCount(chunk.size())
+                    .published(true)
+                    .build();
+
+            lesson = lessonRepository.save(lesson);
+
+            for (int j = 0; j < chunk.size(); j++) {
+                GrammarPoint grammar = chunk.get(j);
+                LessonItem item = LessonItem.builder()
+                        .lessonId(lesson.getId())
+                        .entityId(grammar.getId())
+                        .entityType(UserProgress.EntityType.GRAMMAR)
+                        .orderIndex(j + 1)
+                        .build();
+                lessonItemRepository.save(item);
+            }
+        }
+        log.info("Level {}: Created {} additional grammar lessons for {} new grammar points.", level, newLessonsCount, unassigned.size());
     }
 }

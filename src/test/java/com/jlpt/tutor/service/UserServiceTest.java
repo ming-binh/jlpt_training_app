@@ -28,7 +28,7 @@ class UserServiceTest {
     void testBuildUserContext_UserExists() {
         User user = User.builder()
                 .id("user-001")
-                .username("Minh")
+                .username("Bình Minh")
                 .jlptLevel("N4")
                 .mockScore(80)
                 .streakDays(5)
@@ -38,7 +38,7 @@ class UserServiceTest {
 
         Map<String, String> context = userService.buildUserContext("user-001");
 
-        assertEquals("Minh", context.get("user_name"));
+        assertEquals("Bình Minh", context.get("user_name"));
         assertEquals("N4", context.get("jlpt_level"));
         assertEquals("80", context.get("last_mock_score"));
         assertEquals("5", context.get("streak_days"));
@@ -63,7 +63,7 @@ class UserServiceTest {
 
         Map<String, String> context = userService.buildUserContext("user-002");
 
-        assertEquals("Bạn", context.get("user_name"));
+        assertEquals("Học Viên", context.get("user_name"));
         assertEquals("N5", context.get("jlpt_level"));
         assertEquals("Chưa làm bài test", context.get("last_mock_score"));
         assertEquals("1", context.get("streak_days"));
@@ -71,12 +71,12 @@ class UserServiceTest {
 
     @Test
     void testFindById() {
-        User user = User.builder().id("user-001").username("Minh").build();
+        User user = User.builder().id("user-001").username("Bình Minh").build();
         when(userRepository.findById("user-001")).thenReturn(Optional.of(user));
 
         Optional<User> result = userService.findById("user-001");
 
         assertTrue(result.isPresent());
-        assertEquals("Minh", result.get().getDisplayName());
+        assertEquals("Bình Minh", result.get().getDisplayName());
     }
 }

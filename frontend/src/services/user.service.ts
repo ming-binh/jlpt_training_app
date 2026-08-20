@@ -19,6 +19,7 @@ export interface UserProfile {
   id: string;
   email: string;
   username: string;
+  displayName?: string;
   jlptLevel: string;
   streakDays?: number;
   mockScore?: number;

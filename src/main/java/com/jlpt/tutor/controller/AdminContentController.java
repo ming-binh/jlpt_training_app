@@ -40,4 +40,14 @@ public class AdminContentController {
         adminContentService.delete(type, id, actor);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/sync/grammar")
+    public ResponseEntity<java.util.Map<String, Object>> syncGrammar() {
+        return ResponseEntity.ok(adminContentService.syncGrammar());
+    }
+
+    @PostMapping("/sync/all")
+    public ResponseEntity<java.util.Map<String, Object>> syncAll() {
+        return ResponseEntity.ok(adminContentService.syncAll());
+    }
 }

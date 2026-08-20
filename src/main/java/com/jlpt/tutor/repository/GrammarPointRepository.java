@@ -13,6 +13,8 @@ public interface GrammarPointRepository extends JpaRepository<GrammarPoint, Long
 
     Page<GrammarPoint> findByJlptLevelIgnoreCase(String jlptLevel, Pageable pageable);
 
+    java.util.List<GrammarPoint> findByJlptLevelIgnoreCase(String jlptLevel);
+
     @Query("SELECT g FROM GrammarPoint g WHERE " +
            "(:level IS NULL OR :level = '' OR UPPER(g.jlptLevel) = UPPER(:level)) AND " +
            "(:search IS NULL OR :search = '' OR LOWER(g.title) LIKE LOWER(CONCAT('%', :search, '%')) OR " +

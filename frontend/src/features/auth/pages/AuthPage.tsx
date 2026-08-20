@@ -26,24 +26,24 @@ export function AuthPage() {
   const [sentConfirm, setSentConfirm] = useState(false);
 
   useEffect(() => {
-  supabase.auth.getSession().then(({ data }) => {
-    if (data.session) {
-      api.get("/ai/conversations").catch(() => {});
-      navigate(redirectTarget, { replace: true });
-    }
-  });
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        api.get("/ai/conversations").catch(() => { });
+        navigate(redirectTarget, { replace: true });
+      }
+    });
 
-  const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
-    if (session) {
-      api.get("/ai/conversations").catch(() => {});
-      navigate(redirectTarget, { replace: true });
-    }
-  });
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        api.get("/ai/conversations").catch(() => { });
+        navigate(redirectTarget, { replace: true });
+      }
+    });
 
-  return () => {
-    authListener.subscription.unsubscribe();
-  };
-}, [navigate, redirectTarget]);
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [navigate, redirectTarget]);
 
   const validate = () => {
     const next: Record<string, string> = {};
@@ -78,10 +78,10 @@ export function AuthPage() {
             !rawMsg || rawMsg === "{}" || rawMsg === "[object Object]"
               ? "Không đăng nhập được. Vui lòng kiểm tra lại email và mật khẩu."
               : msg.includes("invalid login") || msg.includes("invalid credentials")
-              ? "Email hoặc mật khẩu không đúng."
-              : msg.includes("email not confirmed")
-              ? "Bạn cần xác nhận email trước khi đăng nhập."
-              : rawMsg
+                ? "Email hoặc mật khẩu không đúng."
+                : msg.includes("email not confirmed")
+                  ? "Bạn cần xác nhận email trước khi đăng nhập."
+                  : rawMsg
           );
           return;
         }
@@ -101,10 +101,10 @@ export function AuthPage() {
             !rawMsg || rawMsg === "{}" || rawMsg === "[object Object]"
               ? "Email này có thể đã được đăng ký hoặc bị giới hạn xác thực. Vui lòng thử lại hoặc dùng email khác."
               : msg.includes("already registered") || msg.includes("already exists") || msg.includes("user already")
-              ? "Email này đã có tài khoản. Hãy chuyển sang Đăng nhập."
-              : msg.includes("rate limit")
-              ? "Gửi quá nhiều yêu cầu xác thực. Vui lòng đợi ít phút."
-              : rawMsg
+                ? "Email này đã có tài khoản. Hãy chuyển sang Đăng nhập."
+                : msg.includes("rate limit")
+                  ? "Gửi quá nhiều yêu cầu xác thực. Vui lòng đợi ít phút."
+                  : rawMsg
           );
           return;
         }

@@ -18,6 +18,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { AppHeader } from "@/components/common/app-header";
 import { chatService, AiUseCase, type ConversationItem } from "@/services/chat.service";
+import { userService } from "@/services/user.service";
 import { supabase } from "@/lib/supabase";
 import {
   AiModelSelector,
@@ -102,12 +103,24 @@ export function NihonChatPage() {
 
   // Require user authentication for AI Chat
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
+    supabase.auth.getUser().then(async ({ data }) => {
       if (!data.user) {
         navigate("/login?redirect=/chat", { replace: true });
       } else {
-        const name = data.user.user_metadata?.name || data.user.email?.split("@")[0] || "Học Viên";
-        setUserName(name);
+        const oauthName =
+          data.user.user_metadata?.full_name ||
+          data.user.user_metadata?.name ||
+          data.user.user_metadata?.user_name;
+        let finalName = oauthName || data.user.email?.split("@")[0] || "Học Viên";
+
+        try {
+          const profile = await userService.getCurrentUser();
+          if (profile?.username) {
+            finalName = profile.username;
+          }
+        } catch (_) {}
+
+        setUserName(finalName);
         setCheckingAuth(false);
         initialFetchConversations();
       }
@@ -226,7 +239,7 @@ export function NihonChatPage() {
           if (parsed.quiz && !(res as any).quiz) {
             (res as any).quiz = parsed.quiz;
           }
-        } catch (_) {}
+        } catch (_) { }
       }
 
       if ((res as any).quiz) {
@@ -269,11 +282,10 @@ export function NihonChatPage() {
       <div
         key={conv.id}
         onClick={() => !isEditing && handleSelectConversation(conv.id)}
-        className={`group relative flex items-center justify-between gap-2 rounded-xl p-2.5 text-xs transition-colors cursor-pointer ${
-          isActive
+        className={`group relative flex items-center justify-between gap-2 rounded-xl p-2.5 text-xs transition-colors cursor-pointer ${isActive
             ? "bg-secondary text-accent font-semibold"
             : "hover:bg-secondary/60 text-muted-foreground"
-        }`}
+          }`}
       >
         <MessageSquare className="size-3.5 shrink-0" />
 
@@ -473,11 +485,10 @@ export function NihonChatPage() {
                     </span>
                   )}
                   <div
-                    className={`max-w-[85%] rounded-2xl px-5 py-3.5 text-sm leading-relaxed ${
-                      m.sender === "user"
+                    className={`max-w-[85%] rounded-2xl px-5 py-3.5 text-sm leading-relaxed ${m.sender === "user"
                         ? "bg-accent text-accent-foreground font-medium rounded-tr-none"
                         : "surface-card text-foreground rounded-tl-none"
-                    }`}
+                      }`}
                   >
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.text}</ReactMarkdown>
                     <span className="block mt-1 text-[10px] opacity-60 text-right">

@@ -83,6 +83,7 @@ public class UserController {
         if (request.getUsername() != null && !request.getUsername().isBlank()) {
             user.setUsername(request.getUsername().trim());
         }
+
         if (request.getJlptLevel() != null && !request.getJlptLevel().isBlank()) {
             String level = request.getJlptLevel().toUpperCase().trim();
             if (ALLOWED_LEVELS.contains(level)) {
