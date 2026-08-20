@@ -13,6 +13,7 @@ export function NihonKanjiPage() {
   const [level, setLevel] = useState<Level | "all">("all");
   const [status, setStatus] = useState<ProgressStatusFilter>("all");
   const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [page, setPage] = useState(0);
   const pageSize = 24;
 
@@ -23,26 +24,35 @@ export function NihonKanjiPage() {
   const [loading, setLoading] = useState(true);
   const [progressMap, setProgressMap] = useState<Record<string, "LEARNING" | "MASTERED">>({});
 
+  // Debounce search query
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQuery(query), 400);
+    return () => clearTimeout(t);
+  }, [query]);
+
+  // Fetch user progress map once on mount
+  useEffect(() => {
+    jlptService.getUserProgressMap().then(setProgressMap).catch(() => {});
+  }, []);
+
+  // Fetch kanji list whenever filters change
   useEffect(() => {
     setLoading(true);
-    Promise.all([
-      jlptService.getKanji(level, query, page, pageSize, status).catch(() => null),
-      jlptService.getUserProgressMap().catch(() => ({})),
-    ]).then(([res, map]) => {
-      if (res) {
-        setKanjiList(res.content || []);
-        setTotalPages(res.totalPages || 0);
-        setTotalElements(res.totalElements || 0);
-        if (res.content && res.content.length > 0) {
-          setActiveId(String(res.content[0].id));
+    jlptService
+      .getKanji(level, debouncedQuery, page, pageSize, status)
+      .then((res) => {
+        if (res) {
+          setKanjiList(res.content || []);
+          setTotalPages(res.totalPages || 0);
+          setTotalElements(res.totalElements || 0);
+          if (res.content && res.content.length > 0) {
+            setActiveId(String(res.content[0].id));
+          }
         }
-      }
-      if (map) {
-        setProgressMap(map);
-      }
-      setLoading(false);
-    });
-  }, [level, status, query, page]);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [level, status, debouncedQuery, page]);
 
   const list = kanjiList.map((k) => ({
     id: String(k.id),
@@ -63,7 +73,7 @@ export function NihonKanjiPage() {
       await jlptService.markProgress("KANJI", Number(active.id), status);
       setProgressMap((prev) => ({ ...prev, [`KANJI_${active.id}`]: status }));
       if (status === "MASTERED") {
-        toast.success(`Đã lưu chữ Kanji "${active.char}" vào Đã thuộc (+10 XP)!`);
+        toast.success(`Đã lưu chữ Kanji "${active.char}" vào Đã thuộc!`);
       } else {
         toast.info(`Đã lưu chữ Kanji "${active.char}" vào Cần học lại.`);
       }
@@ -231,7 +241,7 @@ export function NihonKanjiPage() {
                       : "border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-emerald-950 cursor-pointer"
                   )}
                 >
-                  <CheckCircle2 className="size-4" /> {activeStatus === "MASTERED" ? "Đã thuộc" : "Đã thuộc (+10 XP)"}
+                  <CheckCircle2 className="size-4" /> Đã thuộc
                 </button>
               </div>
             </aside>

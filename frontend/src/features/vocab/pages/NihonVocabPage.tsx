@@ -13,6 +13,7 @@ export function NihonVocabPage() {
   const [level, setLevel] = useState<Level | "all">("all");
   const [status, setStatus] = useState<ProgressStatusFilter>("all");
   const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [page, setPage] = useState(0);
   const pageSize = 20;
 
@@ -25,26 +26,34 @@ export function NihonVocabPage() {
   const [flipped, setFlipped] = useState(false);
   const [progressMap, setProgressMap] = useState<Record<string, "LEARNING" | "MASTERED">>({});
 
-  // Fetch vocabulary & user progress map
+  // Debounce search query
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQuery(query), 400);
+    return () => clearTimeout(t);
+  }, [query]);
+
+  // Fetch user progress map once on mount
+  useEffect(() => {
+    jlptService.getUserProgressMap().then(setProgressMap).catch(() => {});
+  }, []);
+
+  // Fetch vocabulary list whenever filters change
   useEffect(() => {
     setLoading(true);
-    Promise.all([
-      jlptService.getVocabulary(level, query, page, pageSize, status).catch(() => null),
-      jlptService.getUserProgressMap().catch(() => ({})),
-    ]).then(([res, map]) => {
-      if (res) {
-        setVocabList(res.content || []);
-        setTotalPages(res.totalPages || 0);
-        setTotalElements(res.totalElements || 0);
-        setIndex(0);
-        setFlipped(false);
-      }
-      if (map) {
-        setProgressMap(map);
-      }
-      setLoading(false);
-    });
-  }, [level, status, query, page]);
+    jlptService
+      .getVocabulary(level, debouncedQuery, page, pageSize, status)
+      .then((res) => {
+        if (res) {
+          setVocabList(res.content || []);
+          setTotalPages(res.totalPages || 0);
+          setTotalElements(res.totalElements || 0);
+          setIndex(0);
+          setFlipped(false);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [level, status, debouncedQuery, page]);
 
   const list = vocabList.map((v) => ({
     id: String(v.id),
@@ -73,7 +82,7 @@ export function NihonVocabPage() {
       await jlptService.markProgress("VOCABULARY", Number(current.id), status);
       setProgressMap((prev) => ({ ...prev, [`VOCABULARY_${current.id}`]: status }));
       if (status === "MASTERED") {
-        toast.success(`Đã lưu "${current.word}" vào Đã thuộc (+10 XP)!`);
+        toast.success(`Đã lưu "${current.word}" vào Đã thuộc!`);
       } else {
         toast.info(`Đã lưu "${current.word}" vào Cần học lại.`);
       }
@@ -221,7 +230,7 @@ export function NihonVocabPage() {
                     )}
                     title={currentStatus === "MASTERED" ? "Đã thuộc từ này" : "Đánh dấu đã thuộc từ này vào Database"}
                   >
-                    <CheckCircle2 className="size-4" /> {currentStatus === "MASTERED" ? "Đã thuộc" : "Đã thuộc (+10 XP)"}
+                    <CheckCircle2 className="size-4" /> Đã thuộc
                   </button>
 
                   <button

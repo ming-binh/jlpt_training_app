@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, Search, CheckCircle2, Bookmark } from "lucide-react";
 import { type Level } from "@/data/jlpt";
-import { LevelBadge, LevelFilter } from "@/components/common/level-filter";
+import { GrammarLevelFilter, LevelBadge } from "@/components/common/level-filter";
 import { StatusFilter, type ProgressStatusFilter } from "@/components/common/status-filter";
 import { AppHeader } from "@/components/common/app-header";
 import { Pagination } from "@/components/common/pagination";
@@ -13,6 +13,7 @@ export function NihonGrammarPage() {
   const [level, setLevel] = useState<Level | "all">("all");
   const [status, setStatus] = useState<ProgressStatusFilter>("all");
   const [query, setQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const [page, setPage] = useState(0);
   const pageSize = 15;
 
@@ -23,23 +24,32 @@ export function NihonGrammarPage() {
   const [loading, setLoading] = useState(true);
   const [progressMap, setProgressMap] = useState<Record<string, "LEARNING" | "MASTERED">>({});
 
+  // Debounce search query
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQuery(query), 400);
+    return () => clearTimeout(t);
+  }, [query]);
+
+  // Fetch user progress map once on mount
+  useEffect(() => {
+    jlptService.getUserProgressMap().then(setProgressMap).catch(() => {});
+  }, []);
+
+  // Fetch grammar list whenever filters change
   useEffect(() => {
     setLoading(true);
-    Promise.all([
-      jlptService.getGrammar(level, query, page, pageSize, status).catch(() => null),
-      jlptService.getUserProgressMap().catch(() => ({})),
-    ]).then(([res, map]) => {
-      if (res) {
-        setGrammarList(res.content || []);
-        setTotalPages(res.totalPages || 0);
-        setTotalElements(res.totalElements || 0);
-      }
-      if (map) {
-        setProgressMap(map);
-      }
-      setLoading(false);
-    });
-  }, [level, status, query, page]);
+    jlptService
+      .getGrammar(level, debouncedQuery, page, pageSize, status)
+      .then((res) => {
+        if (res) {
+          setGrammarList(res.content || []);
+          setTotalPages(res.totalPages || 0);
+          setTotalElements(res.totalElements || 0);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [level, status, debouncedQuery, page]);
 
   const list = grammarList.map((g) => {
     let examplesArray: any[] = [];
@@ -70,7 +80,7 @@ export function NihonGrammarPage() {
       await jlptService.markProgress("GRAMMAR", Number(grammarId), status);
       setProgressMap((prev) => ({ ...prev, [`GRAMMAR_${grammarId}`]: status }));
       if (status === "MASTERED") {
-        toast.success(`Đã lưu mẫu ngữ pháp "${pattern}" vào Đã thuộc (+10 XP)!`);
+        toast.success(`Đã lưu mẫu ngữ pháp "${pattern}" vào Đã thuộc!`);
       } else {
         toast.info(`Đã lưu mẫu ngữ pháp "${pattern}" vào Cần học lại.`);
       }
@@ -94,7 +104,7 @@ export function NihonGrammarPage() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <LevelFilter
+            <GrammarLevelFilter
               value={level}
               onChange={(l) => {
                 setLevel(l);
@@ -235,7 +245,7 @@ export function NihonGrammarPage() {
                               : "border-emerald-500/40 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500 hover:text-emerald-950 cursor-pointer"
                           )}
                         >
-                          <CheckCircle2 className="size-3.5" /> {status === "MASTERED" ? "Đã thuộc" : "Đã thuộc (+10 XP)"}
+                          <CheckCircle2 className="size-3.5" /> Đã thuộc
                         </button>
                       </div>
                     </div>

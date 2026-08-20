@@ -1,4 +1,4 @@
-export type Level = "N5" | "N4" | "N3";
+export type Level = "N5" | "N4" | "N3" | "N2" | "N1";
 
 export type Vocab = {
   id: string;
@@ -33,7 +33,8 @@ export type Grammar = {
   examples: { jp: string; vi: string }[];
 };
 
-export const LEVELS: Level[] = ["N5", "N4", "N3"];
+export const LEVELS: Level[] = ["N5", "N4", "N3", "N2", "N1"];
+export const LEVELS_SHORT: Level[] = ["N5", "N4", "N3"];
 
 export const VOCAB: Vocab[] = [
   {

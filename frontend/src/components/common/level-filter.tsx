@@ -1,23 +1,24 @@
-import { LEVELS, type Level } from "@/data/jlpt";
+import { LEVELS, LEVELS_SHORT, type Level } from "@/data/jlpt";
 import { cn } from "@/lib/utils";
 
-export function LevelFilter({
+function LevelFilterBase({
   value,
   onChange,
+  levels,
 }: {
   value: Level | "all";
   onChange: (level: Level | "all") => void;
+  levels: (Level | "all")[];
 }) {
-  const options: (Level | "all")[] = ["all", ...LEVELS];
   return (
-    <div className="inline-flex rounded-xl border border-border bg-card p-1">
-      {options.map((opt) => (
+    <div className="inline-flex flex-wrap rounded-xl border border-border bg-card p-1 gap-0.5">
+      {levels.map((opt) => (
         <button
           key={opt}
           type="button"
           onClick={() => onChange(opt)}
           className={cn(
-            "rounded-lg px-3.5 py-1.5 text-xs font-medium uppercase tracking-wider transition-colors",
+            "rounded-lg px-3 py-1.5 text-xs font-medium uppercase tracking-wider transition-colors",
             value === opt
               ? "bg-accent text-accent-foreground font-semibold"
               : "text-muted-foreground hover:text-foreground",
@@ -28,6 +29,28 @@ export function LevelFilter({
       ))}
     </div>
   );
+}
+
+/** Dùng cho Từ vựng & Kanji (N5–N3) */
+export function LevelFilter({
+  value,
+  onChange,
+}: {
+  value: Level | "all";
+  onChange: (level: Level | "all") => void;
+}) {
+  return <LevelFilterBase value={value} onChange={onChange} levels={["all", ...LEVELS_SHORT]} />;
+}
+
+/** Dùng cho Ngữ pháp (N5–N1) */
+export function GrammarLevelFilter({
+  value,
+  onChange,
+}: {
+  value: Level | "all";
+  onChange: (level: Level | "all") => void;
+}) {
+  return <LevelFilterBase value={value} onChange={onChange} levels={["all", ...LEVELS]} />;
 }
 
 export function LevelBadge({ level }: { level: Level }) {
