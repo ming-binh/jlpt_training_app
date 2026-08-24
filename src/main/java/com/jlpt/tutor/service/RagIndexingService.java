@@ -3,9 +3,6 @@ package com.jlpt.tutor.service;
 import com.jlpt.tutor.entity.GrammarPoint;
 import com.jlpt.tutor.entity.Kanji;
 import com.jlpt.tutor.entity.Vocabulary;
-import com.jlpt.tutor.repository.GrammarPointRepository;
-import com.jlpt.tutor.repository.KanjiRepository;
-import com.jlpt.tutor.repository.VocabularyRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,11 +21,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RagIndexingService {
 
-    private final GrammarPointRepository grammarRepo;
-    private final VocabularyRepository vocabRepo;
-    private final KanjiRepository kanjiRepo;
     private final EmbeddingService embeddingService;
     private final JdbcTemplate jdbcTemplate;
+
 
     /** Number of texts sent per Jina AI API call (Jina supports up to 2048). */
     private static final int BATCH_SIZE = 500;

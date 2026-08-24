@@ -25,6 +25,8 @@ public class SyncGrammarTest {
         System.out.println("=== Running testSyncGrammar ===");
         Map<String, Object> result = jlptDataSyncService.syncGrammar();
         System.out.println("Sync Result: " + result);
+        assertNotNull(result);
+
 
         long n5 = grammarPointRepository.countByJlptLevelIgnoreCase("N5");
         long n4 = grammarPointRepository.countByJlptLevelIgnoreCase("N4");
