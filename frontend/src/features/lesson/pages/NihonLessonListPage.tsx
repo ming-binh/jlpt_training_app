@@ -6,6 +6,8 @@ import { LevelBadge } from "@/components/common/level-filter";
 import { Pagination } from "@/components/common/pagination";
 import { cn } from "@/lib/utils";
 import { jlptService, type LessonItem, type PageResponse } from "@/services/jlpt.service";
+import { FadeIn } from "@/components/ui/fade-in";
+
 
 type ContentTypeFilter = "ALL" | "VOCABULARY" | "KANJI" | "GRAMMAR";
 type LevelFilterType = "ALL" | "N5" | "N4" | "N3";
@@ -97,6 +99,7 @@ export function NihonLessonListPage() {
 
       <main className="mx-auto max-w-7xl px-4 py-8">
         {/* Header section */}
+        <FadeIn from="up" delay={0} immediate>
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <div className="flex items-center gap-2">
@@ -132,13 +135,16 @@ export function NihonLessonListPage() {
             ))}
           </div>
         </div>
+        </FadeIn>
 
         {/* Content Type Tabs */}
+        <FadeIn from="up" delay={80} immediate>
         <div className="mt-6 flex flex-wrap items-center justify-between border-b border-border/80 pb-3 gap-3">
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => handleTypeChange("ALL")}
+
               className={cn(
                 "rounded-lg px-3.5 py-2 text-xs font-semibold transition-colors cursor-pointer",
                 type === "ALL" ? "bg-secondary text-accent font-bold" : "text-muted-foreground hover:bg-secondary/50"
@@ -181,8 +187,10 @@ export function NihonLessonListPage() {
             </button>
           </div>
         </div>
+        </FadeIn>
 
         {/* Lessons Grid */}
+        <FadeIn from="up" delay={160} immediate>
         <div className="mt-8">
           {loading ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -197,20 +205,21 @@ export function NihonLessonListPage() {
           ) : (
             <>
               <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {lessons.map((lesson) => {
+                {lessons.map((lesson, idx) => {
                   const percent = lesson.itemCount > 0
                     ? Math.round((lesson.completedCount / lesson.itemCount) * 100)
                     : 0;
                   const isCompleted = lesson.status === "completed";
 
                   return (
+                    <FadeIn key={lesson.id} from="up" delay={Math.min(idx * 50, 350)}>
                     <div
-                      key={lesson.id}
                       className={cn(
                         "surface-card flex flex-col justify-between p-6 border border-border/80 transition-all hover:-translate-y-1 hover:border-accent/60 shadow-sm",
                         isCompleted && "border-emerald-500/40 bg-emerald-500/5"
                       )}
                     >
+
                       <div>
                         <div className="flex items-start justify-between gap-2">
                           <span className="rounded-full bg-secondary px-2.5 py-1 text-[11px] font-bold text-accent">
@@ -269,6 +278,7 @@ export function NihonLessonListPage() {
                         </div>
                       </div>
                     </div>
+                    </FadeIn>
                   );
                 })}
               </div>
@@ -284,7 +294,9 @@ export function NihonLessonListPage() {
             </>
           )}
         </div>
+        </FadeIn>
       </main>
     </div>
   );
 }
+

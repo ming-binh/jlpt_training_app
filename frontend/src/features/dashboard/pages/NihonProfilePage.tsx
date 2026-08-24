@@ -22,6 +22,8 @@ import { progressService, type ProgressSummary } from "@/services/lesson.service
 import { LevelPickerModal } from "../components/LevelPickerModal";
 import { supabase } from "@/lib/supabase";
 import { toast } from "@/components/ui/toast";
+import { FadeIn } from "@/components/ui/fade-in";
+
 
 const MASTERED_META = [
   { key: 'masteredVocab' as const, label: 'Từ vựng', kanji: '語', icon: BookOpen, to: '/tu-vung' },
@@ -150,6 +152,7 @@ export function NihonProfilePage() {
 
         <main className="relative mx-auto max-w-5xl px-4 pb-14 pt-8 sm:pt-12">
           {/* User Profile Card */}
+          <FadeIn from="up" delay={0} immediate>
           <section className="surface-card p-5 sm:p-7">
             <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-4 sm:gap-6">
               <div className="relative shrink-0">
@@ -306,8 +309,10 @@ export function NihonProfilePage() {
               </div>
             </div>
           </section>
+          </FadeIn>
 
           {/* Mastered Skills Grid */}
+          <FadeIn from="up" delay={0}>
           <section className="mt-6 grid gap-4 sm:grid-cols-3">
             {MASTERED_META.map((item) => {
               const count = progressSummary[item.key] || 0;
@@ -335,8 +340,10 @@ export function NihonProfilePage() {
               );
             })}
           </section>
+          </FadeIn>
 
           {/* JLPT Target Level & Roadmap */}
+          <FadeIn from="up" delay={0}>
           <section className="surface-card mt-6 p-5 sm:p-7">
             <div className="flex items-center justify-between border-b border-border/60 pb-4">
               <div className="flex items-center gap-3">
@@ -406,6 +413,7 @@ export function NihonProfilePage() {
               </div>
             </div>
           </section>
+          </FadeIn>
         </main>
       </div>
 

@@ -8,6 +8,8 @@ import { Pagination } from "@/components/common/pagination";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import { jlptService, type KanjiItem } from "@/services/jlpt.service";
+import { FadeIn } from "@/components/ui/fade-in";
+
 
 export function NihonKanjiPage() {
   const [level, setLevel] = useState<Level | "all">("all");
@@ -88,6 +90,7 @@ export function NihonKanjiPage() {
       <AppHeader />
 
       <div className="mx-auto max-w-6xl px-4 py-10">
+        <FadeIn from="up" delay={0} immediate>
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="jp text-sm font-semibold text-accent flex items-center gap-1.5">
@@ -115,8 +118,9 @@ export function NihonKanjiPage() {
             />
           </div>
         </header>
+        </FadeIn>
 
-        {/* Search input */}
+        <FadeIn from="up" delay={80} immediate>
         <div className="relative mt-6">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -129,7 +133,9 @@ export function NihonKanjiPage() {
             className="w-full rounded-xl border border-border bg-card py-3 pl-10 pr-4 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring"
           />
         </div>
+        </FadeIn>
 
+        <FadeIn from="up" delay={160} immediate>
         <div className="mt-8 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           {/* Grid of Kanji Cards */}
           <div>
@@ -247,7 +253,9 @@ export function NihonKanjiPage() {
             </aside>
           )}
         </div>
+        </FadeIn>
       </div>
     </div>
   );
 }
+

@@ -8,6 +8,8 @@ import { Pagination } from "@/components/common/pagination";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import { jlptService, type GrammarPointItem } from "@/services/jlpt.service";
+import { FadeIn } from "@/components/ui/fade-in";
+
 
 export function NihonGrammarPage() {
   const [level, setLevel] = useState<Level | "all">("all");
@@ -95,6 +97,7 @@ export function NihonGrammarPage() {
       <AppHeader />
 
       <div className="mx-auto max-w-4xl px-4 py-10">
+        <FadeIn from="up" delay={0} immediate>
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="jp text-sm font-semibold text-accent">文法 · GRAMMAR</p>
@@ -120,7 +123,9 @@ export function NihonGrammarPage() {
             />
           </div>
         </header>
+        </FadeIn>
 
+        <FadeIn from="up" delay={80} immediate>
         <div className="relative mt-7">
           <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -133,7 +138,9 @@ export function NihonGrammarPage() {
             className="w-full rounded-xl border border-border bg-card py-3 pl-10 pr-4 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring"
           />
         </div>
+        </FadeIn>
 
+        <FadeIn from="up" delay={160} immediate>
         <div className="mt-6 space-y-3">
           {loading ? (
             <div className="surface-card p-8 text-center text-sm text-muted-foreground animate-pulse">
@@ -264,7 +271,9 @@ export function NihonGrammarPage() {
           pageSize={pageSize}
           onPageChange={setPage}
         />
+        </FadeIn>
       </div>
     </div>
   );
 }
+

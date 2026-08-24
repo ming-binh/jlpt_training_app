@@ -8,6 +8,8 @@ import { Pagination } from "@/components/common/pagination";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import { jlptService, type VocabularyItem } from "@/services/jlpt.service";
+import { FadeIn } from "@/components/ui/fade-in";
+
 
 export function NihonVocabPage() {
   const [level, setLevel] = useState<Level | "all">("all");
@@ -108,29 +110,34 @@ export function NihonVocabPage() {
 
       <main className="mx-auto max-w-7xl px-4 py-8">
         {/* Header section */}
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <span className="jp text-sm font-semibold uppercase tracking-[0.24em] text-accent">
-                単語 · Vocab
-              </span>
-              <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs text-muted-foreground">
-                {totalElements} từ
-              </span>
+        <FadeIn from="up" delay={0} immediate>
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="jp text-sm font-semibold uppercase tracking-[0.24em] text-accent">
+                  単語 · Vocab
+                </span>
+                <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs text-muted-foreground">
+                  {totalElements} từ
+                </span>
+              </div>
+              <h1 className="mt-1 text-3xl font-bold">Ôn tập từ vựng JLPT</h1>
             </div>
-            <h1 className="mt-1 text-3xl font-bold">Ôn tập từ vựng JLPT</h1>
-          </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <LevelFilter value={level} onChange={(l) => { setLevel(l); setPage(0); }} />
-            <StatusFilter value={status} onChange={(s) => { setStatus(s); setPage(0); }} />
+            <div className="flex flex-wrap items-center gap-2">
+              <LevelFilter value={level} onChange={(l) => { setLevel(l); setPage(0); }} />
+              <StatusFilter value={status} onChange={(s) => { setStatus(s); setPage(0); }} />
+            </div>
           </div>
-        </div>
+        </FadeIn>
 
         {/* Workspace grid */}
         <div className="mt-8 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
+
           {/* Flashcard viewer */}
+          <FadeIn from="up" delay={80} immediate>
           <div>
+
             <div className="perspective-1000 relative">
               <button
                 type="button"
@@ -254,8 +261,10 @@ export function NihonVocabPage() {
               )}
             </div>
           </div>
+          </FadeIn>
 
           {/* Search & List Table */}
+          <FadeIn from="left" delay={140} immediate>
           <div className="space-y-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -330,6 +339,7 @@ export function NihonVocabPage() {
               onPageChange={setPage}
             />
           </div>
+          </FadeIn>
         </div>
       </main>
     </div>
