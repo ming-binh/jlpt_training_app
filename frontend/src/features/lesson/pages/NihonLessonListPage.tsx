@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { GraduationCap, CheckCircle2, Play, BookOpen, Brain } from "lucide-react";
+import { GraduationCap, CheckCircle2, Play, BookOpen, Brain, Lock } from "lucide-react";
 import { AppHeader } from "@/components/common/app-header";
 import { LevelBadge } from "@/components/common/level-filter";
 import { Pagination } from "@/components/common/pagination";
 import { cn } from "@/lib/utils";
 import { jlptService, type LessonItem, type PageResponse } from "@/services/jlpt.service";
 import { FadeIn } from "@/components/ui/fade-in";
+import { useLevelConfig } from "@/hooks/useLevelConfig";
+import { toast } from "@/components/ui/toast";
 
 
 type ContentTypeFilter = "ALL" | "VOCABULARY" | "KANJI" | "GRAMMAR";
-type LevelFilterType = "ALL" | "N5" | "N4" | "N3";
+type LevelFilterType = "ALL" | "N5" | "N4" | "N3" | "N2" | "N1";
 
 const FALLBACK_LESSONS: LessonItem[] = [
   { id: 1, title: "N5 Từ Vựng - Bài 1", description: "Luyện tập 15 từ vựng JLPT N5 cơ bản", jlptLevel: "N5", contentType: "VOCABULARY", orderIndex: 1, itemCount: 15, completedCount: 0, status: "available" },
@@ -23,6 +25,7 @@ const FALLBACK_LESSONS: LessonItem[] = [
 
 export function NihonLessonListPage() {
   const navigate = useNavigate();
+  const { isLevelActive } = useLevelConfig();
   const [level, setLevel] = useState<LevelFilterType>("ALL");
   const [type, setType] = useState<ContentTypeFilter>("ALL");
   const [lessons, setLessons] = useState<LessonItem[]>([]);
@@ -77,7 +80,8 @@ export function NihonLessonListPage() {
 
   function getFilteredFallback(lvl: LevelFilterType, t: ContentTypeFilter): LessonItem[] {
     return FALLBACK_LESSONS.filter((item) => {
-      const matchLevel = lvl === "ALL" || item.jlptLevel === lvl;
+      const isItemActive = isLevelActive(item.jlptLevel);
+      const matchLevel = lvl === "ALL" ? isItemActive : item.jlptLevel === lvl;
       const matchType = t === "ALL" || item.contentType === t;
       return matchLevel && matchType;
     });
@@ -110,7 +114,7 @@ export function NihonLessonListPage() {
                 {totalElements} bài học
               </span>
             </div>
-            <h1 className="mt-1 text-3xl font-bold">Lộ trình bài học JLPT (N5 ➔ N3)</h1>
+            <h1 className="mt-1 text-3xl font-bold">Lộ trình bài học JLPT</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               Bài học được biên soạn bài bản từng bài, tích hợp Flashcard & Quiz trắc nghiệm đánh giá năng lực.
             </p>
@@ -118,21 +122,35 @@ export function NihonLessonListPage() {
 
           {/* Level Filter Buttons */}
           <div className="flex flex-wrap items-center gap-2">
-            {(["ALL", "N5", "N4", "N3"] as LevelFilterType[]).map((lvl) => (
-              <button
-                key={lvl}
-                type="button"
-                onClick={() => handleLevelChange(lvl)}
-                className={cn(
-                  "rounded-xl border px-3.5 py-2 text-xs font-bold transition-all cursor-pointer",
-                  level === lvl
-                    ? "border-accent bg-accent text-accent-foreground shadow-sm"
-                    : "border-border bg-card text-muted-foreground hover:bg-secondary hover:text-foreground"
-                )}
-              >
-                {lvl === "ALL" ? "Tất cả trình độ" : lvl}
-              </button>
-            ))}
+            {(["ALL", "N5", "N4", "N3", "N2", "N1"] as LevelFilterType[]).map((lvl) => {
+              const isSelected = level === lvl;
+              const isActive = lvl === "ALL" || isLevelActive(lvl);
+
+              return (
+                <button
+                  key={lvl}
+                  type="button"
+                  onClick={() => {
+                    if (lvl !== "ALL" && !isLevelActive(lvl)) {
+                      toast.info(`Trình độ ${lvl} đang được hoàn thiện bài học và sẽ sớm ra mắt!`);
+                      return;
+                    }
+                    handleLevelChange(lvl);
+                  }}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-2 text-xs font-bold transition-all cursor-pointer",
+                    isSelected
+                      ? "border-accent bg-accent text-accent-foreground shadow-sm"
+                      : isActive
+                      ? "border-border bg-card text-muted-foreground hover:bg-secondary hover:text-foreground"
+                      : "border-border/50 bg-secondary/30 text-muted-foreground/60 hover:text-muted-foreground"
+                  )}
+                >
+                  <span>{lvl === "ALL" ? "Tất cả trình độ" : lvl}</span>
+                  {!isActive && <Lock className="size-2.5 text-amber-400 opacity-80" />}
+                </button>
+              );
+            })}
           </div>
         </div>
         </FadeIn>

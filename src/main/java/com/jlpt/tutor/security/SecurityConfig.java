@@ -44,7 +44,8 @@ public class SecurityConfig {
                     .requestMatchers("/api/ai/**").permitAll()
                     .requestMatchers("/api/lessons/**").permitAll()
                     .requestMatchers("/api/progress/**").permitAll()
-                    .requestMatchers("/api/quiz/**").permitAll();
+                    .requestMatchers("/api/quiz/**").permitAll()
+                    .requestMatchers("/api/levels/**").permitAll();
 
                 // H2 console — only in dev (h2.console.enabled=true)
                 if (h2ConsoleEnabled) {

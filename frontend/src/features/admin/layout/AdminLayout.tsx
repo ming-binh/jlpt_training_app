@@ -8,6 +8,7 @@ const NAV = [
   { to: '/admin', glyph: '総', label: 'Dashboard', end: true },
   { to: '/admin/users', glyph: '人', label: 'Người dùng', end: false },
   { to: '/admin/roles', glyph: '権', label: 'Vai trò & Quyền', end: false },
+  { to: '/admin/levels', glyph: '級', label: 'Cấp độ JLPT', end: false },
   { to: '/admin/content', glyph: '料', label: 'Nội dung', end: false },
 ] as const;
 
@@ -15,6 +16,7 @@ const TITLES: Record<string, [string, string]> = {
   '/admin': ['Dashboard tổng quan', 'Số liệu học viên & nội dung toàn hệ thống'],
   '/admin/users': ['Quản lý người dùng', 'Tìm kiếm, đổi vai trò và quản lý tài khoản học viên'],
   '/admin/roles': ['Vai trò & phân quyền', 'Ma trận quyền truy cập theo từng vai trò'],
+  '/admin/levels': ['Quản lý cấp độ JLPT', 'Kích hoạt hoặc tạm khoá các mốc trình độ (N5 - N1)'],
   '/admin/content': ['Quản lý nội dung', 'Bài học, từ vựng, kanji và ngữ pháp'],
 };
 

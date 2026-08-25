@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Lock } from 'lucide-react';
 import { AppHeader } from '@/components/common/app-header';
 import type { JlptLevel, ContentType } from '@/services/lesson.service';
 import { cn } from '@/lib/utils';
+import { useLevelConfig } from '@/hooks/useLevelConfig';
+import { toast } from '@/components/ui/toast';
 
-const LEVELS: JlptLevel[] = ['N5', 'N4', 'N3'];
+const LEVELS: JlptLevel[] = ['N5', 'N4', 'N3', 'N2', 'N1'];
 const TYPES: { type: ContentType | 'MIXED'; jp: string; label: string; desc: string }[] = [
   { type: 'MIXED', jp: '総合', label: 'Tổng hợp', desc: 'Trộn ngẫu nhiên các loại' },
   { type: 'VOCABULARY', jp: '単語', label: 'Từ vựng', desc: 'Chọn nghĩa đúng của từ' },
@@ -16,6 +18,7 @@ const COUNTS = [5, 10, 20, 30];
 
 export const PracticePage: React.FC = () => {
   const navigate = useNavigate();
+  const { isLevelActive } = useLevelConfig();
   const [selectedLevel, setSelectedLevel] = useState<JlptLevel | 'all'>('all');
   const [selectedType, setSelectedType] = useState<ContentType | 'MIXED'>('MIXED');
   const [questionCount, setQuestionCount] = useState(10);
@@ -76,23 +79,37 @@ export const PracticePage: React.FC = () => {
               <p className="text-[11px] uppercase tracking-widest text-muted-foreground">
                 Trình độ
               </p>
-              <div className="mt-3 inline-flex flex-wrap rounded-xl border border-border bg-card p-1">
-                {(['all', ...LEVELS] as const).map((lvl) => (
-                  <button
-                    key={lvl}
-                    id={`practice-level-${lvl.toLowerCase()}`}
-                    type="button"
-                    onClick={() => setSelectedLevel(lvl)}
-                    className={cn(
-                      'rounded-lg px-3.5 py-1.5 text-xs font-medium uppercase tracking-wider transition-colors',
-                      selectedLevel === lvl
-                        ? 'bg-accent text-accent-foreground font-semibold'
-                        : 'text-muted-foreground hover:text-foreground',
-                    )}
-                  >
-                    {lvl === 'all' ? 'Tất cả' : lvl}
-                  </button>
-                ))}
+              <div className="mt-3 inline-flex flex-wrap rounded-xl border border-border bg-card p-1 gap-1">
+                {(['all', ...LEVELS] as const).map((lvl) => {
+                  const isSelected = selectedLevel === lvl;
+                  const isActive = lvl === 'all' || isLevelActive(lvl);
+
+                  return (
+                    <button
+                      key={lvl}
+                      id={`practice-level-${lvl.toLowerCase()}`}
+                      type="button"
+                      onClick={() => {
+                        if (lvl !== 'all' && !isLevelActive(lvl)) {
+                          toast.info(`Trình độ ${lvl} đang được hoàn thiện câu hỏi và sẽ sớm ra mắt!`);
+                          return;
+                        }
+                        setSelectedLevel(lvl);
+                      }}
+                      className={cn(
+                        'inline-flex items-center gap-1 rounded-lg px-3.5 py-1.5 text-xs font-medium uppercase tracking-wider transition-colors cursor-pointer',
+                        isSelected
+                          ? 'bg-accent text-accent-foreground font-semibold shadow-sm'
+                          : isActive
+                          ? 'text-muted-foreground hover:text-foreground'
+                          : 'text-muted-foreground/60 bg-secondary/20',
+                      )}
+                    >
+                      <span>{lvl === 'all' ? 'Tất cả' : lvl}</span>
+                      {!isActive && <Lock className="size-2.5 text-amber-400 opacity-80" />}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

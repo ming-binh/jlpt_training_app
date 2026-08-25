@@ -32,6 +32,7 @@ public class LessonController {
     private final UserService userService;
     private final ExerciseGeneratorService exerciseGeneratorService;
     private final ProgressUpdateService progressUpdateService;
+    private final com.jlpt.tutor.service.JlptLevelConfigService levelConfigService;
 
     private String getUserId(Authentication authentication) {
         if (authentication == null) return null;
@@ -66,15 +67,33 @@ public class LessonController {
             }
         }
 
+        java.util.List<String> activeLevels = levelConfigService.getActiveLevelCodes();
+        if (activeLevels == null || activeLevels.isEmpty()) {
+            activeLevels = java.util.List.of("N5", "N4", "N3");
+        }
+        final java.util.List<String> effectiveActiveLevels = activeLevels;
+
         if (filterLevel != null && filterType != null) {
             lessons = lessonRepository.findByJlptLevelAndContentTypeOrderByOrderIndex(filterLevel, filterType);
         } else if (filterLevel != null) {
             lessons = lessonRepository.findByJlptLevelOrderByOrderIndex(filterLevel);
         } else if (filterType != null) {
-            lessons = lessonRepository.findByContentTypeOrderByJlptLevelAscOrderIndexAsc(filterType);
+            lessons = lessonRepository.findByContentTypeOrderByJlptLevelAscOrderIndexAsc(filterType)
+                    .stream()
+                    .filter(l -> l.getJlptLevel() != null && effectiveActiveLevels.contains(l.getJlptLevel().toUpperCase()))
+                    .toList();
         } else {
-            lessons = lessonRepository.findAll();
+            lessons = lessonRepository.findAll()
+                    .stream()
+                    .filter(l -> l.getJlptLevel() != null && effectiveActiveLevels.contains(l.getJlptLevel().toUpperCase()))
+                    .toList();
         }
+
+        // Logical difficulty sorting: N5 (1) -> N4 (2) -> N3 (3) -> N2 (4) -> N1 (5)
+        Map<String, Integer> levelRank = Map.of("N5", 1, "N4", 2, "N3", 3, "N2", 4, "N1", 5);
+        lessons = new ArrayList<>(lessons);
+        lessons.sort(Comparator.comparingInt((Lesson l) -> levelRank.getOrDefault(l.getJlptLevel() != null ? l.getJlptLevel().toUpperCase() : "", 99))
+                .thenComparingInt(Lesson::getOrderIndex));
 
         Set<String> masteredKeys = new java.util.HashSet<>();
         Map<Long, List<LessonItem>> itemsByLessonMap = new java.util.HashMap<>();

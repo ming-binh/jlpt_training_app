@@ -14,7 +14,8 @@ public interface VocabularyRepository extends JpaRepository<Vocabulary, Long> {
     Page<Vocabulary> findByJlptLevelIgnoreCase(String jlptLevel, Pageable pageable);
 
     @Query("SELECT v FROM Vocabulary v WHERE " +
-           "(:level IS NULL OR :level = '' OR UPPER(v.jlptLevel) = UPPER(:level)) AND " +
+           "((:level IS NOT NULL AND :level <> '' AND UPPER(v.jlptLevel) = UPPER(:level)) OR " +
+           " ((:level IS NULL OR :level = '') AND UPPER(v.jlptLevel) IN :activeLevels)) AND " +
            "(:search IS NULL OR :search = '' OR LOWER(v.word) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(v.reading) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(v.meaning) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
@@ -22,9 +23,12 @@ public interface VocabularyRepository extends JpaRepository<Vocabulary, Long> {
            "  (:status = 'NEW' AND NOT EXISTS (SELECT 1 FROM UserProgress up WHERE up.userId = :userId AND up.entityType = 'VOCABULARY' AND up.entityId = v.id)) OR " +
            "  (:status <> 'NEW' AND EXISTS (SELECT 1 FROM UserProgress up WHERE up.userId = :userId AND up.entityType = 'VOCABULARY' AND up.entityId = v.id AND up.status = :status))" +
            ")")
-    Page<Vocabulary> searchVocabulary(@Param("level") String level, @Param("search") String search,
-                                       @Param("status") String status, @Param("userId") String userId,
-                                       Pageable pageable);
+    Page<Vocabulary> searchVocabulary(@Param("level") String level,
+                                      @Param("activeLevels") java.util.List<String> activeLevels,
+                                      @Param("search") String search,
+                                      @Param("status") String status,
+                                      @Param("userId") String userId,
+                                      Pageable pageable);
 
     @Query("SELECT COUNT(v) FROM Vocabulary v WHERE UPPER(v.jlptLevel) = UPPER(:jlptLevel)")
     long countByJlptLevelIgnoreCase(@Param("jlptLevel") String jlptLevel);

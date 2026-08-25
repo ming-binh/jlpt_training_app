@@ -12,12 +12,15 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+import com.jlpt.tutor.service.JlptLevelConfigService;
+
 @RestController
 @RequestMapping("/api/vocabulary")
 @RequiredArgsConstructor
 public class VocabularyController {
 
     private final VocabularyRepository vocabularyRepository;
+    private final JlptLevelConfigService levelConfigService;
 
     @GetMapping
     public ResponseEntity<Page<Vocabulary>> getVocabulary(
@@ -34,8 +37,13 @@ public class VocabularyController {
         String userId = authentication != null && authentication.getPrincipal() instanceof User user ? user.getId() : null;
         String filterStatus = (userId != null && status != null && !status.isBlank() && !"ALL".equalsIgnoreCase(status)) ? status.toUpperCase() : null;
 
+        java.util.List<String> activeLevels = levelConfigService.getActiveLevelCodes();
+        if (activeLevels == null || activeLevels.isEmpty()) {
+            activeLevels = java.util.List.of("N5", "N4", "N3");
+        }
+
         Page<Vocabulary> result = vocabularyRepository.searchVocabulary(
-                filterLevel, filterSearch, filterStatus, userId, PageRequest.of(page, size));
+                filterLevel, activeLevels, filterSearch, filterStatus, userId, PageRequest.of(page, size));
 
         return ResponseEntity.ok(result);
     }

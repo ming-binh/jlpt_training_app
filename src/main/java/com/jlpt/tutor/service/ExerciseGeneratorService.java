@@ -32,6 +32,7 @@ public class ExerciseGeneratorService {
     private final VocabularyRepository vocabularyRepository;
     private final KanjiRepository kanjiRepository;
     private final GrammarPointRepository grammarPointRepository;
+    private final JlptLevelConfigService levelConfigService;
 
     /** Flashcard + multiple_choice per vocab item, flashcard-only for kanji/grammar — used by lessons. */
     public List<ExerciseDto> generateForItems(List<LessonItem> items) {
@@ -68,9 +69,12 @@ public class ExerciseGeneratorService {
 
     /** Random multiple_choice vocab exercises for a level — used by practice quiz. */
     public List<ExerciseDto> randomVocabExercises(String level, int limit) {
-        List<Vocabulary> rawPool = (level != null && !level.isBlank())
+        List<String> activeLevels = levelConfigService.getActiveLevelCodes();
+        List<Vocabulary> rawPool = (level != null && !level.isBlank() && !"ALL".equalsIgnoreCase(level))
                 ? vocabularyRepository.findByJlptLevelIgnoreCase(level, PageRequest.of(0, 500)).getContent()
-                : vocabularyRepository.findAll();
+                : vocabularyRepository.findAll().stream()
+                    .filter(v -> v.getJlptLevel() != null && activeLevels.contains(v.getJlptLevel().toUpperCase()))
+                    .toList();
 
         // Only Vietnamese-translated words: an English "correct answer" reads as broken next to Vietnamese distractors.
         List<Vocabulary> pool = rawPool.stream()
@@ -88,9 +92,12 @@ public class ExerciseGeneratorService {
 
     /** Random flashcard kanji exercises for a level — used by practice quiz. */
     public List<ExerciseDto> randomKanjiExercises(String level, int limit) {
-        List<Kanji> pool = (level != null && !level.isBlank())
+        List<String> activeLevels = levelConfigService.getActiveLevelCodes();
+        List<Kanji> pool = (level != null && !level.isBlank() && !"ALL".equalsIgnoreCase(level))
                 ? kanjiRepository.findByJlptLevelIgnoreCase(level, PageRequest.of(0, 500)).getContent()
-                : kanjiRepository.findAll();
+                : kanjiRepository.findAll().stream()
+                    .filter(k -> k.getJlptLevel() != null && activeLevels.contains(k.getJlptLevel().toUpperCase()))
+                    .toList();
 
         List<Kanji> shuffled = new ArrayList<>(pool);
         Collections.shuffle(shuffled);
@@ -100,9 +107,12 @@ public class ExerciseGeneratorService {
 
     /** Random flashcard grammar exercises for a level — used by practice quiz. */
     public List<ExerciseDto> randomGrammarExercises(String level, int limit) {
-        List<GrammarPoint> pool = (level != null && !level.isBlank())
+        List<String> activeLevels = levelConfigService.getActiveLevelCodes();
+        List<GrammarPoint> pool = (level != null && !level.isBlank() && !"ALL".equalsIgnoreCase(level))
                 ? grammarPointRepository.findByJlptLevelIgnoreCase(level, PageRequest.of(0, 500)).getContent()
-                : grammarPointRepository.findAll();
+                : grammarPointRepository.findAll().stream()
+                    .filter(g -> g.getJlptLevel() != null && activeLevels.contains(g.getJlptLevel().toUpperCase()))
+                    .toList();
 
         List<GrammarPoint> shuffled = new ArrayList<>(pool);
         Collections.shuffle(shuffled);

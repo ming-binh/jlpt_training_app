@@ -29,6 +29,7 @@ import { AdminLayout } from './features/admin/layout/AdminLayout';
 import { AdminDashboardPage } from './features/admin/pages/AdminDashboardPage';
 import { AdminUsersPage } from './features/admin/pages/AdminUsersPage';
 import { AdminRolesPage } from './features/admin/pages/AdminRolesPage';
+import { AdminLevelsPage } from './features/admin/pages/AdminLevelsPage';
 import { AdminContentPage } from './features/admin/pages/AdminContentPage';
 
 const App: React.FC = () => {
@@ -82,6 +83,7 @@ const App: React.FC = () => {
           <Route index element={<AdminDashboardPage />} />
           <Route path="users" element={<AdminUsersPage />} />
           <Route path="roles" element={<AdminRolesPage />} />
+          <Route path="levels" element={<AdminLevelsPage />} />
           <Route path="content" element={<AdminContentPage />} />
         </Route>
 

@@ -16,7 +16,8 @@ public interface KanjiRepository extends JpaRepository<Kanji, Long> {
     Page<Kanji> findByJlptLevelIgnoreCase(String jlptLevel, Pageable pageable);
 
     @Query("SELECT k FROM Kanji k WHERE " +
-           "(:level IS NULL OR :level = '' OR UPPER(k.jlptLevel) = UPPER(:level)) AND " +
+           "((:level IS NOT NULL AND :level <> '' AND UPPER(k.jlptLevel) = UPPER(:level)) OR " +
+           " ((:level IS NULL OR :level = '') AND UPPER(k.jlptLevel) IN :activeLevels)) AND " +
            "(:search IS NULL OR :search = '' OR LOWER(k.character) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(k.meanings) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(k.onReadings) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
@@ -25,9 +26,12 @@ public interface KanjiRepository extends JpaRepository<Kanji, Long> {
            "  (:status = 'NEW' AND NOT EXISTS (SELECT 1 FROM UserProgress up WHERE up.userId = :userId AND up.entityType = 'KANJI' AND up.entityId = k.id)) OR " +
            "  (:status <> 'NEW' AND EXISTS (SELECT 1 FROM UserProgress up WHERE up.userId = :userId AND up.entityType = 'KANJI' AND up.entityId = k.id AND up.status = :status))" +
            ")")
-    Page<Kanji> searchKanji(@Param("level") String level, @Param("search") String search,
-                             @Param("status") String status, @Param("userId") String userId,
-                             Pageable pageable);
+    Page<Kanji> searchKanji(@Param("level") String level,
+                            @Param("activeLevels") java.util.List<String> activeLevels,
+                            @Param("search") String search,
+                            @Param("status") String status,
+                            @Param("userId") String userId,
+                            Pageable pageable);
 
     @Query("SELECT COUNT(k) FROM Kanji k WHERE UPPER(k.jlptLevel) = UPPER(:jlptLevel)")
     long countByJlptLevelIgnoreCase(@Param("jlptLevel") String jlptLevel);
