@@ -10,6 +10,9 @@ import { NihonVocabPage } from './features/vocab/pages/NihonVocabPage';
 import { NihonKanjiPage } from './features/kanji/pages/NihonKanjiPage';
 import { NihonGrammarPage } from './features/grammar/pages/NihonGrammarPage';
 import { NihonChatPage } from './features/ai-chat/pages/NihonChatPage';
+import { ExamListPage } from './features/exam/pages/ExamListPage';
+import { ExamTakingPage } from './features/exam/pages/ExamTakingPage';
+import { ExamReviewPage } from './features/exam/pages/ExamReviewPage';
 
 // Auth Feature Pages
 import { AuthPage } from './features/auth/pages/AuthPage';
@@ -44,6 +47,10 @@ const App: React.FC = () => {
         <Route path="/tu-vung" element={<NihonVocabPage />} />
         <Route path="/kanji" element={<NihonKanjiPage />} />
         <Route path="/ngu-phap" element={<NihonGrammarPage />} />
+        <Route path="/luyen-de" element={<ExamListPage />} />
+        <Route path="/luyen-de/:examId/take" element={<ExamTakingPage />} />
+        <Route path="/luyen-de/:examId/mondai/:sectionId" element={<ExamTakingPage />} />
+        <Route path="/luyen-de/review/:attemptId" element={<ExamReviewPage />} />
         <Route path="/chat" element={<NihonChatPage />} />
 
         {/* ── Auth System ─────────────────────────────────── */}

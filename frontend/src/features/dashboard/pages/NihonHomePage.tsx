@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, BookOpen, Brain, MessageCircle, GraduationCap, Play, PenLine, RotateCcw, ListChecks, TrendingUp, Check, Star, Clock } from "lucide-react";
+import { ArrowRight, BookOpen, Brain, MessageCircle, GraduationCap, Play, PenLine, RotateCcw, ListChecks, TrendingUp, Check, Star, Clock, Award } from "lucide-react";
 import { GRAMMAR, KANJI, VOCAB } from "@/data/jlpt";
 import { AppHeader } from "@/components/common/app-header";
 import { jlptService } from "@/services/jlpt.service";
@@ -132,8 +132,9 @@ export function NihonHomePage() {
     { to: "/tu-vung", kanji: "語", title: "Ôn từ vựng", desc: "Flashcard lật thẻ, ví dụ thực tế, phát âm tiếng Nhật, lọc theo cấp độ.", icon: BookOpen, count: `${counts.vocab} từ` },
     { to: "/kanji", kanji: "漢", title: "Ôn kanji", desc: "Âm On/Kun, số nét và từ ghép thường gặp.", icon: PenLine, count: `${counts.kanji} chữ` },
     { to: "/ngu-phap", kanji: "文", title: "Cấu trúc ngữ pháp", desc: "Công thức, sắc thái sử dụng và câu ví dụ song ngữ.", icon: Brain, count: `${counts.grammar} mẫu` },
+    { to: "/luyen-de", kanji: "試", title: "Luyện đề JLPT", desc: "Đề thi thật N5-N1 qua các năm, luyện từng Mondai hoặc làm full đề.", icon: Award, count: "Luyện đề ngay" },
     { to: "/chat", kanji: "AI", title: "Trợ lý AI Sensei", desc: "Hỏi đáp ngữ pháp, dịch câu, luyện hội thoại 24/7.", icon: MessageCircle, count: "Chat ngay" },
-    { to: "/practice", kanji: "試", title: "Câu hỏi ôn tập", desc: "Trắc nghiệm từ vựng, Kanji, ngữ pháp theo cấp độ N5-N3.", icon: ListChecks, count: "Luyện tập ngay" },
+    { to: "/practice", kanji: "習", title: "Câu hỏi ôn tập", desc: "Trắc nghiệm từ vựng, Kanji, ngữ pháp theo cấp độ N5-N3.", icon: ListChecks, count: "Luyện tập ngay" },
   ];
 
   const userLevel = userStats?.jlptLevel ?? "N5";

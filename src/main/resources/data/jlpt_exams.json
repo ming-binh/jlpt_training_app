@@ -1,0 +1,519 @@
+[
+  {
+    "code": "N3_2013_12",
+    "title": "Đề thi JLPT N3 - Tháng 12/2013",
+    "jlptLevel": "N3",
+    "year": 2013,
+    "month": 12,
+    "totalTimeMinutes": 105,
+    "description": "Đề thi chính thức kỳ thi Năng lực Nhật ngữ JLPT N3 đợt tháng 12/2013 kèm đáp án và giải thích chi tiết tiếng Việt.",
+    "sections": [
+      {
+        "sectionType": "VOCABULARY",
+        "mondaiNumber": 1,
+        "title": "Mondai 1: Đọc chữ Hán",
+        "instruction": "問題1　_____の言葉の読み方として最もよいものを、1・2・3・4から一つ選びなさい。",
+        "timeLimitMinutes": 12,
+        "orderIndex": 1,
+        "questions": [
+          {
+            "questionNumber": 1,
+            "questionText": "この料理は、_塩_を加えるだけでおいしくなります。",
+            "underlinedText": "塩",
+            "option1": "さとう",
+            "option2": "しお",
+            "option3": "あぶら",
+            "option4": "しょうゆ",
+            "correctOption": 2,
+            "explanation": "「塩」 đọc là 「しお」 (Muối). Câu dịch: Món ăn này chỉ cần thêm muối vào là trở nên ngon."
+          },
+          {
+            "questionNumber": 2,
+            "questionText": "彼は新しい企画を_提案_した。",
+            "underlinedText": "提案",
+            "option1": "ていあん",
+            "option2": "だいあん",
+            "option3": "ていかん",
+            "option4": "だいかん",
+            "correctOption": 1,
+            "explanation": "「提案」 đọc là 「ていあん」 (Đề án, đề xuất). Câu dịch: Anh ấy đã đề xuất một kế hoạch mới."
+          },
+          {
+            "questionNumber": 3,
+            "questionText": "この建物は地震に_耐える_ように造られている。",
+            "underlinedText": "耐える",
+            "option1": "こえる",
+            "option2": "たえる",
+            "option3": "おえる",
+            "option4": "はえる",
+            "correctOption": 2,
+            "explanation": "「耐える」 đọc là 「たえる」 (Chịu đựng, chống chịu). Câu dịch: Tòa nhà này được xây dựng để chịu được động đất."
+          },
+          {
+            "questionNumber": 4,
+            "questionText": "その意見には_賛成_できません。",
+            "underlinedText": "賛成",
+            "option1": "さんせい",
+            "option2": "かんせい",
+            "option3": "さんしょう",
+            "option4": "かんしょう",
+            "correctOption": 1,
+            "explanation": "「賛成」 đọc là 「さんせい」 (Tán thành, đồng ý). Câu dịch: Tôi không thể tán thành ý kiến đó."
+          },
+          {
+            "questionNumber": 5,
+            "questionText": "彼はお金に関してとても_細かい_人だ。",
+            "underlinedText": "細かい",
+            "option1": "みじかい",
+            "option2": "あさい",
+            "option3": "こまかい",
+            "option4": "まるい",
+            "correctOption": 3,
+            "explanation": "「細かい」 đọc là 「こまかい」 (Tỉ mỉ, chi li). Câu dịch: Anh ấy là người rất chi li về chuyện tiền bạc."
+          }
+        ]
+      },
+      {
+        "sectionType": "VOCABULARY",
+        "mondaiNumber": 2,
+        "title": "Mondai 2: Cách viết chữ Hán",
+        "instruction": "問題2　_____の言葉を漢字で書くとき、最もよいものを、1・2・3・4から一つ選びなさい。",
+        "timeLimitMinutes": 10,
+        "orderIndex": 2,
+        "questions": [
+          {
+            "questionNumber": 6,
+            "questionText": "新しい車を_かう_ことにしました。",
+            "underlinedText": "かう",
+            "option1": "買う",
+            "option2": "貝う",
+            "option3": "売う",
+            "option4": "貸う",
+            "correctOption": 1,
+            "explanation": "「買う」 (Mua). Câu dịch: Tôi đã quyết định mua chiếc ô tô mới."
+          },
+          {
+            "questionNumber": 7,
+            "questionText": "外国の文化に_きょうみ_があります。",
+            "underlinedText": "きょうみ",
+            "option1": "趣味",
+            "option2": "興味",
+            "option3": "興未",
+            "option4": "感味",
+            "correctOption": 2,
+            "explanation": "「興味」 (Hứng thú, quan tâm). 趣味 là sở thích. Câu dịch: Tôi có hứng thú với văn hóa nước ngoài."
+          },
+          {
+            "questionNumber": 8,
+            "questionText": "会議の時間を_へんこう_しました。",
+            "underlinedText": "へんこう",
+            "option1": "変向",
+            "option2": "反更",
+            "option3": "変更",
+            "option4": "偏交",
+            "correctOption": 3,
+            "explanation": "「変更」 (Thay đổi, biến cải). Câu dịch: Tôi đã thay đổi giờ họp."
+          }
+        ]
+      },
+      {
+        "sectionType": "VOCABULARY",
+        "mondaiNumber": 3,
+        "title": "Mondai 3: Điền từ vào chỗ trống",
+        "instruction": "問題3　(　　) に入れるのに最もよいものを、1・2・3・4から一つ選びなさい。",
+        "timeLimitMinutes": 15,
+        "orderIndex": 3,
+        "questions": [
+          {
+            "questionNumber": 15,
+            "questionText": "風邪をひいて、のどの（　　）が悪いです。",
+            "underlinedText": null,
+            "option1": "気分",
+            "option2": "調子",
+            "option3": "事情",
+            "option4": "都合",
+            "correctOption": 2,
+            "explanation": "「のどの調子が悪い」 (Tình trạng họng không tốt). 気分 dùng cho tâm trạng/cảm giác cơ thể nói chung, 都合 là sự thuận tiện thời gian. Câu dịch: Do bị cảm nên tình trạng cổ họng của tôi không tốt."
+          },
+          {
+            "questionNumber": 16,
+            "questionText": "このズボンは（　　）ので、もう少し小さいサイズをください。",
+            "underlinedText": null,
+            "option1": "きつい",
+            "option2": "だるい",
+            "option3": "緩い",
+            "option4": "苦しい",
+            "correctOption": 3,
+            "explanation": "「緩い (ゆるい)」 (Rộng/lỏng). Cần size nhỏ hơn chứng tỏ chiếc quần đang bị rộng (緩い). きつい là chật. Câu dịch: Chiếc quần này rộng quá, vui lòng cho tôi cỡ nhỏ hơn một chút."
+          },
+          {
+            "questionNumber": 17,
+            "questionText": "日本に来てから、もう3年（　　）。",
+            "underlinedText": null,
+            "option1": "移りました",
+            "option2": "かかりました",
+            "option3": "通りました",
+            "option4": "たちました",
+            "correctOption": 4,
+            "explanation": "Thời gian + 「たつ (経つ)」: Đã trôi qua bao nhiêu thời gian. Câu dịch: Kể từ khi đến Nhật Bản, đã 3 năm trôi qua rồi."
+          },
+          {
+            "questionNumber": 18,
+            "questionText": "ついさっきまでいい天気だったのに、（　　）雨が降ってきてぬれてしまいました。",
+            "underlinedText": null,
+            "option1": "突然",
+            "option2": "早めに",
+            "option3": "さっそく",
+            "option4": "急ぐ",
+            "correctOption": 1,
+            "explanation": "「突然 (とつぜん)」: Đột nhiên/bất thình lình. Câu dịch: Vừa lúc nãy trời còn đẹp thế mà đột nhiên trời đổ mưa làm tôi ướt sũng."
+          },
+          {
+            "questionNumber": 19,
+            "questionText": "この国は（　　）が高いので、生活が大変です。",
+            "underlinedText": null,
+            "option1": "経済",
+            "option2": "物価",
+            "option3": "消費",
+            "option4": "支出",
+            "correctOption": 2,
+            "explanation": "「物価が高い」: Vật giá/giá cả sinh hoạt đắt đỏ. Câu dịch: Đất nước này giá cả đắt đỏ nên cuộc sống khá vất vả."
+          },
+          {
+            "questionNumber": 20,
+            "questionText": "先に家を出た兄に、駅の近くでやっと（　　）。",
+            "underlinedText": null,
+            "option1": "間に合いました",
+            "option2": "ぶつかりました",
+            "option3": "届きました",
+            "option4": "追いつきました",
+            "correctOption": 4,
+            "explanation": "「追いつく (おいつく)」: Đuổi kịp, bắt kịp. Câu dịch: Tôi cuối cùng đã đuổi kịp anh trai (người ra khỏi nhà trước) ở gần ga."
+          },
+          {
+            "questionNumber": 21,
+            "questionText": "わたしは泳ぐのが下手なので、この前、海で（　　）になりました。",
+            "underlinedText": null,
+            "option1": "こおりそう",
+            "option2": "たまりそう",
+            "option3": "おぼれそう",
+            "option4": "すべりそう",
+            "correctOption": 3,
+            "explanation": "「溺れる (おぼれる)」: Chết đuối, ngộp nước -> 「おぼれそうになる」: Suýt chết đuối. Câu dịch: Tôi bơi rất kém nên đợt trước ra biển suýt nữa thì chết đuối."
+          },
+          {
+            "questionNumber": 22,
+            "questionText": "友人の家で食べたケーキがおいしかったので、（　　）と作り方を教えてもらった。",
+            "underlinedText": null,
+            "option1": "資源",
+            "option2": "材料",
+            "option3": "部品",
+            "option4": "原因",
+            "correctOption": 2,
+            "explanation": "「材料 (ざいりょう)」: Nguyên liệu làm bánh/nấu ăn. 資源 là tài nguyên, 部品 là linh kiện máy móc. Câu dịch: Chiếc bánh ăn ở nhà bạn rất ngon nên tôi đã được chỉ cho nguyên liệu và cách làm."
+          },
+          {
+            "questionNumber": 23,
+            "questionText": "あの兄弟はいつも一緒に学校に来るのに、今日は（　　）来た。",
+            "underlinedText": null,
+            "option1": "別々に",
+            "option2": "半々に",
+            "option3": "分けて",
+            "option4": "区切って",
+            "correctOption": 1,
+            "explanation": "「別々に (べつべつに)」: Riêng biệt, từng người một. Đối lập với 「一緒に」 (cùng nhau). Câu dịch: Hai anh em đó bình thường luôn đến trường cùng nhau, thế mà hôm nay lại đến riêng rẽ."
+          },
+          {
+            "questionNumber": 24,
+            "questionText": "佐藤さんに仕事をお願いしたら、（　　）くれました。",
+            "underlinedText": null,
+            "option1": "引き受けて",
+            "option2": "引き出して",
+            "option3": "引っ張って",
+            "option4": "引っかけて",
+            "correctOption": 1,
+            "explanation": "「引き受ける (ひきうける)」: Nhận lời, đảm nhận công việc. Câu dịch: Khi tôi nhờ anh Sato làm công việc đó, anh ấy đã nhận lời giúp tôi."
+          },
+          {
+            "questionNumber": 25,
+            "questionText": "森さんはいつも、自分の飼っているペットが一番かわいいとみんなに（　　）いる。",
+            "underlinedText": null,
+            "option1": "期待して",
+            "option2": "応援して",
+            "option3": "自慢して",
+            "option4": "賛成して",
+            "correctOption": 3,
+            "explanation": "「自慢する (じまんする)」: Khoe khoang, tự hào. Câu dịch: Anh Mori luôn tự hào khoe với mọi người rằng thú cưng nuôi ở nhà của anh ấy là đáng yêu nhất."
+          }
+        ]
+      },
+      {
+        "sectionType": "VOCABULARY",
+        "mondaiNumber": 4,
+        "title": "Mondai 4: Từ đồng nghĩa",
+        "instruction": "問題4　_____の言葉に意味が最も近いものを、1・2・3・4から一つ選びなさい。",
+        "timeLimitMinutes": 10,
+        "orderIndex": 4,
+        "questions": [
+          {
+            "questionNumber": 26,
+            "questionText": "この仕事は_あきらめました_。",
+            "underlinedText": "あきらめました",
+            "option1": "やめました",
+            "option2": "始めました",
+            "option3": "忘れました",
+            "option4": "急ぎました",
+            "correctOption": 1,
+            "explanation": "「あきらめる」 (Bỏ cuộc, từ bỏ) đồng nghĩa với 「やめる」 (Dừng lại, thôi). Câu dịch: Tôi đã bỏ cuộc công việc này."
+          },
+          {
+            "questionNumber": 27,
+            "questionText": "その知らせを聞いて_びっくりした_。",
+            "underlinedText": "びっくりした",
+            "option1": "安心した",
+            "option2": "驚いた",
+            "option3": "がっかりした",
+            "option4": "怒った",
+            "correctOption": 2,
+            "explanation": "「びっくりする」 (Kinh ngạc, giật mình) đồng nghĩa với 「驚く (おどろく)」. Câu dịch: Nghe tin đó tôi đã vô cùng kinh ngạc."
+          }
+        ]
+      },
+      {
+        "sectionType": "GRAMMAR",
+        "mondaiNumber": 6,
+        "title": "Mondai 6: Điền ngữ pháp thích hợp cho câu",
+        "instruction": "問題6　次の文の（　　）に入れるのに最もよいものを、1・2・3・4から一つ選びなさい。",
+        "timeLimitMinutes": 15,
+        "orderIndex": 5,
+        "questions": [
+          {
+            "questionNumber": 28,
+            "questionText": "田中さんは今、電話中ですから、ここに座って少し（　　）ください。",
+            "underlinedText": null,
+            "option1": "待って",
+            "option2": "待ちながら",
+            "option3": "待たせて",
+            "option4": "待たれて",
+            "correctOption": 1,
+            "explanation": "Cấu trúc 「V-て + ください」: Xin vui lòng làm V. Câu dịch: Anh Tanaka đang bận nghe điện thoại, xin mời ngồi đây đợi một lát."
+          },
+          {
+            "questionNumber": 29,
+            "questionText": "いくら安く（　　）、必要のない物は買いません。",
+            "underlinedText": null,
+            "option1": "ても",
+            "option2": "たら",
+            "option3": "なら",
+            "option4": "ても",
+            "correctOption": 1,
+            "explanation": "Cấu trúc 「いくら + A-くても」: Cho dù có rẻ đến thế nào đi chăng nữa. Câu dịch: Cho dù có rẻ thế nào đi nữa tôi cũng không mua đồ không cần thiết."
+          },
+          {
+            "questionNumber": 30,
+            "questionText": "雨が降らない（　　）に、洗濯物を干してしまいましょう。",
+            "underlinedText": null,
+            "option1": "あいだ",
+            "option2": "うちに",
+            "option3": "まえに",
+            "option4": "とおりに",
+            "correctOption": 2,
+            "explanation": "Cấu trúc 「V-ない + うちに」: Trong khi chưa / Trước khi có sự thay đổi. Câu dịch: Trong khi trời chưa mưa, hãy tranh thủ phơi quần áo xong đi nào."
+          }
+        ]
+      },
+      {
+        "sectionType": "GRAMMAR",
+        "mondaiNumber": 7,
+        "title": "Mondai 7: Sắp xếp thứ tự câu (Câu có dấu sao ⭐)",
+        "instruction": "問題7　次の文の ★ に入る最もよいものを、1・2・3・4から一つ選びなさい。",
+        "timeLimitMinutes": 10,
+        "orderIndex": 6,
+        "questions": [
+          {
+            "questionNumber": 31,
+            "questionText": "毎朝、犬の _____ _____ _★_ _____ ようにしています。",
+            "underlinedText": null,
+            "option1": "散歩を",
+            "option2": "30分は",
+            "option3": "する",
+            "option4": "少なくとも",
+            "correctOption": 3,
+            "explanation": "Thứ tự đúng: 犬の (1: 散歩を) (4: 少なくとも) (2: 30分は) (3: する - ★) ようにしています. Vị trí dấu sao là 3 (する). Câu dịch: Mỗi buổi sáng, tôi cố gắng dắt chó đi dạo ít nhất 30 phút."
+          },
+          {
+            "questionNumber": 32,
+            "questionText": "どんなに _____ _____ _★_ _____ 諦めてはいけない。",
+            "underlinedText": null,
+            "option1": "つらく",
+            "option2": "ても",
+            "option3": "夢を",
+            "option4": "途中で",
+            "correctOption": 4,
+            "explanation": "Thứ tự đúng: どんなに (1: つらく) (2: ても) (4: 途中で - ★) (3: 夢を) 諦めてはいけない. Vị trí dấu sao là 4 (途中で). Câu dịch: Dù có vất vả thế nào thì cũng không được từ bỏ ước mơ giữa chừng."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "N4_2012_12",
+    "title": "Đề thi JLPT N4 - Tháng 12/2012",
+    "jlptLevel": "N4",
+    "year": 2012,
+    "month": 12,
+    "totalTimeMinutes": 85,
+    "description": "Bộ đề thi chuẩn JLPT N4 đợt tháng 12/2012 đầy đủ các Mondai từ vựng, ngữ pháp kèm dịch nghĩa.",
+    "sections": [
+      {
+        "sectionType": "VOCABULARY",
+        "mondaiNumber": 1,
+        "title": "Mondai 1: Đọc chữ Hán",
+        "instruction": "問題1　_____の言葉の読み方として最もよいものを、1・2・3・4から一つ選びなさい。",
+        "timeLimitMinutes": 10,
+        "orderIndex": 1,
+        "questions": [
+          {
+            "questionNumber": 1,
+            "questionText": "きのうの夜、強い_風_が吹いた。",
+            "underlinedText": "風",
+            "option1": "あめ",
+            "option2": "ゆき",
+            "option3": "かぜ",
+            "option4": "くも",
+            "correctOption": 3,
+            "explanation": "「風」 đọc là 「かぜ」 (Gió). Câu dịch: Tối qua đã có một cơn gió mạnh thổi qua."
+          },
+          {
+            "questionNumber": 2,
+            "questionText": "この池はとても_深い_です。",
+            "underlinedText": "深い",
+            "option1": "ふかい",
+            "option2": "ひろい",
+            "option3": "あさい",
+            "option4": "ながい",
+            "correctOption": 1,
+            "explanation": "「深い」 đọc là 「ふかい」 (Sâu). Câu dịch: Cái ao này rất sâu."
+          }
+        ]
+      },
+      {
+        "sectionType": "VOCABULARY",
+        "mondaiNumber": 3,
+        "title": "Mondai 3: Điền từ vào chỗ trống",
+        "instruction": "問題3　(　　) に入れるのに最もよいものを、1・2・3・4から一つ選びなさい。",
+        "timeLimitMinutes": 15,
+        "orderIndex": 2,
+        "questions": [
+          {
+            "questionNumber": 10,
+            "questionText": "机の上に本が（　　）置いてあります。",
+            "underlinedText": null,
+            "option1": "ならんで",
+            "option2": "あつまって",
+            "option3": "かさなって",
+            "option4": "そろって",
+            "correctOption": 3,
+            "explanation": "「重なって (かさなって)」: Chồng lên nhau. Câu dịch: Trên bàn có những cuốn sách đặt chồng lên nhau."
+          },
+          {
+            "questionNumber": 11,
+            "questionText": "電車が遅れて、授業に（　　）しまいました。",
+            "underlinedText": null,
+            "option1": "まにあって",
+            "option2": "おくれて",
+            "option3": "ちこくして",
+            "option4": "やすんで",
+            "correctOption": 3,
+            "explanation": "「遅刻する (ちこくする)」: Đi muộn / Đến trễ. Câu dịch: Vì tàu điện bị trễ nên tôi đã bị muộn giờ học."
+          }
+        ]
+      },
+      {
+        "sectionType": "GRAMMAR",
+        "mondaiNumber": 6,
+        "title": "Mondai 6: Điền ngữ pháp thích hợp cho câu",
+        "instruction": "問題6　次の文の（　　）に入れるのに最もよいものを、1・2・3・4から一つ選びなさい。",
+        "timeLimitMinutes": 12,
+        "orderIndex": 3,
+        "questions": [
+          {
+            "questionNumber": 20,
+            "questionText": "この料理は簡単（　　）作れます。",
+            "underlinedText": null,
+            "option1": "に",
+            "option2": "で",
+            "option3": "な",
+            "option4": "を",
+            "correctOption": 1,
+            "explanation": "Tính từ đuôi な biến thành phó từ: 「簡単 + に + V」 (làm gì một cách đơn giản). Câu dịch: Món ăn này có thể làm một cách đơn giản."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "code": "N5_2012_12",
+    "title": "Đề thi JLPT N5 - Tháng 12/2012",
+    "jlptLevel": "N5",
+    "year": 2012,
+    "month": 12,
+    "totalTimeMinutes": 60,
+    "description": "Bộ đề thi thực tế JLPT N5 nhập môn chuẩn cấu trúc đề thi chính thức.",
+    "sections": [
+      {
+        "sectionType": "VOCABULARY",
+        "mondaiNumber": 1,
+        "title": "Mondai 1: Đọc chữ Hán",
+        "instruction": "問題1　_____の言葉の読み方として最もよいものを、1・2・3・4から一つ選びなさい。",
+        "timeLimitMinutes": 10,
+        "orderIndex": 1,
+        "questions": [
+          {
+            "questionNumber": 1,
+            "questionText": "あそこに_男_の人がいます。",
+            "underlinedText": "男",
+            "option1": "おんな",
+            "option2": "おとこ",
+            "option3": "ひと",
+            "option4": "こども",
+            "correctOption": 2,
+            "explanation": "「男」 đọc là 「おとこ」 (Nam/Đàn ông). Câu dịch: Ở đằng kia có một người đàn ông."
+          },
+          {
+            "questionNumber": 2,
+            "questionText": "毎朝_水_を飲みます。",
+            "underlinedText": "水",
+            "option1": "みず",
+            "option2": "おちゃ",
+            "option3": "さけ",
+            "option4": "ジュース",
+            "correctOption": 1,
+            "explanation": "「水」 đọc là 「みず」 (Nước). Câu dịch: Mỗi sáng tôi đều uống nước."
+          }
+        ]
+      },
+      {
+        "sectionType": "GRAMMAR",
+        "mondaiNumber": 6,
+        "title": "Mondai 6: Điền ngữ pháp thích hợp cho câu",
+        "instruction": "問題6　次の文の（　　）に入れるのに最もよいものを、1・2・3・4から一つ選びなさい。",
+        "timeLimitMinutes": 10,
+        "orderIndex": 2,
+        "questions": [
+          {
+            "questionNumber": 15,
+            "questionText": "わたしは日本（　　）行きたいです。",
+            "underlinedText": null,
+            "option1": "へ",
+            "option2": "で",
+            "option3": "を",
+            "option4": "から",
+            "correctOption": 1,
+            "explanation": "Trợ từ 「へ」 hoặc 「に」 chỉ hướng đích đến của hành động di chuyển. Câu dịch: Tôi muốn đi đến Nhật Bản."
+          }
+        ]
+      }
+    ]
+  }
+]
