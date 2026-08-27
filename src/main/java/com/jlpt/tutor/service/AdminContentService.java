@@ -39,19 +39,22 @@ public class AdminContentService {
         List<String> allLevels = List.of("N5", "N4", "N3", "N2", "N1");
 
         return switch (type) {
-            case VOCAB -> vocabularyRepository.searchVocabulary(filterLevel, allLevels, filterSearch, null, null, pageable)
+            case VOCAB -> vocabularyRepository.searchVocabulary(filterLevel, allLevels, filterSearch,
+                    UserProgress.EntityType.VOCABULARY, null, UserProgress.ProgressStatus.NEW, false, null, pageable)
                     .map(v -> AdminContentItemDto.builder()
                             .id(String.valueOf(v.getId())).type("VOCAB")
                             .title(v.getWord() + (v.getReading() != null ? " (" + v.getReading() + ")" : ""))
                             .level(v.getJlptLevel())
                             .build());
-            case KANJI -> kanjiRepository.searchKanji(filterLevel, allLevels, filterSearch, null, null, pageable)
+            case KANJI -> kanjiRepository.searchKanji(filterLevel, allLevels, filterSearch,
+                    UserProgress.EntityType.KANJI, null, UserProgress.ProgressStatus.NEW, false, null, pageable)
                     .map(k -> AdminContentItemDto.builder()
                             .id(String.valueOf(k.getId())).type("KANJI")
                             .title(k.getCharacter() + (k.getMeanings() != null ? " — " + k.getMeanings() : ""))
                             .level(k.getJlptLevel())
                             .build());
-            case GRAMMAR -> grammarPointRepository.searchGrammar(filterLevel, allLevels, filterSearch, null, null, pageable)
+            case GRAMMAR -> grammarPointRepository.searchGrammar(filterLevel, allLevels, filterSearch,
+                    UserProgress.EntityType.GRAMMAR, null, UserProgress.ProgressStatus.NEW, false, null, pageable)
                     .map(g -> AdminContentItemDto.builder()
                             .id(String.valueOf(g.getId())).type("GRAMMAR")
                             .title(g.getTitle())

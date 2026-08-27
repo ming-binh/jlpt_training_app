@@ -22,6 +22,14 @@ public class KanjiController {
     private final KanjiRepository kanjiRepository;
     private final JlptLevelConfigService levelConfigService;
 
+    private String getUserId(Authentication authentication) {
+        if (authentication == null) return null;
+        if (authentication.getPrincipal() instanceof User user) {
+            return user.getId();
+        }
+        return authentication.getName();
+    }
+
     @GetMapping
     public ResponseEntity<Page<Kanji>> getKanji(
             @RequestParam(required = false) String level,
@@ -31,11 +39,17 @@ public class KanjiController {
             @RequestParam(defaultValue = "20") int size,
             Authentication authentication) {
 
-        String filterLevel = (level != null && !level.isBlank() && !"ALL".equalsIgnoreCase(level)) ? level : null;
+        String filterLevel = (level != null && !level.isBlank() && !"ALL".equalsIgnoreCase(level)) ? level.trim().toUpperCase() : null;
         String filterSearch = (search != null && !search.isBlank()) ? search.trim() : null;
+        String userId = getUserId(authentication);
 
-        String userId = authentication != null && authentication.getPrincipal() instanceof User user ? user.getId() : null;
-        String filterStatus = (userId != null && status != null && !status.isBlank() && !"ALL".equalsIgnoreCase(status)) ? status.toUpperCase() : null;
+        boolean isNew = "NEW".equalsIgnoreCase(status);
+        com.jlpt.tutor.entity.UserProgress.ProgressStatus statusEnum = null;
+        if (!isNew && status != null && !status.isBlank() && !"ALL".equalsIgnoreCase(status)) {
+            try {
+                statusEnum = com.jlpt.tutor.entity.UserProgress.ProgressStatus.valueOf(status.trim().toUpperCase());
+            } catch (Exception ignored) {}
+        }
 
         java.util.List<String> activeLevels = levelConfigService.getActiveLevelCodes();
         if (activeLevels == null || activeLevels.isEmpty()) {
@@ -43,7 +57,13 @@ public class KanjiController {
         }
 
         Page<Kanji> result = kanjiRepository.searchKanji(
-                filterLevel, activeLevels, filterSearch, filterStatus, userId, PageRequest.of(page, size));
+                filterLevel, activeLevels, filterSearch,
+                com.jlpt.tutor.entity.UserProgress.EntityType.KANJI,
+                statusEnum,
+                com.jlpt.tutor.entity.UserProgress.ProgressStatus.NEW,
+                isNew,
+                userId,
+                PageRequest.of(page, size));
 
         return ResponseEntity.ok(result);
     }

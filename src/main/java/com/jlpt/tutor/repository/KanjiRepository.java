@@ -1,6 +1,7 @@
 package com.jlpt.tutor.repository;
 
 import com.jlpt.tutor.entity.Kanji;
+import com.jlpt.tutor.entity.UserProgress;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -22,14 +24,16 @@ public interface KanjiRepository extends JpaRepository<Kanji, Long> {
            "LOWER(k.meanings) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(k.onReadings) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
            "LOWER(k.kunReadings) LIKE LOWER(CONCAT('%', :search, '%'))) AND " +
-           "(:status IS NULL OR :status = '' OR " +
-           "  (:status = 'NEW' AND NOT EXISTS (SELECT 1 FROM UserProgress up WHERE up.userId = :userId AND up.entityType = 'KANJI' AND up.entityId = k.id)) OR " +
-           "  (:status <> 'NEW' AND EXISTS (SELECT 1 FROM UserProgress up WHERE up.userId = :userId AND up.entityType = 'KANJI' AND up.entityId = k.id AND up.status = :status))" +
-           ")")
+           "((:isNew = false AND :status IS NULL) OR " +
+           " (:isNew = true AND (:userId IS NULL OR NOT EXISTS (SELECT 1 FROM UserProgress up WHERE up.userId = :userId AND up.entityType = :entityType AND up.entityId = k.id AND up.status <> :newStatus))) OR " +
+           " (:status IS NOT NULL AND :userId IS NOT NULL AND EXISTS (SELECT 1 FROM UserProgress up WHERE up.userId = :userId AND up.entityType = :entityType AND up.entityId = k.id AND up.status = :status)))")
     Page<Kanji> searchKanji(@Param("level") String level,
-                            @Param("activeLevels") java.util.List<String> activeLevels,
+                            @Param("activeLevels") List<String> activeLevels,
                             @Param("search") String search,
-                            @Param("status") String status,
+                            @Param("entityType") UserProgress.EntityType entityType,
+                            @Param("status") UserProgress.ProgressStatus status,
+                            @Param("newStatus") UserProgress.ProgressStatus newStatus,
+                            @Param("isNew") boolean isNew,
                             @Param("userId") String userId,
                             Pageable pageable);
 
@@ -37,6 +41,6 @@ public interface KanjiRepository extends JpaRepository<Kanji, Long> {
     long countByJlptLevelIgnoreCase(@Param("jlptLevel") String jlptLevel);
 
     long countByJlptLevel(String jlptLevel);
-    Optional<Kanji> findByCharacter(String character);
     boolean existsByCharacter(String character);
+    Optional<Kanji> findByCharacter(String character);
 }
