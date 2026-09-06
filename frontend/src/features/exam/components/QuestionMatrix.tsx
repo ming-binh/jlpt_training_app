@@ -4,6 +4,7 @@ import { type ExamQuestion } from "@/services/exam.service";
 interface QuestionMatrixProps {
   questions: ExamQuestion[];
   answers: Record<number, number>;
+  flaggedQuestions?: Set<number>;
   activeQuestionId?: number;
   onSelectQuestion: (questionId: number) => void;
   reviewMode?: boolean;
@@ -12,11 +13,13 @@ interface QuestionMatrixProps {
 export function QuestionMatrix({
   questions,
   answers,
+  flaggedQuestions,
   activeQuestionId,
   onSelectQuestion,
   reviewMode = false,
 }: QuestionMatrixProps) {
   const answeredCount = Object.keys(answers).length;
+  const flaggedCount = flaggedQuestions?.size || 0;
 
   return (
     <div className="rounded-2xl border border-border/80 bg-card/60 p-4">
@@ -29,10 +32,11 @@ export function QuestionMatrix({
         </span>
       </div>
 
-      <div className="grid grid-cols-5 sm:grid-cols-6 gap-1.5 max-h-56 overflow-y-auto pr-1">
+      <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 max-h-56 overflow-y-auto p-1 scrollbar-thin">
         {questions.map((q, idx) => {
           const isAnswered = answers[q.id] !== undefined;
           const isActive = activeQuestionId === q.id;
+          const isFlagged = flaggedQuestions?.has(q.id) ?? false;
 
           let btnClass = "border-border/60 bg-secondary/30 text-muted-foreground hover:bg-secondary hover:text-foreground";
 
@@ -44,7 +48,11 @@ export function QuestionMatrix({
               btnClass = "border-rose-500/40 bg-rose-500/20 text-rose-400 font-bold";
             }
           } else if (isAnswered) {
-            btnClass = "border-accent/40 bg-accent/20 text-accent font-bold";
+            btnClass = isFlagged
+              ? "border-amber-500/60 bg-amber-500/20 text-amber-400 font-bold"
+              : "border-accent/50 bg-accent/20 text-accent font-bold";
+          } else if (isFlagged) {
+            btnClass = "border-amber-500/50 bg-amber-500/10 text-amber-400 font-bold";
           }
 
           return (
@@ -53,19 +61,22 @@ export function QuestionMatrix({
               type="button"
               onClick={() => onSelectQuestion(q.id)}
               className={cn(
-                "flex size-9 items-center justify-center rounded-xl border text-xs font-medium transition-all cursor-pointer",
+                "relative flex size-9 items-center justify-center rounded-xl border text-xs font-medium transition-all cursor-pointer",
                 btnClass,
-                isActive && "ring-2 ring-accent ring-offset-2 ring-offset-background scale-105 font-bold"
+                isActive && "border-accent bg-accent/25 text-accent font-extrabold shadow-[0_0_0_2px_rgba(245,158,11,0.7)] z-10"
               )}
             >
               {q.questionNumber || idx + 1}
+              {isFlagged && !reviewMode && (
+                <span className="absolute -top-1 -right-1 size-2.5 rounded-full bg-amber-400 border-2 border-background" />
+              )}
             </button>
           );
         })}
       </div>
 
       {!reviewMode && (
-        <div className="mt-3 flex items-center justify-center gap-4 text-[11px] text-muted-foreground border-t border-border/50 pt-2.5">
+        <div className="mt-3 flex flex-wrap items-center justify-center gap-3 text-[11px] text-muted-foreground border-t border-border/50 pt-2.5">
           <div className="flex items-center gap-1.5">
             <span className="size-2.5 rounded-full bg-accent/80" />
             <span>Đã làm</span>
@@ -74,8 +85,15 @@ export function QuestionMatrix({
             <span className="size-2.5 rounded-full bg-secondary border border-border" />
             <span>Chưa làm</span>
           </div>
+          {flaggedCount > 0 && (
+            <div className="flex items-center gap-1.5">
+              <span className="size-2.5 rounded-full bg-amber-400" />
+              <span>Đã gắn cờ</span>
+            </div>
+          )}
         </div>
       )}
     </div>
   );
 }
+

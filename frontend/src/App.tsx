@@ -13,6 +13,7 @@ import { NihonChatPage } from './features/ai-chat/pages/NihonChatPage';
 import { ExamListPage } from './features/exam/pages/ExamListPage';
 import { ExamTakingPage } from './features/exam/pages/ExamTakingPage';
 import { ExamReviewPage } from './features/exam/pages/ExamReviewPage';
+import { ExamHistoryPage } from './features/exam/pages/ExamHistoryPage';
 
 // Auth Feature Pages
 import { AuthPage } from './features/auth/pages/AuthPage';
@@ -48,6 +49,7 @@ const App: React.FC = () => {
         <Route path="/kanji" element={<NihonKanjiPage />} />
         <Route path="/ngu-phap" element={<NihonGrammarPage />} />
         <Route path="/luyen-de" element={<ExamListPage />} />
+        <Route path="/luyen-de/lich-su" element={<ExamHistoryPage />} />
         <Route path="/luyen-de/:examId/take" element={<ExamTakingPage />} />
         <Route path="/luyen-de/:examId/mondai/:sectionId" element={<ExamTakingPage />} />
         <Route path="/luyen-de/review/:attemptId" element={<ExamReviewPage />} />

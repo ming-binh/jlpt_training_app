@@ -11,7 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "jlpt_exam_attempt")
+@Table(name = "jlpt_exam_attempt", indexes = {
+    @Index(name = "idx_attempt_user_submitted", columnList = "userId, submittedAt"),
+    @Index(name = "idx_attempt_user_exam", columnList = "userId, exam_id"),
+    @Index(name = "idx_attempt_exam_id", columnList = "exam_id")
+})
 @Data
 @Builder
 @NoArgsConstructor

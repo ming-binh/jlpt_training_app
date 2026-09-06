@@ -515,5 +515,494 @@
         ]
       }
     ]
+  },
+  {
+    "code": "N5_2019_07",
+    "title": "Đề thi JLPT N5 - Tháng 07/2019",
+    "jlptLevel": "N5",
+    "year": 2019,
+    "month": 7,
+    "totalTimeMinutes": 60,
+    "description": "Đề thi chính thức kỳ thi Năng lực Nhật ngữ JLPT N5 đợt tháng 7/2019. Cấp độ nhập môn tiếng Nhật.",
+    "sections": [
+      {
+        "sectionType": "VOCABULARY",
+        "mondaiNumber": 1,
+        "title": "Mondai 1: Đọc chữ Hán",
+        "instruction": "問題1　＿＿＿の言葉の読み方として最もよいものを、1・2・3・4から一つ選びなさい。",
+        "passageText": null,
+        "audioUrl": null,
+        "timeLimitMinutes": 8,
+        "orderIndex": 1,
+        "questions": [
+          {
+            "questionNumber": 1,
+            "questionText": "あの<u>山</u>は高いです。",
+            "underlinedText": "山",
+            "option1": "さん",
+            "option2": "やま",
+            "option3": "まい",
+            "option4": "しま",
+            "correctOption": 2,
+            "explanation": "Từ gạch chân là '山' (núi). Cách đọc kun-yomi phổ biến nhất ở N5 là 'やま'.\n1. さん: Là cách đọc on-yomi của '山', thường dùng khi ghép với các từ khác (ví dụ: 富士山 - ふじさん).\n2. やま: Là cách đọc đúng (kun-yomi) của '山' khi đứng một mình hoặc chỉ núi nói chung.\n3. まい: Không phải là cách đọc của '山'.\n4. しま: Có nghĩa là 'đảo', không phải 'núi'."
+          },
+          {
+            "questionNumber": 2,
+            "questionText": "冷たい<u>水</u>が飲みたいです。",
+            "underlinedText": "水",
+            "option1": "すい",
+            "option2": "みち",
+            "option3": "みず",
+            "option4": "ちず",
+            "correctOption": 3,
+            "explanation": "Từ gạch chân là '水' (nước). Cách đọc kun-yomi phổ biến nhất ở N5 là 'みず'.\n1. すい: Là cách đọc on-yomi của '水', thường dùng khi ghép với các từ khác (ví dụ: 水曜日 - すいようび).\n2. みち: Có nghĩa là 'con đường', không phải 'nước'.\n3. みず: Là cách đọc đúng (kun-yomi) của '水' khi đứng một mình.\n4. ちず: Có nghĩa là 'bản đồ', không phải 'nước'."
+          },
+          {
+            "questionNumber": 3,
+            "questionText": "私は<u>本</u>を読みます。",
+            "underlinedText": "本",
+            "option1": "もと",
+            "option2": "ほん",
+            "option3": "ぽん",
+            "option4": "ぼん",
+            "correctOption": 2,
+            "explanation": "Từ gạch chân là '本' (sách). Cách đọc phổ biến nhất ở N5 là 'ほん'.\n1. もと: Là một cách đọc khác của '本' (kun-yomi), có nghĩa là 'nguồn gốc, gốc rễ', không phải 'sách' trong ngữ cảnh này.\n2. ほん: Là cách đọc đúng của '本' (sách).\n3. ぽん: Là biến âm của 'ほん' khi đếm vật dẹt (ví dụ: いっぽん - một cây bút), không phải cách đọc của '本' khi đứng một mình.\n4. ぼん: Là biến âm của 'ほん' trong một số từ ghép (ví dụ: 日本 - にほん/にっぽん), không phải cách đọc của '本' khi đứng một mình."
+          },
+          {
+            "questionNumber": 4,
+            "questionText": "あの<u>人</u>は先生です。",
+            "underlinedText": "人",
+            "option1": "じん",
+            "option2": "にん",
+            "option3": "ひと",
+            "option4": "じんるい",
+            "correctOption": 3,
+            "explanation": "Từ gạch chân là '人' (người). Cách đọc kun-yomi phổ biến nhất ở N5 là 'ひと'.\n1. じん: Là cách đọc on-yomi của '人', thường dùng khi chỉ quốc tịch (ví dụ: 日本人 - にほんじん) hoặc trong các từ ghép khác.\n2. にん: Là cách đọc on-yomi của '人', thường dùng khi đếm người (ví dụ: 一人 - ひとり, 二人 - ふたり, 三人 - さんにん).\n3. ひと: Là cách đọc đúng (kun-yomi) của '人' khi đứng một mình, có nghĩa là 'người'.\n4. じんるい: Có nghĩa là 'loài người', là một từ phức tạp hơn N5 và không phải cách đọc của riêng chữ '人'."
+          },
+          {
+            "questionNumber": 5,
+            "questionText": "私は<u>日本</u>が好きです。",
+            "underlinedText": "日本",
+            "option1": "にっぽん",
+            "option2": "にちほん",
+            "option3": "にほん",
+            "option4": "ひほん",
+            "correctOption": 3,
+            "explanation": "Từ gạch chân là '日本' (Nhật Bản). Cả 'にほん' và 'にっぽん' đều là cách đọc đúng, nhưng 'にほん' thường được dùng phổ biến hơn trong giao tiếp hàng ngày và là một trong những lựa chọn chính xác.\n1. にっぽん: Là một cách đọc đúng khác của '日本', thường được dùng trong các trường hợp trang trọng hơn hoặc trong thể thao.\n2. にちほん: Là cách đọc sai, kết hợp cách đọc của '日' (にち) và '本' (ほん) mà không có sự biến âm chính xác.\n3. にほん: Là cách đọc đúng và phổ biến của '日本'.\n4. ひほん: Là cách đọc sai, '日' không đọc là 'ひ' trong trường hợp này."
+          },
+          {
+            "questionNumber": 6,
+            "questionText": "彼は<u>学生</u>です。",
+            "underlinedText": "学生",
+            "option1": "がくしょう",
+            "option2": "かくせい",
+            "option3": "がくせい",
+            "option4": "がくせいん",
+            "correctOption": 3,
+            "explanation": "Từ gạch chân là '学生' (học sinh). Cách đọc đúng là 'がくせい'.\n1. がくしょう: Là cách đọc sai, '生' trong '学生' đọc là 'せい', không phải 'しょう'.\n2. かくせい: Là cách đọc sai, '学' đọc là 'がく', không phải 'かく'.\n3. がくせい: Là cách đọc đúng của '学生'.\n4. がくせいん: Là cách đọc sai, thêm âm 'ん' không có trong từ."
+          },
+          {
+            "questionNumber": 7,
+            "questionText": "私の<u>家族</u>は五人です。",
+            "underlinedText": "家族",
+            "option1": "かぞう",
+            "option2": "かそく",
+            "option3": "かぞく",
+            "option4": "かぞくう",
+            "correctOption": 3,
+            "explanation": "Từ gạch chân là '家族' (gia đình). Cách đọc đúng là 'かぞく'.\n1. かぞう: Là cách đọc sai, '族' đọc là 'ぞく', không phải 'ぞう'.\n2. かそく: Là cách đọc sai, '族' đọc là 'ぞく', không phải 'そく'.\n3. かぞく: Là cách đọc đúng của '家族'.\n4. かぞくう: Là cách đọc sai, thêm âm 'う' không có trong từ."
+          }
+        ]
+      },
+      {
+        "sectionType": "VOCABULARY",
+        "mondaiNumber": 2,
+        "title": "Mondai 2: Viết chữ Hán",
+        "instruction": "問題2　＿＿＿の言葉を漢字で書くとき、最もよいものを、1・2・3・4から一つ選びなさい。",
+        "passageText": null,
+        "audioUrl": null,
+        "timeLimitMinutes": 7,
+        "orderIndex": 2,
+        "questions": [
+          {
+            "questionNumber": 8,
+            "questionText": "私はよく**ひだり**のてでごはんをたべます。",
+            "underlinedText": "ひだり",
+            "option1": "右",
+            "option2": "上",
+            "option3": "左",
+            "option4": "下",
+            "correctOption": 3,
+            "explanation": "Từ gạch chân là 「ひだり」 (trái). \nPhương án 1: 「右」 đọc là 「みぎ」 (phải).\nPhương án 2: 「上」 đọc là 「うえ」 (trên).\nPhương án 3: 「左」 đọc là 「ひだり」 (trái) là đáp án đúng.\nPhương án 4: 「下」 đọc là 「した」 (dưới).\nCâu hỏi có nghĩa: Tôi thường ăn cơm bằng tay trái."
+          },
+          {
+            "questionNumber": 9,
+            "questionText": "えきの**まえ**にコンビニがあります。",
+            "underlinedText": "まえ",
+            "option1": "後",
+            "option2": "前",
+            "option3": "午",
+            "option4": "今",
+            "correctOption": 2,
+            "explanation": "Từ gạch chân là 「まえ」 (trước).\nPhương án 1: 「後」 đọc là 「うしろ」 (sau).\nPhương án 2: 「前」 đọc là 「まえ」 (trước) là đáp án đúng.\nPhương án 3: 「午」 đọc là 「ご」 (ngọ, ví dụ: 午前 - buổi sáng).\nPhương án 4: 「今」 đọc là 「いま」 (bây giờ).\nCâu hỏi có nghĩa: Có một cửa hàng tiện lợi ở phía trước nhà ga."
+          },
+          {
+            "questionNumber": 10,
+            "questionText": "あの**おとこのひと**はだれですか。",
+            "underlinedText": "おとこのひと",
+            "option1": "女の人",
+            "option2": "男の人",
+            "option3": "子の人",
+            "option4": "大の人",
+            "correctOption": 2,
+            "explanation": "Từ gạch chân là 「おとこのひと」 (người đàn ông).\nPhương án 1: 「女の人」 đọc là 「おんなのひと」 (người phụ nữ).\nPhương án 2: 「男の人」 đọc là 「おとこのひと」 (người đàn ông) là đáp án đúng.\nPhương án 3: 「子の人」 không phải là cách viết đúng cho 'người con' hay 'người trẻ con'. 「子供」 (こども) là trẻ con.\nPhương án 4: 「大の人」 không có nghĩa trong tiếng Nhật.\nCâu hỏi có nghĩa: Người đàn ông kia là ai vậy?"
+          },
+          {
+            "questionNumber": 11,
+            "questionText": "わたしのいえはがっこうに**ちかい**です。",
+            "underlinedText": "ちかい",
+            "option1": "遠い",
+            "option2": "近い",
+            "option3": "長い",
+            "option4": "短い",
+            "correctOption": 2,
+            "explanation": "Từ gạch chân là 「ちかい」 (gần).\nPhương án 1: 「遠い」 đọc là 「とおい」 (xa).\nPhương án 2: 「近い」 đọc là 「ちかい」 (gần) là đáp án đúng.\nPhương án 3: 「長い」 đọc là 「ながい」 (dài).\nPhương án 4: 「短い」 đọc là 「みじかい」 (ngắn).\nCâu hỏi có nghĩa: Nhà của tôi gần trường học."
+          },
+          {
+            "questionNumber": 12,
+            "questionText": "デパートへ**かいもの**に行きます。",
+            "underlinedText": "かいもの",
+            "option1": "買物",
+            "option2": "買もの",
+            "option3": "買い物",
+            "option4": "買者",
+            "correctOption": 3,
+            "explanation": "Từ gạch chân là 「かいもの」 (mua sắm).\nPhương án 1: 「買物」 là cách viết đúng, nhưng thường được viết là 「買い物」 với kanji cho cả hai phần.\nPhương án 2: 「買もの」 là cách viết pha trộn giữa kanji và hiragana, không phải là cách viết kanji hoàn chỉnh.\nPhương án 3: 「買い物」 đọc là 「かいもの」 (mua sắm) là đáp án đúng, sử dụng kanji cho cả hai phần 「買う」 (mua) và 「物」 (vật, đồ vật).\nPhương án 4: 「買者」 đọc là 「かいしゃ」 (người mua) hoặc 「かいもの」 (mua sắm) nhưng chữ 「者」 thường dùng cho người, không phải đồ vật.\nCâu hỏi có nghĩa: Tôi đi đến cửa hàng bách hóa để mua sắm."
+          },
+          {
+            "questionNumber": 13,
+            "questionText": "友達に**でんわ**をかけます。",
+            "underlinedText": "でんわ",
+            "option1": "電車",
+            "option2": "電気",
+            "option3": "電話",
+            "option4": "電言",
+            "correctOption": 3,
+            "explanation": "Từ gạch chân là 「でんわ」 (điện thoại).\nPhương án 1: 「電車」 đọc là 「でんしゃ」 (tàu điện).\nPhương án 2: 「電気」 đọc là 「でんき」 (điện, điện lực).\nPhương án 3: 「電話」 đọc là 「でんわ」 (điện thoại) là đáp án đúng.\nPhương án 4: 「電言」 không phải là một từ tiếng Nhật có nghĩa.\nCâu hỏi có nghĩa: Tôi gọi điện thoại cho bạn bè."
+          }
+        ]
+      },
+      {
+        "sectionType": "VOCABULARY",
+        "mondaiNumber": 3,
+        "title": "Mondai 3: Điền từ vào chỗ trống",
+        "instruction": "問題3　（　　）に入れるのに最もよいものを、1・2・3・4から一つ選びなさい。",
+        "passageText": null,
+        "audioUrl": null,
+        "timeLimitMinutes": 10,
+        "orderIndex": 3,
+        "questions": [
+          {
+            "questionNumber": 14,
+            "questionText": "私は朝ごはんを７時（　　）食べます。",
+            "underlinedText": null,
+            "option1": "に",
+            "option2": "で",
+            "option3": "と",
+            "option4": "へ",
+            "correctOption": 1,
+            "explanation": "Đáp án đúng là 1. に. Trợ từ 「に」 được dùng để chỉ thời điểm cụ thể xảy ra hành động. Trong câu này, hành động 'ăn sáng' xảy ra vào '7 giờ'.\n2. で: Trợ từ 「で」 dùng để chỉ địa điểm hành động hoặc phương tiện.\n3. と: Trợ từ 「と」 dùng để nối các danh từ có nghĩa 'và' hoặc chỉ người cùng thực hiện hành động 'với'.\n4. へ: Trợ từ 「へ」 dùng để chỉ hướng đi hoặc điểm đến, tương tự 「に」 nhưng thường nhấn mạnh hướng hơn."
+          },
+          {
+            "questionNumber": 15,
+            "questionText": "テーブルの（　　）に猫がいます。",
+            "underlinedText": null,
+            "option1": "うえ",
+            "option2": "した",
+            "option3": "まえ",
+            "option4": "よこ",
+            "correctOption": 2,
+            "explanation": "Đáp án đúng là 2. した. 「～の下に (～のしたに)」 có nghĩa là 'ở dưới ~'. Câu này có nghĩa 'Có một con mèo ở dưới bàn'.\n1. うえ: 「上 (うえ)」 có nghĩa là 'trên'.\n3. まえ: 「前 (まえ)」 có nghĩa là 'trước'.\n4. よこ: 「横 (よこ)」 có nghĩa là 'bên cạnh'."
+          },
+          {
+            "questionNumber": 16,
+            "questionText": "ちょっと（　　）ください。",
+            "underlinedText": null,
+            "option1": "まち",
+            "option2": "まって",
+            "option3": "まつ",
+            "option4": "まちます",
+            "correctOption": 2,
+            "explanation": "Đáp án đúng là 2. まって. Cấu trúc 「～てください」 dùng để đưa ra yêu cầu hoặc nhờ vả một cách lịch sự. Động từ phải ở thể て (te-form). Thể て của 「待つ (まつ)」 là 「待って (まって)」.\n1. まち: Đây là thể ます (masu-stem) của động từ, dùng để ghép với các cấu trúc khác như 「～たい」, 「～ながら」.\n3. まつ: Đây là thể từ điển (dictionary form) của động từ.\n4. まちます: Đây là thể ます (masu-form) của động từ, dùng trong câu khẳng định lịch sự."
+          },
+          {
+            "questionNumber": 17,
+            "questionText": "今日はとても（　　）です。",
+            "underlinedText": null,
+            "option1": "あつい",
+            "option2": "さむい",
+            "option3": "たかい",
+            "option4": "ひろい",
+            "correctOption": 1,
+            "explanation": "Đáp án đúng là 1. あつい. 「暑い (あつい)」 là tính từ đuôi い dùng để miêu tả thời tiết nóng. Câu này có nghĩa 'Hôm nay rất nóng'.\n2. さむい: 「寒い (さむい)」 là tính từ đuôi い dùng để miêu tả thời tiết lạnh.\n3. たかい: 「高い (たかい)」 là tính từ đuôi い có nghĩa 'cao' (về chiều cao) hoặc 'đắt' (về giá cả).\n4. ひろい: 「広い (ひろい)」 là tính từ đuôi い có nghĩa 'rộng'."
+          },
+          {
+            "questionNumber": 18,
+            "questionText": "家族は（　　）人です。",
+            "underlinedText": null,
+            "option1": "ふたり",
+            "option2": "さんにん",
+            "option3": "よにん",
+            "option4": "ごにん",
+            "correctOption": 2,
+            "explanation": "Đáp án đúng là 2. さんにん. 「三人 (さんにん)」 là cách đếm 'ba người'. Câu này có nghĩa 'Gia đình tôi có ba người'.\n1. ふたり: 「二人 (ふたり)」 là cách đếm 'hai người'.\n3. よにん: 「四人 (よにん)」 là cách đếm 'bốn người'.\n4. ごにん: 「五人 (ごにん)」 là cách đếm 'năm người'."
+          },
+          {
+            "questionNumber": 19,
+            "questionText": "私は水を（　　）ます。",
+            "underlinedText": null,
+            "option1": "のみ",
+            "option2": "のんで",
+            "option3": "のむ",
+            "option4": "のみます",
+            "correctOption": 4,
+            "explanation": "Đáp án đúng là 4. のみます. Câu này cần một động từ ở thể ます (masu-form) để hoàn thành câu khẳng định lịch sự. 「飲みます (のみます)」 là thể ます của động từ 「飲む (のむ)」 (uống).\n1. のみ: Đây là thể ます (masu-stem) của động từ.\n2. のんで: Đây là thể て (te-form) của động từ.\n3. のむ: Đây là thể từ điển (dictionary form) của động từ."
+          },
+          {
+            "questionNumber": 20,
+            "questionText": "（　　）本はおもしろいです。",
+            "underlinedText": null,
+            "option1": "これ",
+            "option2": "それ",
+            "option3": "この",
+            "option4": "どこ",
+            "correctOption": 3,
+            "explanation": "Đáp án đúng là 3. この. 「この」 là một từ chỉ định (demonstrative adjective) dùng để bổ nghĩa cho danh từ đứng ngay sau nó, có nghĩa là 'cuốn sách này'.\n1. これ: 「これ」 là đại từ chỉ định, có nghĩa là 'cái này', không đứng trực tiếp trước danh từ.\n2. それ: 「それ」 là đại từ chỉ định, có nghĩa là 'cái đó' (gần người nghe), không đứng trực tiếp trước danh từ.\n4. どこ: 「どこ」 là từ để hỏi, có nghĩa là 'ở đâu'."
+          },
+          {
+            "questionNumber": 21,
+            "questionText": "私は学校（　　）行きます。",
+            "underlinedText": null,
+            "option1": "を",
+            "option2": "で",
+            "option3": "に",
+            "option4": "が",
+            "correctOption": 3,
+            "explanation": "Đáp án đúng là 3. に. Trợ từ 「に」 được dùng để chỉ điểm đến của hành động di chuyển (đi, đến, về). Cấu trúc 「～に行きます」 có nghĩa 'đi đến ~'.\n1. を: Trợ từ 「を」 dùng để chỉ tân ngữ trực tiếp của động từ.\n2. で: Trợ từ 「で」 dùng để chỉ địa điểm xảy ra hành động hoặc phương tiện.\n4. が: Trợ từ 「が」 dùng để chỉ chủ ngữ của câu hoặc đối tượng của một số tính từ/động từ."
+          },
+          {
+            "questionNumber": 22,
+            "questionText": "（　　）は日曜日です。",
+            "underlinedText": null,
+            "option1": "きのう",
+            "option2": "きょう",
+            "option3": "あした",
+            "option4": "まいにち",
+            "correctOption": 3,
+            "explanation": "Đáp án đúng là 3. あした. 「明日 (あした)」 có nghĩa là 'ngày mai'. Câu này có nghĩa 'Ngày mai là Chủ Nhật'.\n1. きのう: 「昨日 (きのう)」 có nghĩa là 'hôm qua'.\n2. きょう: 「今日 (きょう)」 có nghĩa là 'hôm nay'.\n4. まいにち: 「毎日 (まいにち)」 có nghĩa là 'mỗi ngày' hoặc 'hàng ngày'."
+          },
+          {
+            "questionNumber": 23,
+            "questionText": "あのビルはとても（　　）です。",
+            "underlinedText": null,
+            "option1": "ちいさい",
+            "option2": "おおきい",
+            "option3": "たかい",
+            "option4": "ふるい",
+            "correctOption": 2,
+            "explanation": "Đáp án đúng là 2. おおきい. 「大きい (おおきい)」 là tính từ đuôi い có nghĩa là 'lớn, to'. Câu này có nghĩa 'Tòa nhà kia rất to'.\n1. ちいさい: 「小さい (ちいさい)」 là tính từ đuôi い có nghĩa là 'nhỏ'.\n3. たかい: 「高い (たかい)」 là tính từ đuôi い có nghĩa là 'cao' hoặc 'đắt'.\n4. ふるい: 「古い (ふるい)」 là tính từ đuôi い có nghĩa là 'cũ'."
+          }
+        ]
+      },
+      {
+        "sectionType": "GRAMMAR",
+        "mondaiNumber": 6,
+        "title": "Mondai 6: Điền ngữ pháp thích hợp cho câu",
+        "instruction": "問題6　次の文の（　　）に入れるのに最もよいものを、1・2・3・4から一つ選びなさい。",
+        "passageText": null,
+        "audioUrl": null,
+        "timeLimitMinutes": 10,
+        "orderIndex": 4,
+        "questions": [
+          {
+            "questionNumber": 24,
+            "questionText": "わたしは　がっこう（　　）　いきます。",
+            "underlinedText": null,
+            "option1": "を",
+            "option2": "に",
+            "option3": "で",
+            "option4": "と",
+            "correctOption": 2,
+            "explanation": "Đáp án đúng là 2 (に).\nGiải thích:\n- に (ni): Được dùng để chỉ đích đến của hành động di chuyển (đi, đến, về). Trong câu này, \"がっこう\" (trường học) là đích đến của hành động \"いきます\" (đi).\n- を (wo): Được dùng để chỉ tân ngữ trực tiếp của động từ. Không dùng để chỉ đích đến.\n- で (de): Được dùng để chỉ địa điểm diễn ra hành động hoặc phương tiện. Không dùng để chỉ đích đến.\n- と (to): Được dùng để nối các danh từ (và) hoặc chỉ người/vật cùng thực hiện hành động (với). Không phù hợp trong ngữ cảnh này."
+          },
+          {
+            "questionNumber": 25,
+            "questionText": "えき（　　）　コーヒーを　のみます。",
+            "underlinedText": null,
+            "option1": "が",
+            "option2": "を",
+            "option3": "に",
+            "option4": "で",
+            "correctOption": 4,
+            "explanation": "Đáp án đúng là 4 (で).\nGiải thích:\n- で (de): Được dùng để chỉ địa điểm diễn ra hành động. Trong câu này, \"えき\" (nhà ga) là nơi diễn ra hành động \"コーヒーをのみます\" (uống cà phê).\n- が (ga): Dùng để chỉ chủ ngữ hoặc tân ngữ của một số động từ/tính từ. Không dùng để chỉ địa điểm hành động.\n- を (wo): Dùng để chỉ tân ngữ trực tiếp của động từ. Không dùng để chỉ địa điểm hành động.\n- に (ni): Dùng để chỉ đích đến, thời điểm, hoặc vị trí tồn tại. Không dùng để chỉ địa điểm diễn ra hành động."
+          },
+          {
+            "questionNumber": 26,
+            "questionText": "わたしは　パン（　　）　たべます。",
+            "underlinedText": null,
+            "option1": "が",
+            "option2": "を",
+            "option3": "は",
+            "option4": "に",
+            "correctOption": 2,
+            "explanation": "Đáp án đúng là 2 (を).\nGiải thích:\n- を (wo): Được dùng để chỉ tân ngữ trực tiếp của động từ. Trong câu này, \"パン\" (bánh mì) là đối tượng của hành động \"たべます\" (ăn).\n- が (ga): Dùng để chỉ chủ ngữ hoặc tân ngữ của một số động từ/tính từ. Không dùng cho tân ngữ trực tiếp của động từ \"たべます\".\n- は (wa): Dùng để chỉ chủ đề của câu. Không dùng để chỉ tân ngữ.\n- に (ni): Dùng để chỉ đích đến, thời điểm, hoặc vị trí tồn tại. Không dùng để chỉ tân ngữ trực tiếp."
+          },
+          {
+            "questionNumber": 27,
+            "questionText": "これは　わたし（　　）　かばんです。",
+            "underlinedText": null,
+            "option1": "が",
+            "option2": "の",
+            "option3": "を",
+            "option4": "は",
+            "correctOption": 2,
+            "explanation": "Đáp án đúng là 2 (の).\nGiải thích:\n- の (no): Được dùng để thể hiện sự sở hữu hoặc mối quan hệ giữa hai danh từ. Trong câu này, \"わたしのかばん\" có nghĩa là \"cặp sách của tôi\".\n- が (ga): Dùng để chỉ chủ ngữ hoặc tân ngữ. Không dùng để thể hiện sở hữu.\n- を (wo): Dùng để chỉ tân ngữ trực tiếp. Không dùng để thể hiện sở hữu.\n- は (wa): Dùng để chỉ chủ đề của câu. Không dùng để thể hiện sở hữu."
+          },
+          {
+            "questionNumber": 28,
+            "questionText": "はし（　　）　ごはんを　たべます。",
+            "underlinedText": null,
+            "option1": "が",
+            "option2": "を",
+            "option3": "で",
+            "option4": "と",
+            "correctOption": 3,
+            "explanation": "Đáp án đúng là 3 (で).\nGiải thích:\n- で (de): Được dùng để chỉ phương tiện hoặc công cụ thực hiện hành động. Trong câu này, \"はし\" (đũa) là công cụ để \"ごはんをたべます\" (ăn cơm).\n- が (ga): Dùng để chỉ chủ ngữ hoặc tân ngữ. Không dùng để chỉ phương tiện.\n- を (wo): Dùng để chỉ tân ngữ trực tiếp. Không dùng để chỉ phương tiện.\n- と (to): Dùng để nối các danh từ (và) hoặc chỉ người/vật cùng thực hiện hành động (với). Không phù hợp trong ngữ cảnh này."
+          },
+          {
+            "questionNumber": 29,
+            "questionText": "まいにち　しちじ（　　）　おきます。",
+            "underlinedText": null,
+            "option1": "が",
+            "option2": "を",
+            "option3": "に",
+            "option4": "で",
+            "correctOption": 3,
+            "explanation": "Đáp án đúng là 3 (に).\nGiải thích:\n- に (ni): Được dùng để chỉ thời điểm cụ thể của hành động. Trong câu này, \"しちじ\" (bảy giờ) là thời điểm của hành động \"おきます\" (thức dậy).\n- が (ga): Dùng để chỉ chủ ngữ hoặc tân ngữ. Không dùng để chỉ thời điểm.\n- を (wo): Dùng để chỉ tân ngữ trực tiếp. Không dùng để chỉ thời điểm.\n- で (de): Dùng để chỉ địa điểm hành động, phương tiện hoặc giới hạn. Không dùng để chỉ thời điểm cụ thể."
+          },
+          {
+            "questionNumber": 30,
+            "questionText": "わたしは　りんご（　　）　みかんを　かいました。",
+            "underlinedText": null,
+            "option1": "が",
+            "option2": "を",
+            "option3": "と",
+            "option4": "は",
+            "correctOption": 3,
+            "explanation": "Đáp án đúng là 3 (と).\nGiải thích:\n- と (to): Được dùng để nối các danh từ, mang nghĩa \"và\". Trong câu này, \"りんごとみかん\" có nghĩa là \"táo và quýt\".\n- が (ga): Dùng để chỉ chủ ngữ hoặc tân ngữ. Không dùng để nối danh từ.\n- を (wo): Dùng để chỉ tân ngữ trực tiếp. Không dùng để nối danh từ.\n- は (wa): Dùng để chỉ chủ đề của câu. Không dùng để nối danh từ."
+          },
+          {
+            "questionNumber": 31,
+            "questionText": "わたしは　テニスが　すきです。　サッカー（　　）　すきです。",
+            "underlinedText": null,
+            "option1": "が",
+            "option2": "を",
+            "option3": "は",
+            "option4": "も",
+            "correctOption": 4,
+            "explanation": "Đáp án đúng là 4 (も).\nGiải thích:\n- も (mo): Được dùng để biểu thị ý \"cũng, cũng vậy\". Trong câu này, nếu người nói thích tennis, thì \"サッカーもすきです\" có nghĩa là \"cũng thích bóng đá\".\n- が (ga): Dùng để chỉ chủ ngữ hoặc tân ngữ. Không biểu thị ý \"cũng\".\n- を (wo): Dùng để chỉ tân ngữ trực tiếp. Không biểu thị ý \"cũng\".\n- は (wa): Dùng để chỉ chủ đề của câu, thường dùng để đối chiếu hoặc nhấn mạnh. Không biểu thị ý \"cũng\" trong trường hợp này."
+          },
+          {
+            "questionNumber": 32,
+            "questionText": "きょうは　ごぜんくじ（　　）　ごごごじまで　はたらきます。",
+            "underlinedText": null,
+            "option1": "を",
+            "option2": "から",
+            "option3": "で",
+            "option4": "と",
+            "correctOption": 2,
+            "explanation": "Đáp án đúng là 2 (から).\nGiải thích:\n- から (kara): Được dùng để chỉ điểm bắt đầu của một khoảng thời gian hoặc địa điểm. Cấu trúc \"kara ~ made\" có nghĩa là \"từ ~ đến\". Trong câu này, \"ごぜんくじからごごごじまで\" có nghĩa là \"từ 9 giờ sáng đến 5 giờ chiều\".\n- を (wo): Dùng để chỉ tân ngữ trực tiếp. Không dùng trong cấu trúc này.\n- で (de): Dùng để chỉ địa điểm hành động, phương tiện hoặc giới hạn. Không dùng trong cấu trúc này.\n- と (to): Dùng để nối các danh từ hoặc chỉ người/vật cùng thực hiện hành động. Không dùng trong cấu trúc này."
+          },
+          {
+            "questionNumber": 33,
+            "questionText": "あめが　ふって　います（　　）　きょうは　いえに　います。",
+            "underlinedText": null,
+            "option1": "が",
+            "option2": "を",
+            "option3": "ので",
+            "option4": "と",
+            "correctOption": 3,
+            "explanation": "Đáp án đúng là 3 (ので).\nGiải thích:\n- ので (node): Được dùng để diễn tả nguyên nhân, lý do một cách khách quan hoặc nhẹ nhàng. \"あめがふっていますので\" có nghĩa là \"vì trời đang mưa\".\n- が (ga): Dùng để nối hai mệnh đề có ý nghĩa đối lập hoặc bổ sung, mang nghĩa \"nhưng\" hoặc \"và\". Không diễn tả nguyên nhân.\n- を (wo): Dùng để chỉ tân ngữ trực tiếp. Không dùng để nối mệnh đề.\n- と (to): Dùng để nối các danh từ, hoặc chỉ điều kiện, kết quả tất yếu. Không dùng để diễn tả nguyên nhân trong trường hợp này."
+          }
+        ]
+      },
+      {
+        "sectionType": "GRAMMAR",
+        "mondaiNumber": 7,
+        "title": "Mondai 7: Sắp xếp thứ tự trong câu (★)",
+        "instruction": "問題7　次の文の ★ に入る最もよいものを、1・2・3・4から一つ選びなさい。",
+        "passageText": null,
+        "audioUrl": null,
+        "timeLimitMinutes": 7,
+        "orderIndex": 5,
+        "questions": [
+          {
+            "questionNumber": 34,
+            "questionText": "私は日本へ _____ _____ _star_ _____ です。",
+            "underlinedText": null,
+            "option1": "日本語を",
+            "option2": "勉強しに",
+            "option3": "行きたい",
+            "option4": "私は",
+            "correctOption": 3,
+            "explanation": "Câu hoàn chỉnh là: 私は日本へ日本語を勉強しに行きたいです。(Tôi muốn đi Nhật để học tiếng Nhật.)\n- `日本語を` (tiếng Nhật): tân ngữ của động từ `勉強する` (học).\n- `勉強しに` (để học): cấu trúc `V-masu + ni iku` (勉強しに行く) nghĩa là \"đi để làm V\".\n- `行きたい` (muốn đi): thể hiện mong muốn \"muốn làm V\".\n- `です`: trợ từ kết thúc câu lịch sự.\nThứ tự đúng là: 私は日本へ + (1)日本語を + (2)勉強しに + (3)行きたい + です. Do đó, từ ở vị trí dấu sao là `行きたい`."
+          },
+          {
+            "questionNumber": 35,
+            "questionText": "机の上に _____ _____ _star_ _____ あります。",
+            "underlinedText": null,
+            "option1": "本が",
+            "option2": "一冊",
+            "option3": "あります",
+            "option4": "机の上に",
+            "correctOption": 2,
+            "explanation": "Câu hoàn chỉnh là: 机の上に本が一冊あります。(Trên bàn có một quyển sách.)\n- `机の上に` (trên bàn): chỉ địa điểm.\n- `本が` (sách): chủ ngữ của câu, đi với trợ từ `が`.\n- `一冊` (một quyển): lượng từ chỉ số lượng sách, đứng sau danh từ và trợ từ `が`.\n- `あります` (có): động từ tồn tại cho vật.\nThứ tự đúng là: 机の上に + (1)本が + (2)一冊 + (3)あります. Do đó, từ ở vị trí dấu sao là `一冊`."
+          },
+          {
+            "questionNumber": 36,
+            "questionText": "図書館へ _____ _____ _star_ _____ 行きます。",
+            "underlinedText": null,
+            "option1": "本を",
+            "option2": "借りに",
+            "option3": "行きます",
+            "option4": "図書館へ",
+            "correctOption": 2,
+            "explanation": "Câu hoàn chỉnh là: 図書館へ本を借りにいきます。(Tôi đi thư viện để mượn sách.)\n- `図書館へ` (đến thư viện): chỉ hướng đi.\n- `本を` (sách): tân ngữ của động từ `借りる` (mượn).\n- `借りに` (để mượn): cấu trúc `V-masu + ni iku` (借りにいく) nghĩa là \"đi để làm V\".\n- `行きます` (đi): động từ chính của câu.\nThứ tự đúng là: 図書館へ + (1)本を + (2)借りに + (3)行きます. Do đó, từ ở vị trí dấu sao là `借りに`."
+          },
+          {
+            "questionNumber": 37,
+            "questionText": "私は _____ _____ _star_ _____ です。",
+            "underlinedText": null,
+            "option1": "りんごが",
+            "option2": "好き",
+            "option3": "です",
+            "option4": "私は",
+            "correctOption": 2,
+            "explanation": "Câu hoàn chỉnh là: 私はりんごが好きです。(Tôi thích táo.)\n- `私は` (tôi): chủ đề của câu.\n- `りんごが` (táo): đối tượng của sự yêu thích, đi với trợ từ `が` trong cấu trúc `N ga suki desu`.\n- `好き` (thích): tính từ đuôi na, thể hiện sự yêu thích.\n- `です`: trợ từ kết thúc câu lịch sự.\nThứ tự đúng là: 私は + (1)りんごが + (2)好き + (3)です. Do đó, từ ở vị trí dấu sao là `好き`."
+          },
+          {
+            "questionNumber": 38,
+            "questionText": "毎日、9時から _____ _____ _star_ _____ 働きます。",
+            "underlinedText": null,
+            "option1": "5時まで",
+            "option2": "働きます",
+            "option3": "毎日",
+            "option4": "9時から",
+            "correctOption": 1,
+            "explanation": "Câu hoàn chỉnh là: 毎日、9時から5時まで働きます。(Hàng ngày, tôi làm việc từ 9 giờ đến 5 giờ.)\n- `毎日` (hàng ngày): trạng từ chỉ tần suất.\n- `9時から` (từ 9 giờ): điểm bắt đầu thời gian, dùng trợ từ `から`.\n- `5時まで` (đến 5 giờ): điểm kết thúc thời gian, dùng trợ từ `まで`.\n- `働きます` (làm việc): động từ chính của câu.\nThứ tự đúng là: 毎日、9時から + (1)5時まで + (2)働きます. Do đó, từ ở vị trí dấu sao là `5時まで`."
+          }
+        ]
+      }
+    ]
   }
 ]

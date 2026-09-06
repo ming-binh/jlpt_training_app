@@ -3,6 +3,7 @@ import { Layers, Send, ChevronRight, Award } from "lucide-react";
 import { type ExamItem, type ExamSection } from "@/services/exam.service";
 import { ExamTimer } from "./ExamTimer";
 import { QuestionMatrix } from "./QuestionMatrix";
+import { formatMondaiTitle } from "../utils/examFormatters";
 import { cn } from "@/lib/utils";
 
 interface MondaiNavSidebarProps {
@@ -10,11 +11,12 @@ interface MondaiNavSidebarProps {
   currentSection?: ExamSection;
   allQuestions: any[];
   answers: Record<number, number>;
+  flaggedQuestions?: Set<number>;
   activeQuestionId?: number;
   onSelectQuestion: (questionId: number) => void;
   onSubmit: () => void;
-  onTimeUp: () => void;
-  timeLimitMinutes: number;
+  /** Seconds remaining — controlled by useExamTimer hook in parent */
+  secondsRemaining: number;
   reviewMode?: boolean;
 }
 
@@ -23,15 +25,16 @@ export function MondaiNavSidebar({
   currentSection,
   allQuestions,
   answers,
+  flaggedQuestions,
   activeQuestionId,
   onSelectQuestion,
   onSubmit,
-  onTimeUp,
-  timeLimitMinutes,
+  secondsRemaining,
   reviewMode = false,
 }: MondaiNavSidebarProps) {
   const navigate = useNavigate();
   const answeredCount = Object.keys(answers).length;
+  const flaggedCount = flaggedQuestions?.size || 0;
   const isFullExam = !currentSection;
 
   return (
@@ -40,18 +43,27 @@ export function MondaiNavSidebar({
       <div className="rounded-3xl border border-border/80 bg-card/80 backdrop-blur-xl p-5 shadow-lg space-y-4">
         {/* Title */}
         <div className="flex items-center gap-2 text-accent font-bold text-sm">
-          <Layers className="size-4" />
-          <span>{currentSection ? currentSection.title : "Toàn bộ đề thi"}</span>
+          <Layers className="size-4 shrink-0" />
+          <span className="truncate">
+            {currentSection ? formatMondaiTitle(currentSection.title) : "Toàn bộ đề thi"}
+          </span>
         </div>
 
         {/* Progress & Timer Row */}
         <div className="flex items-center justify-between gap-3">
-          <span className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-secondary text-muted-foreground">
-            Đã làm <strong className="text-foreground">{answeredCount}</strong>/{allQuestions.length} câu
-          </span>
+          <div className="space-y-0.5">
+            <span className="text-xs font-semibold px-3 py-1.5 rounded-xl bg-secondary text-muted-foreground">
+              Đã làm <strong className="text-foreground">{answeredCount}</strong>/{allQuestions.length} câu
+            </span>
+            {flaggedCount > 0 && (
+              <p className="text-[10px] text-amber-400 font-semibold pl-1">
+                🚩 {flaggedCount} câu đã gắn cờ
+              </p>
+            )}
+          </div>
 
           {!reviewMode && (
-            <ExamTimer initialMinutes={timeLimitMinutes} onTimeUp={onTimeUp} />
+            <ExamTimer secondsRemaining={secondsRemaining} />
           )}
         </div>
 
@@ -72,6 +84,7 @@ export function MondaiNavSidebar({
       <QuestionMatrix
         questions={allQuestions}
         answers={answers}
+        flaggedQuestions={flaggedQuestions}
         activeQuestionId={activeQuestionId}
         onSelectQuestion={onSelectQuestion}
         reviewMode={reviewMode}
@@ -97,7 +110,7 @@ export function MondaiNavSidebar({
                   : "text-muted-foreground hover:bg-secondary hover:text-foreground"
               )}
             >
-              <span>⭐ Toàn bộ đề thi ({exam.totalQuestions} câu)</span>
+              <span>★ Toàn bộ đề thi ({exam.totalQuestions} câu)</span>
               <ChevronRight className="size-3.5 opacity-50" />
             </button>
 
@@ -105,6 +118,7 @@ export function MondaiNavSidebar({
             {exam.sections.map((sec) => {
               const isCurrent = currentSection?.id === sec.id;
               const hasScore = sec.userBestScore !== undefined && sec.userBestScore !== null;
+              const titleWithDiacritics = formatMondaiTitle(sec.title);
 
               return (
                 <button
@@ -119,7 +133,7 @@ export function MondaiNavSidebar({
                   )}
                 >
                   <div className="flex items-center gap-2 truncate pr-1">
-                    <span className="truncate">{sec.title}</span>
+                    <span className="truncate">{titleWithDiacritics}</span>
                   </div>
 
                   <div className="flex items-center gap-1.5 shrink-0">
@@ -142,3 +156,4 @@ export function MondaiNavSidebar({
     </div>
   );
 }
+

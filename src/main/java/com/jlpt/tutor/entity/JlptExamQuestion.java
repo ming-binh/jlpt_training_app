@@ -8,7 +8,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "jlpt_exam_question")
+@Table(name = "jlpt_exam_question", indexes = {
+    @Index(name = "idx_question_section_id", columnList = "section_id"),
+    @Index(name = "idx_question_section_order", columnList = "section_id, questionNumber, orderIndex")
+})
 @Data
 @Builder
 @NoArgsConstructor

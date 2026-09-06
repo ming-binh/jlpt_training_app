@@ -1,5 +1,5 @@
 import React from "react";
-import { CheckCircle2, XCircle, Sparkles, HelpCircle } from "lucide-react";
+import { CheckCircle2, XCircle, Sparkles, HelpCircle, Flag } from "lucide-react";
 import { type ExamQuestion } from "@/services/exam.service";
 import { cn } from "@/lib/utils";
 
@@ -10,6 +10,9 @@ interface QuestionItemProps {
   onSelectOption?: (option: number) => void;
   reviewMode?: boolean;
   onAskAi?: (question: ExamQuestion) => void;
+  isFlagged?: boolean;
+  onToggleFlag?: (questionId: number) => void;
+  isActive?: boolean;
 }
 
 export function QuestionItem({
@@ -19,6 +22,9 @@ export function QuestionItem({
   onSelectOption,
   reviewMode = false,
   onAskAi,
+  isFlagged = false,
+  onToggleFlag,
+  isActive = false,
 }: QuestionItemProps) {
   const options = [
     { num: 1, text: question.option1 },
@@ -29,9 +35,33 @@ export function QuestionItem({
 
   // Render question text with underlined emphasis if specified
   const renderQuestionText = () => {
-    const raw = question.questionText;
-    const target = question.underlinedText;
+    const raw = question.questionText || "";
 
+    // 1. If raw contains HTML <u> tags (e.g. あの<u>山</u>は高いです。)
+    if (raw.includes("<u>") && raw.includes("</u>")) {
+      const parts = raw.split(/(<u>.*?<\/u>)/g);
+      return (
+        <span>
+          {parts.map((part, i) => {
+            if (part.startsWith("<u>") && part.endsWith("</u>")) {
+              const content = part.slice(3, -5);
+              return (
+                <span
+                  key={i}
+                  className="font-bold text-accent underline underline-offset-4 decoration-2"
+                >
+                  {content}
+                </span>
+              );
+            }
+            return <React.Fragment key={i}>{part}</React.Fragment>;
+          })}
+        </span>
+      );
+    }
+
+    // 2. If target underlinedText is specified
+    const target = question.underlinedText;
     if (target && raw.includes(target)) {
       const parts = raw.split(target);
       return (
@@ -45,7 +75,7 @@ export function QuestionItem({
       );
     }
 
-    // Support markdown style _word_
+    // 3. Support markdown style _word_
     if (raw.includes("_")) {
       const regex = /_([^_]+)_/g;
       const elements: (string | React.ReactNode)[] = [];
@@ -77,6 +107,7 @@ export function QuestionItem({
       id={`q-${question.id}`}
       className={cn(
         "rounded-3xl border p-6 transition-all duration-200 bg-card/60 backdrop-blur-sm",
+        isActive && !reviewMode && "ring-2 ring-accent/60 shadow-[0_0_24px_rgba(245,158,11,0.14)] border-accent/80",
         reviewMode
           ? question.isCorrect
             ? "border-emerald-500/30 bg-emerald-500/5"
@@ -97,31 +128,50 @@ export function QuestionItem({
           </span>
         </div>
 
-        {reviewMode && (
-          <div className="flex items-center gap-2">
-            {question.isCorrect ? (
-              <span className="flex items-center gap-1 text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/30">
-                <CheckCircle2 className="size-3.5" /> Chính xác
-              </span>
-            ) : (
-              <span className="flex items-center gap-1 text-xs font-bold text-rose-400 bg-rose-500/10 px-2.5 py-1 rounded-full border border-rose-500/30">
-                <XCircle className="size-3.5" /> Chưa đúng
-              </span>
-            )}
+        <div className="flex items-center gap-2">
+          {/* Flag/Bookmark button — only in taking mode */}
+          {!reviewMode && onToggleFlag && (
+            <button
+              type="button"
+              onClick={() => onToggleFlag(question.id)}
+              title={isFlagged ? "Bỏ gắn cờ câu này" : "Gắn cờ câu chưa chắc để xem lại"}
+              className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full border transition-all cursor-pointer ${
+                isFlagged
+                  ? "bg-amber-500/20 text-amber-400 border-amber-500/40 hover:bg-amber-500/30"
+                  : "bg-secondary/50 text-muted-foreground border-border/60 hover:border-amber-500/40 hover:text-amber-400"
+              }`}
+            >
+              <Flag className={`size-3.5 ${isFlagged ? "fill-amber-400" : ""}`} />
+              <span>{isFlagged ? "Đã gắn cờ" : "Gắn cờ"}</span>
+            </button>
+          )}
 
-            {onAskAi && (
-              <button
-                type="button"
-                onClick={() => onAskAi(question)}
-                className="flex items-center gap-1 text-xs font-bold text-accent bg-accent/10 px-3 py-1 rounded-full border border-accent/30 hover:bg-accent/20 transition-all cursor-pointer"
-                title="Hỏi trợ lý AI giải thích câu này"
-              >
-                <Sparkles className="size-3.5 text-accent animate-pulse" />
-                <span>Hỏi AI</span>
-              </button>
-            )}
-          </div>
-        )}
+          {reviewMode && (
+            <>
+              {question.isCorrect ? (
+                <span className="flex items-center gap-1 text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/30">
+                  <CheckCircle2 className="size-3.5" /> Chính xác
+                </span>
+              ) : (
+                <span className="flex items-center gap-1 text-xs font-bold text-rose-400 bg-rose-500/10 px-2.5 py-1 rounded-full border border-rose-500/30">
+                  <XCircle className="size-3.5" /> Chưa đúng
+                </span>
+              )}
+
+              {onAskAi && (
+                <button
+                  type="button"
+                  onClick={() => onAskAi(question)}
+                  className="flex items-center gap-1 text-xs font-bold text-accent bg-accent/10 px-3 py-1 rounded-full border border-accent/30 hover:bg-accent/20 transition-all cursor-pointer"
+                  title="Hỏi trợ lý AI giải thích câu này"
+                >
+                  <Sparkles className="size-3.5 text-accent animate-pulse" />
+                  <span>Hỏi AI</span>
+                </button>
+              )}
+            </>
+          )}
+        </div>
       </div>
 
       {/* Question Content */}

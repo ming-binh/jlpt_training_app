@@ -30,6 +30,7 @@ public class ExamDataInitializer {
     @EventListener(ApplicationReadyEvent.class)
     @Transactional
     public void initExams() {
+        sanitizeExistingExamTitles();
         try {
             ClassPathResource resource = new ClassPathResource("data/jlpt_exams.json");
             if (!resource.exists()) {
@@ -125,6 +126,60 @@ public class ExamDataInitializer {
             }
         } catch (Exception e) {
             log.error("Failed to seed JLPT exams: {}", e.getMessage(), e);
+        }
+    }
+
+    private void sanitizeExistingExamTitles() {
+        try {
+            List<JlptExam> exams = examRepository.findAll();
+            for (JlptExam exam : exams) {
+                boolean changed = false;
+                String title = exam.getTitle();
+                if (title != null) {
+                    String newTitle = title
+                            .replace("De thi", "Đề thi")
+                            .replace("Thang", "Tháng");
+                    if (!newTitle.equals(title)) {
+                        exam.setTitle(newTitle);
+                        changed = true;
+                    }
+                }
+                String desc = exam.getDescription();
+                if (desc != null && desc.startsWith("De thi")) {
+                    exam.setDescription("Đề thi chính thức kỳ thi Năng lực Nhật ngữ " + exam.getJlptLevel() + " đợt tháng " + exam.getMonth() + "/" + exam.getYear() + ". Cấp độ nhập môn tiếng Nhật.");
+                    changed = true;
+                }
+                if (exam.getSections() != null) {
+                    for (JlptExamSection sec : exam.getSections()) {
+                        String secTitle = sec.getTitle();
+                        if (secTitle != null) {
+                            String newSecTitle = secTitle
+                                    .replace("Doc chu Han", "Đọc chữ Hán")
+                                    .replace("Viet chu Han", "Viết chữ Hán")
+                                    .replace("Dien tu vao cho trong", "Điền từ vào chỗ trống")
+                                    .replace("Tu dong nghia", "Từ đồng nghĩa")
+                                    .replace("Cach dung tu", "Cách dùng từ")
+                                    .replace("Dien ngu phap thich hop cho cau", "Điền ngữ pháp thích hợp cho câu")
+                                    .replace("Sap xep thu tu tu trong cau (sao)", "Sắp xếp thứ tự trong câu (★)")
+                                    .replace("Sap xep thu tu trong cau (sao)", "Sắp xếp thứ tự trong câu (★)")
+                                    .replace("Ngu phap trong doan van", "Ngữ pháp trong đoạn văn")
+                                    .replace("Doc hieu doan van ngan", "Đọc hiểu đoạn văn ngắn")
+                                    .replace("Doc hieu doan van trung", "Đọc hiểu đoạn văn trung")
+                                    .replace("Doc hieu tim kiem thong tin", "Đọc hiểu tìm kiếm thông tin");
+                            if (!newSecTitle.equals(secTitle)) {
+                                sec.setTitle(newSecTitle);
+                                changed = true;
+                            }
+                        }
+                    }
+                }
+                if (changed) {
+                    examRepository.save(exam);
+                    log.info("Sanitized titles for exam: {}", exam.getCode());
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Could not sanitize exam titles: {}", e.getMessage());
         }
     }
 }

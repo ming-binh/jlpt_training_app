@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { Award, FileText, Search, RotateCcw } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Award, FileText, Search, RotateCcw, History } from "lucide-react";
 import { type Level } from "@/data/jlpt";
 import { LevelFilter } from "@/components/common/level-filter";
 import { AppHeader } from "@/components/common/app-header";
 import { FadeIn } from "@/components/ui/fade-in";
 import { ExamCard } from "../components/ExamCard";
 import { examService, type ExamItem } from "@/services/exam.service";
+import { formatExamTitle } from "../utils/examFormatters";
 import { cn } from "@/lib/utils";
 
 type StatusFilterType = "all" | "done" | "passed" | "todo";
@@ -34,7 +36,8 @@ export function ExamListPage() {
     // Search match
     if (search.trim()) {
       const q = search.toLowerCase();
-      const matchTitle = e.title.toLowerCase().includes(q);
+      const formattedT = formatExamTitle(e.title).toLowerCase();
+      const matchTitle = e.title.toLowerCase().includes(q) || formattedT.includes(q);
       const matchDesc = e.description?.toLowerCase().includes(q);
       const matchCode = e.code.toLowerCase().includes(q);
       if (!matchTitle && !matchDesc && !matchCode) return false;
@@ -78,8 +81,8 @@ export function ExamListPage() {
               </p>
             </div>
 
-            {/* Quick stats mini cards */}
-            <div className="flex items-center gap-3">
+            {/* Quick stats mini cards & History button */}
+            <div className="flex flex-wrap items-center gap-3">
               <div className="rounded-2xl border border-border/80 bg-card/60 px-4 py-3 text-center">
                 <p className="text-[11px] font-semibold text-muted-foreground uppercase">Đã làm</p>
                 <p className="text-xl font-bold text-foreground mt-0.5">{attemptedCount} <span className="text-xs text-muted-foreground">/ {totalExams}</span></p>
@@ -88,6 +91,19 @@ export function ExamListPage() {
                 <p className="text-[11px] font-semibold text-emerald-400 uppercase">Đã đạt</p>
                 <p className="text-xl font-bold text-emerald-400 mt-0.5">{passedCount} <span className="text-xs text-emerald-400/70">đề</span></p>
               </div>
+              <Link
+                to="/luyen-de/lich-su"
+                className="flex flex-col items-center justify-center rounded-2xl border border-accent/40 bg-accent/10 hover:bg-accent/20 px-4 py-3 text-center transition-all cursor-pointer group"
+                title="Xem lại lịch sử và kết quả các bài thi đã làm"
+              >
+                <div className="flex items-center gap-1.5 text-[11px] font-bold text-accent uppercase">
+                  <History className="size-3.5 group-hover:rotate-[-20deg] transition-transform" />
+                  <span>Lịch sử thi</span>
+                </div>
+                <span className="text-[11px] text-muted-foreground mt-0.5 group-hover:text-foreground transition-colors font-medium">
+                  Xem lại tiến độ →
+                </span>
+              </Link>
             </div>
           </div>
         </FadeIn>

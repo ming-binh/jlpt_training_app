@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,6 +52,17 @@ public class ExamService {
             }
         }
 
+        List<Long> examIds = exams.stream().map(JlptExam::getId).collect(Collectors.toList());
+        Map<Long, Integer> questionCountBySectionId = new HashMap<>();
+        if (!examIds.isEmpty()) {
+            List<Object[]> counts = questionRepository.countQuestionsBySectionForExamIds(examIds);
+            for (Object[] row : counts) {
+                if (row[0] != null && row[1] != null) {
+                    questionCountBySectionId.put((Long) row[0], ((Number) row[1]).intValue());
+                }
+            }
+        }
+
         return exams.stream().map(exam -> {
             List<JlptExamAttempt> attempts = userAttemptsByExam.getOrDefault(exam.getId(), Collections.emptyList());
 
@@ -74,11 +86,11 @@ public class ExamService {
             }
 
             List<ExamSectionDto> sectionDtos = exam.getSections().stream()
-                    .map(s -> mapSectionSummary(s, attempts))
+                    .map(s -> mapSectionSummary(s, attempts, questionCountBySectionId.getOrDefault(s.getId(), 0)))
                     .collect(Collectors.toList());
 
             int totalQuestions = exam.getSections().stream()
-                    .mapToInt(s -> s.getQuestions().size())
+                    .mapToInt(s -> questionCountBySectionId.getOrDefault(s.getId(), 0))
                     .sum();
 
             return ExamDto.builder()
@@ -111,9 +123,21 @@ public class ExamService {
                 ? attemptRepository.findByUserIdAndExamIdOrderBySubmittedAtDesc(userId, examId)
                 : Collections.emptyList();
 
+        List<Object[]> counts = questionRepository.countQuestionsBySectionForExamIds(List.of(examId));
+        Map<Long, Integer> questionCountBySectionId = new HashMap<>();
+        for (Object[] row : counts) {
+            if (row[0] != null && row[1] != null) {
+                questionCountBySectionId.put((Long) row[0], ((Number) row[1]).intValue());
+            }
+        }
+
         List<ExamSectionDto> sectionDtos = exam.getSections().stream()
-                .map(s -> mapSectionSummary(s, attempts))
+                .map(s -> mapSectionSummary(s, attempts, questionCountBySectionId.getOrDefault(s.getId(), 0)))
                 .collect(Collectors.toList());
+
+        int totalQuestions = exam.getSections().stream()
+                .mapToInt(s -> questionCountBySectionId.getOrDefault(s.getId(), 0))
+                .sum();
 
         return ExamDto.builder()
                 .id(exam.getId())
@@ -123,7 +147,7 @@ public class ExamService {
                 .year(exam.getYear())
                 .month(exam.getMonth())
                 .totalTimeMinutes(exam.getTotalTimeMinutes())
-                .totalQuestions(exam.getSections().stream().mapToInt(s -> s.getQuestions().size()).sum())
+                .totalQuestions(totalQuestions > 0 ? totalQuestions : exam.getTotalQuestions())
                 .description(exam.getDescription())
                 .isPublished(exam.getIsPublished())
                 .sections(sectionDtos)
@@ -283,7 +307,23 @@ public class ExamService {
         }
 
         double percentage = maxScore > 0 ? ((double) score / maxScore) * 100.0 : 0.0;
-        boolean isPassed = percentage >= 50.0; // 50% standard benchmark
+        boolean isPassed;
+        if (request.getSectionId() != null) {
+            // Luyện tập từng phần (Mondai riêng lẻ): chuẩn 50%
+            isPassed = percentage >= 50.0;
+        } else {
+            // Thi toàn bộ đề thi chuẩn hóa theo ngưỡng đỗ chính thức của JEES (thang điểm 180)
+            String level = exam.getJlptLevel() != null ? exam.getJlptLevel().toUpperCase() : "";
+            double passingThreshold = switch (level) {
+                case "N5" -> 44.4; // Điểm chuẩn đậu N5 >= 80/180 (~44.4%)
+                case "N4" -> 50.0; // Điểm chuẩn đậu N4 >= 90/180 (50.0%)
+                case "N3" -> 52.8; // Điểm chuẩn đậu N3 >= 95/180 (~52.8%)
+                case "N2" -> 50.0; // Điểm chuẩn đậu N2 >= 90/180 (50.0%)
+                case "N1" -> 55.6; // Điểm chuẩn đậu N1 >= 100/180 (~55.6%)
+                default -> 50.0;
+            };
+            isPassed = percentage >= passingThreshold;
+        }
         int xpEarned = correctCount * 5 + (isPassed ? 25 : 0);
 
         String effectiveUserId = userId != null ? userId : "guest_" + UUID.randomUUID();
@@ -415,11 +455,21 @@ public class ExamService {
         if (userId == null) return Collections.emptyList();
 
         List<JlptExamAttempt> attempts = attemptRepository.findByUserIdOrderBySubmittedAtDesc(userId);
+        if (attempts.isEmpty()) return Collections.emptyList();
+
+        Set<Long> sectionIds = attempts.stream()
+                .map(JlptExamAttempt::getSectionId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        Map<Long, JlptExamSection> sectionMap = sectionIds.isEmpty()
+                ? Collections.emptyMap()
+                : sectionRepository.findAllById(sectionIds).stream()
+                        .collect(Collectors.toMap(JlptExamSection::getId, Function.identity()));
+
         return attempts.stream().map(a -> {
             JlptExam exam = a.getExam();
-            JlptExamSection section = a.getSectionId() != null
-                    ? sectionRepository.findById(a.getSectionId()).orElse(null)
-                    : null;
+            JlptExamSection section = a.getSectionId() != null ? sectionMap.get(a.getSectionId()) : null;
 
             double pct = a.getMaxScore() > 0 ? ((double) a.getScore() / a.getMaxScore()) * 100.0 : 0.0;
 
@@ -447,11 +497,15 @@ public class ExamService {
         }).collect(Collectors.toList());
     }
 
-    private ExamSectionDto mapSectionSummary(JlptExamSection s, List<JlptExamAttempt> attempts) {
+    private ExamSectionDto mapSectionSummary(JlptExamSection s, List<JlptExamAttempt> attempts, int questionCount) {
         JlptExamAttempt sectionBest = attempts.stream()
                 .filter(a -> Objects.equals(a.getSectionId(), s.getId()))
                 .max(Comparator.comparingInt(a -> a.getScore() != null ? a.getScore() : 0))
                 .orElse(null);
+
+        int effectiveCount = questionCount > 0
+                ? questionCount
+                : (s.getQuestions() != null ? s.getQuestions().size() : 0);
 
         return ExamSectionDto.builder()
                 .id(s.getId())
@@ -464,7 +518,7 @@ public class ExamService {
                 .audioUrl(s.getAudioUrl())
                 .timeLimitMinutes(s.getTimeLimitMinutes())
                 .orderIndex(s.getOrderIndex())
-                .questionCount(s.getQuestions().size())
+                .questionCount(effectiveCount)
                 .userBestScore(sectionBest != null ? sectionBest.getScore() : null)
                 .userMaxScore(sectionBest != null ? sectionBest.getMaxScore() : null)
                 .userPassed(sectionBest != null ? sectionBest.getIsPassed() : null)

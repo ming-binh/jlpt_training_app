@@ -13,6 +13,14 @@ spring:
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 10000
+      idle-timeout: 60000
+      max-lifetime: 120000
+      keepalive-time: 30000
+      leak-detection-threshold: 10000
   jpa:
     open-in-view: false
     hibernate:
@@ -21,7 +29,6 @@ spring:
     properties:
       hibernate:
         format_sql: false
-        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 ai:
   rate-limit:
